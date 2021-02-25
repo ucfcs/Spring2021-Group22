@@ -1,0 +1,8 @@
+.DS_Store
+.settings/
+.classpath
+.project
+target
+install.command
+.factorypath
+dependency-reduced-pom.xml
