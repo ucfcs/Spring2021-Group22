@@ -130,7 +130,7 @@ public class RemoteAPI {
 			return;
 		data.put("epilogServerID", serverID);
 		data.put("email", email);
-		data.put("serverName", this.plugin.getServer().getServerName());
+		data.put("serverName", this.plugin.getServer().getName());
 		Request request = new Request("access", data, null);
 		this.addRequest(request);
 		// TODO: add response handler to provide feedback

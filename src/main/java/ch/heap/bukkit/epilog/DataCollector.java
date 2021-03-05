@@ -348,8 +348,9 @@ public class DataCollector {
 		data.put("port", server.getPort()); // int
 		data.put("viewDistance", server.getViewDistance()); // int
 		data.put("ip", server.getIp()); // String
-		data.put("serverName", server.getServerName()); // String
-		data.put("serverId", server.getServerId()); // String
+		data.put("serverName", server.getName()); // String
+		//TODO this method was removed in (I think?) Bukkit 1.14
+		// data.put("serverId", server.getId()); // String
 		data.put("worldType", server.getWorldType()); // String
 		data.put("generateStructures", server.getGenerateStructures() ? 1 : 0); // boolean
 		data.put("allowEnd", server.getAllowEnd() ? 1 : 0); // boolean
