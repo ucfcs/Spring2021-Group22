@@ -15,6 +15,7 @@ import java.security.cert.Certificate;
 import java.security.KeyStore;
 import java.security.cert.CertificateFactory;
 import java.util.ArrayDeque;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,8 +31,9 @@ import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.JSONArray;
+
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import org.bson.Document;
 
@@ -46,10 +48,10 @@ public class RemoteAPI {
 	private int logSendLimit = 5000;
 	private int previousLogSize = Integer.MAX_VALUE;
 	private boolean logSendRequestPending = false;
-	private ArrayDeque<JSONObject> pendingLogs = new ArrayDeque<JSONObject>();
+	private ArrayDeque<Map<String, Object>> pendingLogs = new ArrayDeque<>();
 	public int skippedLogs = 0;
 
-	private BlockingQueue<JSONObject> logQueue = new LinkedBlockingQueue<JSONObject>();
+	private BlockingQueue<Map<String, Object>> logQueue = new LinkedBlockingQueue<>();
 	private BlockingQueue<Request> requests = new LinkedBlockingQueue<Request>();
 	private Postman postman = null;
 
@@ -105,26 +107,21 @@ public class RemoteAPI {
 
 
 		//Document doc = Document.parse(event.data.toString());
-		System.out.println(event.data.toString().replace('=', ':'));
-		Document doc = new Document();
-		doc.append("data", event.data.toString().replace('=', ':'));
-
+		// System.out.println(event.data.toString().replace('=', ':'));
+		Document doc = event.toDocument();
 		this.db.sendData(doc);
 	}
 
-	public void addLogData(JSONObject data) {
+	public void addLogData(Map<String, Object> data) {
 		//this.logQueue.add(data);
 
 		//Document doc = Document.parse(data.toString());
-		System.out.println(data.toString().replace('=', ':'));
-		Document doc = new Document();
-		doc.append("data", data.toString().replace('=', ':'));
-
+		Document doc = new Document(data);
 		this.db.sendData(doc);
 	}
 
 	public void accessRequest(String email) {
-		final JSONObject data = new JSONObject();
+		final Map<String, Object> data = new HashMap<>();
 		String serverID = this.getPrivateServerID();
 		if (serverID == null)
 			return;
@@ -233,13 +230,13 @@ public class RemoteAPI {
 			final int toSkip = logSize - this.logCacheLimit + 1;
 			int skipped = 0;
 			while (toSkip > skipped) {
-				JSONObject log = this.pendingLogs.poll();
+				Map<String, Object> log = this.pendingLogs.poll();
 				if (log == null)
 					break;
 				skipped += 1;
 			}
 			while (toSkip > skipped) {
-				JSONObject log = this.logQueue.poll();
+				Map<String, Object> log = this.logQueue.poll();
 				if (log == null)
 					break;
 				skipped += 1;
@@ -255,7 +252,7 @@ public class RemoteAPI {
 		if (n > this.logSendLimit)
 			n = this.logSendLimit;
 		while (this.pendingLogs.size() < n) {
-			JSONObject log = this.logQueue.poll();
+			Map<String, Object> log = this.logQueue.poll();
 			if (log == null)
 				break;
 			this.pendingLogs.add(log);
@@ -274,7 +271,7 @@ public class RemoteAPI {
 			if (plugin == null)
 				continue;
 			try {
-				Method method = plugin.getClass().getMethod("onLogSendRequestPrepare", JSONObject.class);
+				Method method = plugin.getClass().getMethod("onLogSendRequestPrepare", Map.class);
 				method.invoke(plugin, request.info);
 			} catch (Exception e) {
 			}
@@ -303,7 +300,7 @@ public class RemoteAPI {
 		LogEvent event = new LogEvent("Worlds", System.currentTimeMillis(), null);
 		event.data.put("worlds", plugin.dataCollector.getWorlds(only));
 		event.data.put("cause", "token");
-		Request request = new Request("worlds", event.toJSON(), null);
+		Request request = new Request("worlds", event.toMap(), null);
 		sendRequest(request);
 		return true;
 	}
@@ -326,7 +323,7 @@ public class RemoteAPI {
 		String id = this.getPrivateServerID();
 		event.data.put("epilogServerID", id);
 
-		Request request = new Request("token", event.toJSON(), new RequestDelegate() {
+		Request request = new Request("token", event.toMap(), new RequestDelegate() {
 			@Override
 			public void response(boolean success, JSONObject answer) {
 				if (answer == null)
@@ -393,12 +390,12 @@ public class RemoteAPI {
 
 	public class Request {
 		public String cmd = null;
-		public Collection<JSONObject> data = null;
+		public Collection<Map<String, Object>> data = null;
 		public RequestDelegate delegate = null;
 		public boolean callDelegateInGameLoop = false;
 		public boolean requiresServerToken = true;
 		public long dispatchTime = 0;
-		public JSONObject info = new JSONObject();
+		public Map<String, Object> info = new HashMap<>();
 
 		public Request(String cmd, RequestDelegate delegate) {
 			this.cmd = cmd;
@@ -411,27 +408,27 @@ public class RemoteAPI {
 			this.delegate = delegate;
 		}
 
-		public Request(String cmd, JSONObject data, RequestDelegate delegate) {
+		public Request(String cmd, Map<String, Object> data, RequestDelegate delegate) {
 			this.cmd = cmd;
 			this.setData(data);
 			this.delegate = delegate;
 		}
 
-		public void setData(ArrayDeque<JSONObject> data) {
+		public void setData(ArrayDeque<Map<String, Object>> data) {
 			this.data = data;
 		}
 
-		public void setData(JSONObject data) {
+		public void setData(Map<String, Object> data) {
 			if (data == null) {
 				this.data = null;
 			} else {
-				ArrayList<JSONObject> dataList = new ArrayList<JSONObject>();
+				ArrayList<Map<String, Object>> dataList = new ArrayList<>();
 				dataList.add(data);
 				this.data = dataList;
 			}
 		}
 
-		public void addInfo(JSONObject info) {
+		public void addInfo(Map<String, Object> info) {
 			if (info == null)
 				return;
 			for (String key : info.keySet()) {
@@ -511,10 +508,10 @@ public class RemoteAPI {
 		}*/
 
 
-		Document doc = new Document();
-		doc.parse(request.data.toString());
-
-		db.sendData(doc);
+		for (Map<String, Object> req : request.data) {
+			Document doc = new Document(req);
+			db.sendData(doc);
+		}
 	}
 
 	

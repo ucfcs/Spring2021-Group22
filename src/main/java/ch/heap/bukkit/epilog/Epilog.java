@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -42,9 +43,10 @@ public class Epilog extends JavaPlugin {
 
 	private DatabaseDriver db;
 	
-	private String statePath = null;
-	private JSONObject state = null;
-	public JSONObject config = null;
+	//TODO bring state back eventually
+	// private String statePath = null;
+	// private JSONObject state = null;
+	public Map<String, Object> config = null;
 	
 	public boolean isLogging = false;
 	public List<String> connectedPlugins = new ArrayList<String>();
@@ -90,10 +92,10 @@ public class Epilog extends JavaPlugin {
 
 		this.versionCheck();
 		this.version = this.getDescription().getVersion();
-		this.loadState();
+		// this.loadState();
 		eventNotifier = new EventNotifier();
 		remote = new RemoteAPI(this, db);
-		remote.skippedLogs = this.state.optInt("skippedLogs", 0);
+		// remote.skippedLogs = this.state.optInt("skippedLogs", 0);
 		dataCollector = new DataCollector(this);
 		observers = new ArrayList<Observer>();
 		// load observers (they add themselves)
@@ -104,8 +106,8 @@ public class Epilog extends JavaPlugin {
 	}
 	
 	public void loadConfig(FileConfiguration config) {
-		JSONObject conf = this.configToJSON(config);
-		if (conf.similar(this.config)) return;
+		Map<String, Object> conf = this.configToMap(config);
+		if (conf.equals(this.config)) return;
 		boolean initial = this.config==null; 
 		this.config = conf;
 		LogEvent changeEvent = initial ? null : epilogStateEvent("configChange", true);
@@ -143,7 +145,7 @@ public class Epilog extends JavaPlugin {
 		// flush cache and stop sending data to logging server
 		// might trigger new events which are ignored
 		remote.stop(); 
-		this.state.put("skippedLogs", remote.skippedLogs);
+		// this.state.put("skippedLogs", remote.skippedLogs);
 		remote = null;
 		// stop event notification thread
 		if (eventNotifier!=null) {
@@ -156,7 +158,7 @@ public class Epilog extends JavaPlugin {
 		observers = null;
 		inventoryTracker = null;
 		informant = null;
-		this.saveState();
+		// this.saveState();
 	}
 	
 	public LogEvent epilogStateEvent(String trigger, boolean includeConfig) {
@@ -164,7 +166,7 @@ public class Epilog extends JavaPlugin {
 		event.data.put("trigger", trigger);
 		event.data.put("onlinePlayers", this.dataCollector.getOnlinePlayers());
 		if (this.config!=null) {
-			boolean loggingEnabled = this.config.getBoolean("loggingEnabled");
+			boolean loggingEnabled = ((Boolean) this.config.get("loggingEnabled")).booleanValue();
 			// TODO: solve more elegantly
 			boolean canLog = loggingEnabled;
 			if (this.isLogging!=canLog) {
@@ -212,7 +214,7 @@ public class Epilog extends JavaPlugin {
 	
 	// remote api functions
 	
-	public void log(JSONObject data) {
+	public void log(Map<String, Object> data) {
 		remote.addLogData(data);
 	}
 	
@@ -229,7 +231,7 @@ public class Epilog extends JavaPlugin {
 		postEvent(event);
 	}
 	
-	public void sendRequest(String cmd, JSONObject info) {
+	public void sendRequest(String cmd, Map<String, Object> info) {
 		RemoteAPI.Request request = this.remote.new Request(cmd, null, null);
 		request.addInfo(info);
 		remote.addRequest(request);
@@ -309,8 +311,8 @@ public class Epilog extends JavaPlugin {
 	
 	// configuration helpers
 	
-	private JSONObject configToJSON(FileConfiguration config) {
-		JSONObject conf = new JSONObject();
+	private Map<String, Object> configToMap(FileConfiguration config) {
+		Map<String, Object> conf = new HashMap<>();
 		conf.put("logSendPeriod", config.getInt("log-send-period", 10*1000)); // 10 s
 		conf.put("heartbeatSendPeriod", config.getInt("heartbeat-send-period", 5*60*1000)); // 5 min
 		conf.put("loggingEnabled", config.getBoolean("logging-enabled", true));
@@ -324,53 +326,53 @@ public class Epilog extends JavaPlugin {
 		return conf;
 	}
 	
-	private void loadConfig(JSONObject conf) {
-		this.logSendPeriod = conf.getInt("logSendPeriod");
-		this.heartbeatSendPeriod = conf.getInt("heartbeatSendPeriod");
-		this.loggingEnabled = conf.getBoolean("loggingEnabled");
-		this.logChats = conf.getBoolean("logChats");
-		this.useEvaluationServer = conf.getBoolean("useEvaluationServer");
-		this.notifications = conf.getBoolean("notifications");
-		this.loggingInfo = conf.getBoolean("loggingInfo");
-		this.ingameCommands = conf.getBoolean("ingameCommands");
-		this.debugMode = conf.getBoolean("debugMode");
-		this.mongoURI = conf.getString("mongoURI");
+	private void loadConfig(Map<String, Object> conf) {
+		this.logSendPeriod = ((Integer) conf.get("logSendPeriod")).intValue();
+		this.heartbeatSendPeriod = ((Integer) conf.get("heartbeatSendPeriod")).intValue();
+		this.loggingEnabled = ((Boolean) conf.get("loggingEnabled")).booleanValue();
+		this.logChats = ((Boolean) conf.get("logChats")).booleanValue();
+		this.useEvaluationServer = ((Boolean) conf.get("useEvaluationServer")).booleanValue();
+		this.notifications = ((Boolean) conf.get("notifications")).booleanValue();
+		this.loggingInfo = ((Boolean) conf.get("loggingInfo")).booleanValue();
+		this.ingameCommands = ((Boolean) conf.get("ingameCommands")).booleanValue();
+		this.debugMode = ((Boolean) conf.get("debugMode")).booleanValue();
+		this.mongoURI = ((String) conf.get("mongoURI"));
 	}
 	
 	// state functions
 	
-	private void loadState() {
-		this.state = null;
-		try {
-			InputStream is = new FileInputStream(this.getStatePath());
-			this.state = new JSONObject(new JSONTokener(is));
-			is.close();
-		} catch (FileNotFoundException e) {} catch (Exception e) {e.printStackTrace();};
-		if (this.state==null) {
-			this.state = new JSONObject();
-		}
-	}
+	// private void loadState() {
+	// 	this.state = null;
+	// 	try {
+	// 		InputStream is = new FileInputStream(this.getStatePath());
+	// 		this.state = new JSONObject(new JSONTokener(is));
+	// 		is.close();
+	// 	} catch (FileNotFoundException e) {} catch (Exception e) {e.printStackTrace();};
+	// 	if (this.state==null) {
+	// 		this.state = new JSONObject();
+	// 	}
+	// }
 	
-	public void saveState() {
-		// write state file
-		try {
-			PrintWriter writer = new PrintWriter(this.getStatePath(), "UTF-8");
-			this.state.write(writer);
-			writer.close();
-			// System.out.println("state saved");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	// public void saveState() {
+	// 	// write state file
+	// 	try {
+	// 		PrintWriter writer = new PrintWriter(this.getStatePath(), "UTF-8");
+	// 		this.state.write(writer);
+	// 		writer.close();
+	// 		// System.out.println("state saved");
+	// 	} catch (Exception e) {
+	// 		e.printStackTrace();
+	// 	}
+	// }
 	
-	private String getStatePath() {
-		if (statePath==null) {
-			File dataFolder = this.getDataFolder();
-			dataFolder.mkdirs();
-			statePath = dataFolder.getAbsolutePath() + File.separator + "state.json";
-		}
-		return statePath;
-	}
+	// private String getStatePath() {
+	// 	if (statePath==null) {
+	// 		File dataFolder = this.getDataFolder();
+	// 		dataFolder.mkdirs();
+	// 		statePath = dataFolder.getAbsolutePath() + File.separator + "state.json";
+	// 	}
+	// 	return statePath;
+	// }
 
 	public String getCurrentVersion() {
 		Plugin plugin = this.getServer().getPluginManager().getPlugin("epilog");

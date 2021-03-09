@@ -27,7 +27,7 @@ public class LogEvent {
 	}
 
 	public Document toDocument() {
-		Document doc = Document.parse(this.data.toString());
+		Document doc = new Document(this.data);
 
 		Player p = this.player;
 		if (p!=null) {
@@ -38,6 +38,18 @@ public class LogEvent {
 		doc.append("event", this.eventName);
 
 		return doc;
+	}
+
+	public Map<String, Object> toMap() {
+		Map<String, Object> data = new HashMap<>(this.data);
+		Player p = this.player;
+		if (p!=null) {
+			data.put("player", p.getUniqueId().toString());
+			data.put("worldUUID", p.getWorld().getUID().toString());
+		}
+		data.put("time", this.time);
+		data.put("event", this.eventName);
+		return data;
 	}
 
 	public JSONObject toJSON() {

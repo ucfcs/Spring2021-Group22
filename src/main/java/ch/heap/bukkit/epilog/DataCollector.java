@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -50,8 +52,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class DataCollector {
 	Epilog epilog = null;
@@ -324,19 +324,19 @@ public class DataCollector {
 //	    }
 	}
 	
-	public JSONArray getOnlinePlayers() {
+	public List<String> getOnlinePlayers() {
 		return playerArray(this.epilog.getServer().getOnlinePlayers());
 	}
 	
 	// collect server data
 	public void addServerMetaData(LogEvent logEvent) {
 		Server server = this.epilog.getServer();
-		JSONObject data = new JSONObject();
+		Map<String, Object> data = new HashMap<>();
 		
 		// get loaded plugins 
-		JSONArray plugins = new JSONArray();
+		List<Map<String, Object>> plugins = new ArrayList<>();
 		for (Plugin plugin : server.getPluginManager().getPlugins()) {
-			plugins.put(getPluginMetaData(plugin));
+			plugins.add(getPluginMetaData(plugin));
 		}
 		data.put("plugins", plugins);
 		
@@ -370,8 +370,8 @@ public class DataCollector {
 		logEvent.data.put("serverMeta", data);
 	}
 	
-	private static JSONObject getPluginMetaData(Plugin plugin) {
-		JSONObject data = new JSONObject();
+	private static Map<String, Object> getPluginMetaData(Plugin plugin) {
+		Map<String, Object> data = new HashMap<>();
 		PluginDescriptionFile desc = plugin.getDescription();
 		data.put("name", desc.getName());
 		data.put("version", desc.getVersion());
@@ -381,9 +381,9 @@ public class DataCollector {
 		return data;
 	}
 	
-	public JSONObject getWorlds(World only) {
+	public Map<String, Object> getWorlds(World only) {
 		Server server = this.epilog.getServer();
-		JSONObject worlds = new JSONObject();
+		Map<String, Object> worlds = new HashMap<>();
 		for (World world : server.getWorlds()) {
 			if (only!=null && !world.equals(only)) continue;
 			worlds.put(world.getUID().toString(), getWorldMetaData(world));
@@ -391,8 +391,8 @@ public class DataCollector {
 		return worlds;
 	}
 	
-	private static JSONObject getWorldMetaData(World world) {
-		JSONObject data = new JSONObject();
+	private static Map<String, Object> getWorldMetaData(World world) {
+		Map<String, Object> data = new HashMap<>();
 		
 		// collect some more possibly usefull properties
 //		data.put("entities", world.getEntities()); // List<Entity>
@@ -421,7 +421,7 @@ public class DataCollector {
 		data.put("ticksPerMonsterSpawns", world.getTicksPerMonsterSpawns()); // long
 		
 		data.put("uuid", world.getUID().toString()); // string
-		JSONObject spawnLocation = new JSONObject();
+		Map<String, Object> spawnLocation = new HashMap<>();
 		Location loc = world.getSpawnLocation();
 		spawnLocation.put("x", loc.getX());
 		spawnLocation.put("y", loc.getY());
@@ -433,10 +433,10 @@ public class DataCollector {
 		return data;
 	}
 	
-	private static JSONArray playerArray(Collection<? extends OfflinePlayer> playerSet) {
-		JSONArray result = new JSONArray();
+	private static List<String> playerArray(Collection<? extends OfflinePlayer> playerSet) {
+		List<String> result = new ArrayList<>();
 		for (OfflinePlayer p : playerSet) {
-			result.put(p.getUniqueId().toString());
+			result.add(p.getUniqueId().toString());
 		}
 		return result;
 	}
