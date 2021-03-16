@@ -340,6 +340,7 @@ public class DataCollector {
 		}
 		data.put("plugins", plugins);
 		
+		//TODO fix comments
 		// collect some more possibly usefull properties
 		data.put("name", server.getName()); // String
 		data.put("version", server.getVersion()); // String
@@ -363,7 +364,7 @@ public class DataCollector {
 		data.put("onlineMode", server.getOnlineMode() ? 1 : 0); // boolean
 		data.put("allowFlight", server.getAllowFlight() ? 1 : 0); // boolean
 		
-		data.put("ipBans", server.getIPBans()); // Set<String>
+		data.put("ipBans", asList(server.getIPBans())); // Set<String>
 		data.put("bannedPlayers", playerArray(server.getBannedPlayers())); // Set<OfflinePlayer>
 		data.put("operators", playerArray(server.getOperators())); // Set<OfflinePlayer>
 		
@@ -375,9 +376,10 @@ public class DataCollector {
 		PluginDescriptionFile desc = plugin.getDescription();
 		data.put("name", desc.getName());
 		data.put("version", desc.getVersion());
-		if (desc.getCommands()!=null) {
-			data.put("commands", desc.getCommands().keySet().toArray());
-		}
+		// TODO why do we need this ???
+		// if (desc.getCommands()!=null) {
+		// 	data.put("commands", desc.getCommands().keySet().toArray());
+		// }
 		return data;
 	}
 	
@@ -431,6 +433,12 @@ public class DataCollector {
 		data.put("spawnLocation", spawnLocation);
 		
 		return data;
+	}
+
+	private static <T> List<T> asList(Collection<T> set) {
+		List<T> result = new ArrayList<>();
+		result.addAll(set);
+		return result;
 	}
 	
 	private static List<String> playerArray(Collection<? extends OfflinePlayer> playerSet) {

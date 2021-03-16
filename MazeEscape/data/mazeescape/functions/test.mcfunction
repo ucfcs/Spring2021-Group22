@@ -1,0 +1,1 @@
+effect give @a minecraft:glowing 3 1 true
