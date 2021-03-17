@@ -7,7 +7,6 @@ import org.bson.Document;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.json.JSONObject;
 
 public class LogEvent {
 	public Event event;
@@ -32,7 +31,6 @@ public class LogEvent {
 		Player p = this.player;
 		if (p!=null) {
 			doc.append("player", p.getUniqueId().toString());
-			doc.append("worldUUID", p.getWorld().getUID().toString());
 		}
 		doc.append("time", this.time);
 		doc.append("event", this.eventName);
@@ -45,33 +43,9 @@ public class LogEvent {
 		Player p = this.player;
 		if (p!=null) {
 			data.put("player", p.getUniqueId().toString());
-			data.put("worldUUID", p.getWorld().getUID().toString());
 		}
 		data.put("time", this.time);
 		data.put("event", this.eventName);
 		return data;
-	}
-
-	public JSONObject toJSON() {
-		JSONObject data = new JSONObject(this.data);
-		Player p = this.player;
-		if (p!=null) {
-			data.put("player", p.getUniqueId().toString());
-			data.put("worldUUID", p.getWorld().getUID().toString());
-		}
-		data.put("time", this.time);
-		data.put("event", this.eventName);
-		return data;
-	}
-	public static LogEvent fromJSON(JSONObject data) {
-		LogEvent event = new LogEvent();
-		event.eventName = data.optString("event");
-		JSONObject d = data.optJSONObject("data");
-		if (d!=null) {
-			for (String key : d.keySet()) {
-				event.data.put(key, d.get(key));
-			}
-		}
-		return event;
 	}
 }

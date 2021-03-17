@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.mongodb.MongoClientURI;
+import com.mongodb.ConnectionString;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -25,8 +25,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+
 
 import ch.heap.bukkit.epilog.DatabaseDriver;
 import ch.heap.bukkit.epilog.LogEvent;
@@ -87,8 +86,7 @@ public class Epilog extends JavaPlugin {
 		this.loadConfig(config);
 
 		// connect to DB
-		db = new DatabaseDriver(new MongoClientURI(mongoURI));
-		db.test();
+		db = new DatabaseDriver(new ConnectionString(mongoURI));
 
 		this.versionCheck();
 		this.version = this.getDescription().getVersion();
@@ -231,14 +229,6 @@ public class Epilog extends JavaPlugin {
 		postEvent(event);
 	}
 	
-	public void sendRequest(String cmd, Map<String, Object> info) {
-		RemoteAPI.Request request = this.remote.new Request(cmd, null, null);
-		request.addInfo(info);
-		remote.addRequest(request);
-	}
-	
-	// event notification functions
-	
 	public boolean postEvent(LogEvent event) {
 		if (eventNotifier==null) return false;
 		return eventNotifier.queue.offer(event);
@@ -338,41 +328,6 @@ public class Epilog extends JavaPlugin {
 		this.debugMode = ((Boolean) conf.get("debugMode")).booleanValue();
 		this.mongoURI = ((String) conf.get("mongoURI"));
 	}
-	
-	// state functions
-	
-	// private void loadState() {
-	// 	this.state = null;
-	// 	try {
-	// 		InputStream is = new FileInputStream(this.getStatePath());
-	// 		this.state = new JSONObject(new JSONTokener(is));
-	// 		is.close();
-	// 	} catch (FileNotFoundException e) {} catch (Exception e) {e.printStackTrace();};
-	// 	if (this.state==null) {
-	// 		this.state = new JSONObject();
-	// 	}
-	// }
-	
-	// public void saveState() {
-	// 	// write state file
-	// 	try {
-	// 		PrintWriter writer = new PrintWriter(this.getStatePath(), "UTF-8");
-	// 		this.state.write(writer);
-	// 		writer.close();
-	// 		// System.out.println("state saved");
-	// 	} catch (Exception e) {
-	// 		e.printStackTrace();
-	// 	}
-	// }
-	
-	// private String getStatePath() {
-	// 	if (statePath==null) {
-	// 		File dataFolder = this.getDataFolder();
-	// 		dataFolder.mkdirs();
-	// 		statePath = dataFolder.getAbsolutePath() + File.separator + "state.json";
-	// 	}
-	// 	return statePath;
-	// }
 
 	public String getCurrentVersion() {
 		Plugin plugin = this.getServer().getPluginManager().getPlugin("epilog");

@@ -32,27 +32,21 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import org.json.JSONObject;
-import org.json.JSONArray;
-
 import org.bson.Document;
 
 public class RemoteAPI {
 	private Epilog plugin;
 	private DatabaseDriver db;
-	private String serverToken = null;
+	private Document doc;
 
 	// 10000 events: about 2.5 MB (250 KB compressed); 1000 player seconds
 	private int logCacheLimit = 100000; // 25 MB; 2.7 player hours
 	// limite sending of large caches; adapts to number of new events
-	private int logSendLimit = 5000;
-	private int previousLogSize = Integer.MAX_VALUE;
-	private boolean logSendRequestPending = false;
-	private ArrayDeque<Map<String, Object>> pendingLogs = new ArrayDeque<>();
-	public int skippedLogs = 0;
 
-	private BlockingQueue<Map<String, Object>> logQueue = new LinkedBlockingQueue<>();
-	private BlockingQueue<Request> requests = new LinkedBlockingQueue<Request>();
+	private ArrayDeque<Map<String, Object>> pendingLogs = new ArrayDeque<>();
+
+	private BlockingQueue<Document> documentQueue = new LinkedBlockingQueue<>();
+	// private BlockingQueue<Request> requests = new LinkedBlockingQueue<Request>();
 	private Postman postman = null;
 
 	public RemoteAPI(Epilog plugin, DatabaseDriver db) {
@@ -63,7 +57,7 @@ public class RemoteAPI {
 	public void start() {
 		if (!this.plugin.isEnabled())
 			return;
-		//loadLogCache();
+		// loadLogCache();
 		this.addLogEvent(this.plugin.epilogStateEvent("connect", true));
 		if (postman == null) {
 			postman = new Postman();
@@ -78,441 +72,345 @@ public class RemoteAPI {
 				postman.join();
 				// no more ongoing web requests now
 			} catch (InterruptedException e) {
+				Bukkit.getServer().broadcastMessage(e.getMessage());
 			}
 			postman = null;
 		}
 		this.addLogEvent(this.plugin.epilogStateEvent("disconnect", false));
-		dispatchLogQueue(false);
-		// now send all pending requests in this thread
-		sendRequests(new Runnable() {
-			@Override
-			public void run() {
-				// we are sure now that all log send requests are finished
-				// TODO: WRITE ALL REMAINING REQUESTS
-				//saveLogCache();
-				serverToken = null;
+
+		try {
+			while (!documentQueue.isEmpty()) {
+				doc = documentQueue.take();
+				db.sendData(doc);
 			}
-		});
+		} catch (InterruptedException e) {
+			Bukkit.getServer().broadcastMessage(e.getMessage());
+		}
+
+		Bukkit.getServer().broadcastMessage("queue cleared");
 	}
 
-	// heart beats will trigger updates
-	public void triggerHeartBeat() {
-		if (this.postman == null)
-			return;
-		this.postman.sendHeartBeatAt = 0;
+	public void addLogEvent(Document doc) {
+
+		documentQueue.add(doc);
+
+		// this.db.sendData(doc);
 	}
 
 	public void addLogEvent(LogEvent event) {
-		//this.logQueue.add(event.toJSON());
-
-
-		//Document doc = Document.parse(event.data.toString());
-		// System.out.println(event.data.toString().replace('=', ':'));
-		Document doc = event.toDocument();
-		this.db.sendData(doc);
+		// Document doc = event.toDocument();
+		documentQueue.add(event.toDocument());
+		// this.db.sendData(doc);
 	}
 
 	public void addLogData(Map<String, Object> data) {
-		//this.logQueue.add(data);
-
-		//Document doc = Document.parse(data.toString());
 		Document doc = new Document(data);
-		this.db.sendData(doc);
+		// this.db.sendData(doc);
+		documentQueue.add(doc);
 	}
 
-	public void accessRequest(String email) {
-		final Map<String, Object> data = new HashMap<>();
-		String serverID = this.getPrivateServerID();
-		if (serverID == null)
-			return;
-		data.put("epilogServerID", serverID);
-		data.put("email", email);
-		data.put("serverName", this.plugin.getServer().getName());
-		Request request = new Request("access", data, null);
-		this.addRequest(request);
-		// TODO: add response handler to provide feedback
-	}
+	// private void dispatchLogQueue(boolean notifyPlugins) {
+	// if (this.logSendRequestPending)
+	// return;
+	// int n = logQueue.size() + this.pendingLogs.size();
+	// if (n == 0)
+	// return;
+	// this.logSendRequestPending = true;
 
-	public String getPrivateServerID() {
-		File keyFile = new File(this.plugin.getDataFolder(), "private_server_id");
-		try {
-			Scanner ss = new Scanner(keyFile);
-			String id = ss.useDelimiter("\\Z").next().trim();
-			ss.close();
-			if (id.length() == 0)
-				return null;
-			return id;
-		} catch (FileNotFoundException e) {
-			return null;
-		}
-	}
+	// final int logSize = n;
+	// Request request = new Request("log", new RequestDelegate() {
+	// @Override
+	// public void response(boolean success, JSONObject answer) {
+	// if (success) {
+	// pendingLogs.clear();
+	// }
+	// if (answer != null) {
+	// skippedLogs -= answer.optInt("skippedLogs", 0);
+	// }
+	// logSendRequestPending = false;
+	// }
+	// });
 
-	public void setPrivateServerID(String id) {
-		File keyFile = new File(this.plugin.getDataFolder(), "private_server_id");
-		try {
-			PrintWriter writer = new PrintWriter(keyFile, "UTF-8");
-			writer.print(id);
-			writer.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	// int newLogs = logQueue.size() - previousLogSize;
+	// if (newLogs > this.logSendLimit) {
+	// // queue is growing faster than we are sending
+	// this.logSendLimit = newLogs;
+	// }
+	// previousLogSize = logQueue.size();
 
-	/*private void loadLogCache() {
-		File cacheFile = new File(this.plugin.getDataFolder(), "log_cache.json");
-		if (!cacheFile.exists())
-			return;
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(cacheFile));
-			String line;
-			while ((line = br.readLine()) != null) {
-				JSONObject event = new JSONObject(line);
-				this.logQueue.add(event);
-			}
-			br.close();
-		} catch (Exception e) {
-		}
-		cacheFile.delete();
-	}*/
+	// if (logSize > this.logCacheLimit) {
+	// // add 1 to include new logSkipEvent
+	// final int toSkip = logSize - this.logCacheLimit + 1;
+	// int skipped = 0;
+	// while (toSkip > skipped) {
+	// Map<String, Object> log = this.pendingLogs.poll();
+	// if (log == null)
+	// break;
+	// skipped += 1;
+	// }
+	// while (toSkip > skipped) {
+	// Map<String, Object> log = this.logQueue.poll();
+	// if (log == null)
+	// break;
+	// skipped += 1;
+	// }
+	// this.skippedLogs += skipped;
+	// Map<String, Object> data = new HashMap<String, Object>();
+	// data.put("skipped", skipped);
+	// data.put("logSize", logSize);
+	// this.plugin.postEvent("logSkipEvent", null, data, true);
+	// this.plugin.getLogger().warning("log cache is full; skipping " + skipped + "
+	// events");
+	// }
 
-	/*private void saveLogCache() {
-		if (this.logQueue.size() + this.pendingLogs.size() == 0)
-			return;
-		File cacheFile = new File(this.plugin.getDataFolder(), "log_cache.json");
-		try {
-			PrintWriter writer = new PrintWriter(cacheFile, "UTF-8");
-			JSONObject log;
-			while ((log = this.pendingLogs.poll()) != null) {
-				writer.println(log.toString());
-			}
-			while ((log = this.logQueue.poll()) != null) {
-				writer.println(log.toString());
-			}
-			writer.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}*/
+	// if (n > this.logSendLimit)
+	// n = this.logSendLimit;
+	// while (this.pendingLogs.size() < n) {
+	// Map<String, Object> log = this.logQueue.poll();
+	// if (log == null)
+	// break;
+	// this.pendingLogs.add(log);
+	// }
+	// previousLogSize = this.logQueue.size();
 
-	// request stuff
-
-	private void dispatchLogQueue(boolean notifyPlugins) {
-		if (this.logSendRequestPending)
-			return;
-		int n = logQueue.size() + this.pendingLogs.size();
-		if (n == 0)
-			return;
-		this.logSendRequestPending = true;
-
-		final int logSize = n;
-		Request request = new Request("log", new RequestDelegate() {
-			@Override
-			public void response(boolean success, JSONObject answer) {
-				if (success) {
-					pendingLogs.clear();
-				}
-				if (answer != null) {
-					skippedLogs -= answer.optInt("skippedLogs", 0);
-				}
-				logSendRequestPending = false;
-			}
-		});
-
-		int newLogs = logQueue.size() - previousLogSize;
-		if (newLogs > this.logSendLimit) {
-			// queue is growing faster than we are sending
-			this.logSendLimit = newLogs;
-		}
-		previousLogSize = logQueue.size();
-
-		if (logSize > this.logCacheLimit) {
-			// add 1 to include new logSkipEvent
-			final int toSkip = logSize - this.logCacheLimit + 1;
-			int skipped = 0;
-			while (toSkip > skipped) {
-				Map<String, Object> log = this.pendingLogs.poll();
-				if (log == null)
-					break;
-				skipped += 1;
-			}
-			while (toSkip > skipped) {
-				Map<String, Object> log = this.logQueue.poll();
-				if (log == null)
-					break;
-				skipped += 1;
-			}
-			this.skippedLogs += skipped;
-			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("skipped", skipped);
-			data.put("logSize", logSize);
-			this.plugin.postEvent("logSkipEvent", null, data, true);
-			this.plugin.getLogger().warning("log cache is full; skipping " + skipped + " events");
-		}
-
-		if (n > this.logSendLimit)
-			n = this.logSendLimit;
-		while (this.pendingLogs.size() < n) {
-			Map<String, Object> log = this.logQueue.poll();
-			if (log == null)
-				break;
-			this.pendingLogs.add(log);
-		}
-		previousLogSize = this.logQueue.size();
-
-		if (this.skippedLogs != 0) {
-			request.info.put("skippedLogs", this.skippedLogs);
-		}
-		request.setData(this.pendingLogs);
-		// give connected plugins a chance to add request info
-		for (String pluginName : this.plugin.connectedPlugins) {
-			if (!notifyPlugins)
-				continue;
-			Plugin plugin = this.plugin.getServer().getPluginManager().getPlugin(pluginName);
-			if (plugin == null)
-				continue;
-			try {
-				Method method = plugin.getClass().getMethod("onLogSendRequestPrepare", Map.class);
-				method.invoke(plugin, request.info);
-			} catch (Exception e) {
-			}
-		}
-		this.addRequest(request);
-	}
-
-	public void addRequest(Request request) {
-		this.requests.add(request);
-	}
+	// if (this.skippedLogs != 0) {
+	// request.info.put("skippedLogs", this.skippedLogs);
+	// }
+	// request.setData(this.pendingLogs);
+	// // give connected plugins a chance to add request info
+	// for (String pluginName : this.plugin.connectedPlugins) {
+	// if (!notifyPlugins)
+	// continue;
+	// Plugin plugin =
+	// this.plugin.getServer().getPluginManager().getPlugin(pluginName);
+	// if (plugin == null)
+	// continue;
+	// try {
+	// Method method = plugin.getClass().getMethod("onLogSendRequestPrepare",
+	// Map.class);
+	// method.invoke(plugin, request.info);
+	// } catch (Exception e) {
+	// }
+	// }
+	// this.addRequest(request);
+	// }
 
 	// executes requester in Postman thread
-	public boolean offerCustomRequest(final Runnable requester) {
-		Request request = new Request(new RequestDelegate() {
-			@Override
-			public void response(boolean success, JSONObject answer) {
-				requester.run();
-			}
-		});
-		request.requiresServerToken = false;
-		addRequest(request);
-		return true;
-	}
+	// public boolean offerCustomRequest(final Runnable requester) {
+	// Request request = new Request(new RequestDelegate() {
+	// @Override
+	// public void response(boolean success, JSONObject answer) {
+	// requester.run();
+	// }
+	// });
+	// request.requiresServerToken = false;
+	// addRequest(request);
+	// return true;
+	// }
 
-	public boolean offerWorlds(String cause, World only) {
-		LogEvent event = new LogEvent("Worlds", System.currentTimeMillis(), null);
-		event.data.put("worlds", plugin.dataCollector.getWorlds(only));
-		event.data.put("cause", "token");
-		Request request = new Request("worlds", event.toMap(), null);
-		sendRequest(request);
-		return true;
-	}
+	// public boolean offerWorlds(String cause, World only) {
+	// LogEvent event = new LogEvent("Worlds", System.currentTimeMillis(), null);
+	// event.data.put("worlds", plugin.dataCollector.getWorlds(only));
+	// event.data.put("cause", "token");
+	// Request request = new Request("worlds", event.toMap(), null);
+	// sendRequest(request);
+	// return true;
+	// }
 
-	private void sendRequests(Runnable then) {
-		Request request;
-		while ((request = requests.poll()) != null) {
-			request.dispatchTime = System.currentTimeMillis();
-			sendRequest(request);
-		}
-		if (then != null) {
-			then.run();
-		}
-	}
+	// private void sendRequests(Runnable then) {
+	// Request request;
+	// while ((request = requests.poll()) != null) {
+	// request.dispatchTime = System.currentTimeMillis();
+	// sendRequest(request);
+	// }
+	// if (then != null) {
+	// then.run();
+	// }
+	// }
 
-	private void sendTokenRequest() {
-		LogEvent event = new LogEvent("TokenRequest", System.currentTimeMillis(), null);
-		plugin.dataCollector.addServerMetaData(event);
-		event.data.put("port", this.plugin.getServer().getPort());
-		String id = this.getPrivateServerID();
-		event.data.put("epilogServerID", id);
+	// private void sendTokenRequest() {
+	// LogEvent event = new LogEvent("TokenRequest", System.currentTimeMillis(),
+	// null);
+	// plugin.dataCollector.addServerMetaData(event);
+	// event.data.put("port", this.plugin.getServer().getPort());
+	// String id = this.getPrivateServerID();
+	// event.data.put("epilogServerID", id);
 
-		Request request = new Request("token", event.toMap(), new RequestDelegate() {
-			@Override
-			public void response(boolean success, JSONObject answer) {
-				if (answer == null)
-					return;
-				String token = answer.optString("serverToken", null);
-				String id = answer.optString("epilogServerID", null);
-				if (token != null) {
-					serverToken = token;
-					// trigger first successful log queue dispatch
-					postman.sendHeartBeatAt = 0;
-				}
-				if (id != null) {
-					setPrivateServerID(id);
-				}
-				skippedLogs -= answer.optInt("skippedLogs", 0);
-				// send worlds
-				offerWorlds("token", null);
-			}
-		});
-		if (this.skippedLogs != 0) {
-			request.info.put("skippedLogs", this.skippedLogs);
-		}
-		request.requiresServerToken = false;
-		sendRequest(request);
-	}
+	// Request request = new Request("token", event.toMap(), new RequestDelegate() {
+	// @Override
+	// public void response(boolean success, JSONObject answer) {
+	// if (answer == null)
+	// return;
+	// String token = answer.optString("serverToken", null);
+	// String id = answer.optString("epilogServerID", null);
+	// if (token != null) {
+	// serverToken = token;
+	// // trigger first successful log queue dispatch
+	// postman.sendHeartBeatAt = 0;
+	// }
+	// if (id != null) {
+	// setPrivateServerID(id);
+	// }
+	// skippedLogs -= answer.optInt("skippedLogs", 0);
+	// // send worlds
+	// offerWorlds("token", null);
+	// }
+	// });
+	// if (this.skippedLogs != 0) {
+	// request.info.put("skippedLogs", this.skippedLogs);
+	// }
+	// request.requiresServerToken = false;
+	// sendRequest(request);
+	// }
 
-	private void sendHeartBeat() {
-		Document data = new Document();
-		data.append("key", "value");
-		data.append("time", (int)System.currentTimeMillis());
-		//data.append("currentVersion", plugin.getCurrentVersion());
-		//data.append("config", plugin.config);
-		//data.append("port", plugin.getServer().getPort()); // int
-		//data.append("serverID", this.getPrivateServerID());
-		//Request request = new Request("heartbeat", data, null);
-		//request.requiresServerToken = false;
-		//sendRequest(request);
+	// private void sendHeartBeat() {
+	// Document data = new Document();
+	// data.append("key", "value");
+	// data.append("time", (int)System.currentTimeMillis());
+	// //data.append("currentVersion", plugin.getCurrentVersion());
+	// //data.append("config", plugin.config);
+	// //data.append("port", plugin.getServer().getPort()); // int
+	// //data.append("serverID", this.getPrivateServerID());
+	// //Request request = new Request("heartbeat", data, null);
+	// //request.requiresServerToken = false;
+	// //sendRequest(request);
 
-		db.sendData(data);
-	}
+	// db.sendData(data);
+	// }
 
 	// handle events/actions initiated by the server
-	private void handleRequestResponse(JSONObject answer) {
-		JSONArray events = answer.optJSONArray("events");
-		if (events != null) {
-			long time = System.currentTimeMillis();
-			int length = events.length();
-			for (int i = 0; i < length; i++) {
-				LogEvent event = LogEvent.fromJSON(events.getJSONObject(i));
-				event.time = time;
-				event.ignore = true; // don't send back to logging server
-				this.plugin.postEvent(event);
-			}
-		}
-		JSONObject plugins = answer.optJSONObject("plugins");
-		if (plugins != null && !plugin.bukkitMode) {
-			// this.plugin.updater.setAvailablePlugins(plugins);
-		}
-	}
+	// private void handleRequestResponse(JSONObject answer) {
+	// JSONArray events = answer.optJSONArray("events");
+	// if (events != null) {
+	// long time = System.currentTimeMillis();
+	// int length = events.length();
+	// for (int i = 0; i < length; i++) {
+	// LogEvent event = LogEvent.fromJSON(events.getJSONObject(i));
+	// event.time = time;
+	// event.ignore = true; // don't send back to logging server
+	// this.plugin.postEvent(event);
+	// }
+	// }
+	// JSONObject plugins = answer.optJSONObject("plugins");
+	// if (plugins != null && !plugin.bukkitMode) {
+	// // this.plugin.updater.setAvailablePlugins(plugins);
+	// }
+	// }
 
-	public interface RequestDelegate {
-		public void response(boolean success, JSONObject answer);
-	}
+	// public interface RequestDelegate {
+	// public void response(boolean success, JSONObject answer);
+	// }
 
-	public class Request {
-		public String cmd = null;
-		public Collection<Map<String, Object>> data = null;
-		public RequestDelegate delegate = null;
-		public boolean callDelegateInGameLoop = false;
-		public boolean requiresServerToken = true;
-		public long dispatchTime = 0;
-		public Map<String, Object> info = new HashMap<>();
+	// public class Request {
+	// public String cmd = null;
+	// public Collection<Map<String, Object>> data = null;
+	// public RequestDelegate delegate = null;
+	// public boolean callDelegateInGameLoop = false;
+	// public boolean requiresServerToken = true;
+	// public long dispatchTime = 0;
+	// public Map<String, Object> info = new HashMap<>();
 
-		public Request(String cmd, RequestDelegate delegate) {
-			this.cmd = cmd;
-			this.delegate = delegate;
-		}
+	// public Request(String cmd, RequestDelegate delegate) {
+	// this.cmd = cmd;
+	// this.delegate = delegate;
+	// }
 
-		public Request(RequestDelegate delegate) {
-			// dummy request to allow sending request to other servers
-			// within the delegate (no request made if cmd==null)
-			this.delegate = delegate;
-		}
+	// public Request(RequestDelegate delegate) {
+	// // dummy request to allow sending request to other servers
+	// // within the delegate (no request made if cmd==null)
+	// this.delegate = delegate;
+	// }
 
-		public Request(String cmd, Map<String, Object> data, RequestDelegate delegate) {
-			this.cmd = cmd;
-			this.setData(data);
-			this.delegate = delegate;
-		}
+	// public Request(String cmd, Map<String, Object> data, RequestDelegate
+	// delegate) {
+	// this.cmd = cmd;
+	// this.setData(data);
+	// this.delegate = delegate;
+	// }
 
-		public void setData(ArrayDeque<Map<String, Object>> data) {
-			this.data = data;
-		}
+	// public void setData(ArrayDeque<Map<String, Object>> data) {
+	// this.data = data;
+	// }
 
-		public void setData(Map<String, Object> data) {
-			if (data == null) {
-				this.data = null;
-			} else {
-				ArrayList<Map<String, Object>> dataList = new ArrayList<>();
-				dataList.add(data);
-				this.data = dataList;
-			}
-		}
+	// public void setData(Map<String, Object> data) {
+	// if (data == null) {
+	// this.data = null;
+	// } else {
+	// ArrayList<Map<String, Object>> dataList = new ArrayList<>();
+	// dataList.add(data);
+	// this.data = dataList;
+	// }
+	// }
 
-		public void addInfo(Map<String, Object> info) {
-			if (info == null)
-				return;
-			for (String key : info.keySet()) {
-				this.info.put(key, info.get(key));
-			}
-		}
+	// public void addInfo(Map<String, Object> info) {
+	// if (info == null)
+	// return;
+	// for (String key : info.keySet()) {
+	// this.info.put(key, info.get(key));
+	// }
+	// }
 
-		public void response(final boolean success, final JSONObject answer) {
-			if (this.delegate == null)
-				return;
-			if (this.callDelegateInGameLoop) {
-				if (!plugin.isEnabled())
-					return;
-				new BukkitRunnable() {
-					@Override
-					public void run() {
-						delegate.response(success, answer);
-					}
-				}.runTask(plugin);
-			} else {
-				delegate.response(success, answer);
-			}
-		}
-	}
+	// public void response(final boolean success, final JSONObject answer) {
+	// if (this.delegate == null)
+	// return;
+	// if (this.callDelegateInGameLoop) {
+	// if (!plugin.isEnabled())
+	// return;
+	// new BukkitRunnable() {
+	// @Override
+	// public void run() {
+	// delegate.response(success, answer);
+	// }
+	// }.runTask(plugin);
+	// } else {
+	// delegate.response(success, answer);
+	// }
+	// }
+	// }
 
 	// thread to send web requests
 	private class Postman extends Thread {
-		public long sendLogsAt = 0;
-		public long sendHeartBeatAt = 0;
-		public long requestTokenAt = 0;
+		private Document doc;
 
 		public void run() {
-			while (!this.isInterrupted()) {
-				// System.out.println("postman");
-				long time = System.currentTimeMillis();
-				if (serverToken == null) {
-					if (requestTokenAt <= time) {
-						requestTokenAt = time + plugin.heartbeatSendPeriod;
-						sendTokenRequest();
-					}
+			try {
+				while (true) {
+					doc = documentQueue.take();
+					System.out.println("logging");
+
+					System.out.println(doc);
+
+					db.sendData(doc);
 				}
-				if (sendLogsAt <= time) {
-					sendLogsAt = time + plugin.logSendPeriod;
-					dispatchLogQueue(true);
-				}
-				if (sendHeartBeatAt <= time) {
-					sendHeartBeatAt = time + plugin.heartbeatSendPeriod;
-					sendHeartBeat();
-				}
-				sendRequests(null);
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					return;
-				}
+			} catch (InterruptedException ignore) {
+				Bukkit.getServer().broadcastMessage("postman interupted");	
 			}
 		}
 	}
 
-	private void sendRequest(Request request) {
+	// private void sendRequest(Request request) {
 
-		/*for (Player p : plugin.getServer().getOnlinePlayers()) {
-			if (plugin.notifications && p.hasPermission("epilog.notifications")) {
-				p.sendMessage("[epilog] TODO: make post request");
-				if (request.data != null) {
-					for (JSONObject json : request.data) {
-						p.sendMessage(json.toString());
-					}
-				}
-			}
-		}
-		plugin.getLogger().info("TODO: make post request");
-		if (request.data != null) {
-			for (JSONObject json : request.data) {
-				plugin.getLogger().info(json.toString());
-			}
-		}*/
+	// /*for (Player p : plugin.getServer().getOnlinePlayers()) {
+	// if (plugin.notifications && p.hasPermission("epilog.notifications")) {
+	// p.sendMessage("[epilog] TODO: make post request");
+	// if (request.data != null) {
+	// for (JSONObject json : request.data) {
+	// p.sendMessage(json.toString());
+	// }
+	// }
+	// }
+	// }
+	// plugin.getLogger().info("TODO: make post request");
+	// if (request.data != null) {
+	// for (JSONObject json : request.data) {
+	// plugin.getLogger().info(json.toString());
+	// }
+	// }*/
 
+	// for (Map<String, Object> req : request.data) {
+	// Document doc = new Document(req);
+	// db.sendData(doc);
+	// }
+	// }
 
-		for (Map<String, Object> req : request.data) {
-			Document doc = new Document(req);
-			db.sendData(doc);
-		}
-	}
-
-	
 }

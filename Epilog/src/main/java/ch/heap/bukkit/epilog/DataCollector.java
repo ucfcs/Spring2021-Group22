@@ -173,7 +173,7 @@ public class DataCollector {
 			if (block==null) {
 				boolean e2IsPlayer = e2 instanceof Player;
 				if (e1IsPlayer) {
-					data.put("entityID", e2.getUniqueId());
+					data.put("entityID", e2.getUniqueId().toString());
 					data.put("entity", e2.getType().name());
 					if (e2IsPlayer) {
 						logEvent.eventName = "PlayerDamageByPlayerEvent";
@@ -183,7 +183,7 @@ public class DataCollector {
 				} else if (e2IsPlayer) {
 					logEvent.eventName = "EntityDamageByPlayerEvent";
 					logEvent.player = (Player)e2;
-					data.put("entityID", e1.getUniqueId());
+					data.put("entityID", e1.getUniqueId().toString());
 					data.put("entity", e1.getType().name());
 				}
 			}
@@ -401,7 +401,7 @@ public class DataCollector {
 //		data.put("livingEntities", world.getLivingEntities()); // List<LivingEntity>
 //		data.put("players", world.getPlayers()); // List<Player>
 		data.put("name", world.getName()); // String
-		data.put("uuid", world.getUID()); // UUID
+		data.put("uuid", world.getUID().toString()); // UUID
 		data.put("time", world.getTime()); // long
 		data.put("fullTime", world.getFullTime()); // long
 //		data.put("weatherDuration", world.getWeatherDuration()); // int

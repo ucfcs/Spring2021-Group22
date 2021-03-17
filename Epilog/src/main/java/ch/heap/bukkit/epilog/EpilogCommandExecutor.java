@@ -7,10 +7,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.json.JSONObject;
-
-import ch.heap.bukkit.epilog.RemoteAPI.Request;
-import ch.heap.bukkit.epilog.RemoteAPI.RequestDelegate;
 
 public class EpilogCommandExecutor implements CommandExecutor {
 	public Epilog plugin;
@@ -64,7 +60,7 @@ public class EpilogCommandExecutor implements CommandExecutor {
 				if (!permCheck(p, arg0, "epilog.access"))
 					return true;
 				if (arg1.contains("@")) {
-					this.plugin.remote.accessRequest(arg1);
+					//this.plugin.remote.accessRequest(arg1);
 					sender.sendMessage("admin interface access key has been sent to " + arg1);
 					sender.sendMessage("receiving might take some time; also check your spam folder");
 				} else {
@@ -77,21 +73,8 @@ public class EpilogCommandExecutor implements CommandExecutor {
 				sender.sendMessage("/el versions");
 				sender.sendMessage("/el ping");
 				sender.sendMessage("/el access <email>");
-				sender.sendMessage("more information on http://heapcraft.net/");
 			} else if (arg0.equalsIgnoreCase("ping")) {
-				RemoteAPI remote = this.plugin.remote;
-				final Request request = remote.new Request("ping", null);
-				RequestDelegate delegate = new RequestDelegate() {
-					@Override
-					public void response(boolean success, JSONObject answer) {
-						float dt = System.currentTimeMillis() - request.dispatchTime;
-						String pong = success ? answer.optString("pong", "pong") : "server connection failed";
-						sender.sendMessage(pong + " (time=" + (dt / 1000) + "s)");
-					}
-				};
-				request.delegate = delegate;
-				request.callDelegateInGameLoop = true;
-				remote.addRequest(request);
+				sender.sendMessage("removed ping functionality");
 			} else {
 				return false;
 			}

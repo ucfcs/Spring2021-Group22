@@ -1,5 +1,6 @@
 package ch.heap.bukkit.epilog;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -76,13 +77,10 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
-import ch.heap.bukkit.epilog.LogEvent;
-
 public class EventListener implements Listener {
 	public Epilog epilog;
-	
+
 	private void handleEvent(Event event) {
-		//this.logger.plugin.getServer().broadcastMessage(event.getEventName());
 		LogEvent logEvent = new LogEvent();
 		logEvent.event = event;
 		logEvent.time = System.currentTimeMillis();
@@ -93,175 +91,387 @@ public class EventListener implements Listener {
 		logEvent.needsData = true;
 		epilog.postEvent(logEvent);
 	}
-	
+
 	@EventHandler
 	public void onWorldLoad(WorldLoadEvent event) {
-		epilog.remote.offerWorlds(event.getEventName(), event.getWorld());
+		// epilog.remote.offerWorlds(event.getEventName(), event.getWorld());
+		Bukkit.getServer().broadcastMessage("world loaded");
 	}
-	
+
 	// block events
 	@EventHandler
-	public void onBlockBreak(BlockBreakEvent event) {handleEvent(event);}
+	public void onBlockBreak(BlockBreakEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onBlockDamage(BlockDamageEvent event) {handleEvent(event);}
+	public void onBlockDamage(BlockDamageEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onBlockIgnite(BlockIgniteEvent event) {handleEvent(event);}
+	public void onBlockIgnite(BlockIgniteEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onBlockPlace(BlockPlaceEvent event) {handleEvent(event);}
+	public void onBlockPlace(BlockPlaceEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onSignChange(SignChangeEvent event) {handleEvent(event);}
+	public void onSignChange(SignChangeEvent event) {
+		handleEvent(event);
+	}
 
 	// entity events
 	@EventHandler
-	public void onEntityBreakDoor(EntityBreakDoorEvent event) {handleEvent(event);}
-//	@EventHandler
-//	public void onEntityChangeBlock(EntityChangeBlockEvent event) {handleEvent(event);}
+	public void onEntityBreakDoor(EntityBreakDoorEvent event) {
+		handleEvent(event);
+	}
+
+	// @EventHandler
+	// public void onEntityChangeBlock(EntityChangeBlockEvent event)
+	// {handleEvent(event);}
 	@EventHandler
-	public void onEntityCombustByBlock(EntityCombustByBlockEvent event) {handleEvent(event);}
+	public void onEntityCombustByBlock(EntityCombustByBlockEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityCombustByEntity(EntityCombustByEntityEvent event) {handleEvent(event);}
+	public void onEntityCombustByEntity(EntityCombustByEntityEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityCombust(EntityCombustEvent event) {handleEvent(event);}
+	public void onEntityCombust(EntityCombustEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityCreatePortal(EntityCreatePortalEvent event) {handleEvent(event);}
+	public void onEntityCreatePortal(EntityCreatePortalEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {handleEvent(event);}
+	public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {handleEvent(event);}
+	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityDamage(EntityDamageEvent event) {handleEvent(event);}
+	public void onEntityDamage(EntityDamageEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityDeath(EntityDeathEvent event) {handleEvent(event);}
-//	@EventHandler
-//	public void onEntityExplode(EntityExplodeEvent event) {handleEvent(event);}
+	public void onEntityDeath(EntityDeathEvent event) {
+		handleEvent(event);
+	}
+
+	// @EventHandler
+	// public void onEntityExplode(EntityExplodeEvent event) {handleEvent(event);}
 	@EventHandler
-	public void onEntityInteract(EntityInteractEvent event) {handleEvent(event);}
+	public void onEntityInteract(EntityInteractEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityPortalEnter(EntityPortalEnterEvent event) {handleEvent(event);}
+	public void onEntityPortalEnter(EntityPortalEnterEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityPortal(EntityPortalEvent event) {handleEvent(event);}
+	public void onEntityPortal(EntityPortalEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityPortalExit(EntityPortalExitEvent event) {handleEvent(event);}
+	public void onEntityPortalExit(EntityPortalExitEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityRegainHealth(EntityRegainHealthEvent event) {handleEvent(event);}
+	public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onEntityShootBow(EntityShootBowEvent event) {handleEvent(event);}
-//	@EventHandler
-//	public void onEntityTame(EntityTameEvent event) {handleEvent(event);}
+	public void onEntityShootBow(EntityShootBowEvent event) {
+		handleEvent(event);
+	}
+
+	// @EventHandler
+	// public void onEntityTame(EntityTameEvent event) {handleEvent(event);}
 	@EventHandler
-	public void onFoodLevelChange(FoodLevelChangeEvent event) {handleEvent(event);}
+	public void onFoodLevelChange(FoodLevelChangeEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerDeath(PlayerDeathEvent event) {handleEvent(event);}
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerLeashEntity(PlayerLeashEntityEvent event) {handleEvent(event);}
+	public void onPlayerLeashEntity(PlayerLeashEntityEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPotionSplash(PotionSplashEvent event) {handleEvent(event);}
-//	@EventHandler
-//	public void onProjectileHit(ProjectileHitEvent event) {handleEvent(event);}
+	public void onPotionSplash(PotionSplashEvent event) {
+		handleEvent(event);
+	}
+
+	// @EventHandler
+	// public void onProjectileHit(ProjectileHitEvent event) {handleEvent(event);}
 	@EventHandler
-	public void onProjectileLaunch(ProjectileLaunchEvent event) {handleEvent(event);}
+	public void onProjectileLaunch(ProjectileLaunchEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onSheepDyeWool(SheepDyeWoolEvent event) {handleEvent(event);}
+	public void onSheepDyeWool(SheepDyeWoolEvent event) {
+		handleEvent(event);
+	}
 
 	// hanging events
 	@EventHandler
-	public void onHangingPlace(HangingPlaceEvent event) {handleEvent(event);}
+	public void onHangingPlace(HangingPlaceEvent event) {
+		handleEvent(event);
+	}
 
 	// inventory events
 	@EventHandler
-	public void onFurnaceExtract(FurnaceExtractEvent event) {handleEvent(event);}
+	public void onFurnaceExtract(FurnaceExtractEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent event) {handleEvent(event);}
+	public void onInventoryClose(InventoryCloseEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onInventoryOpen(InventoryOpenEvent event) {handleEvent(event);}
-//	@EventHandler
-//	public void onCraftItem(CraftItemEvent event) {handleEvent(event);}; // already handled by InventoryClickEvent
+	public void onInventoryOpen(InventoryOpenEvent event) {
+		handleEvent(event);
+	}
+
+	// @EventHandler
+	// public void onCraftItem(CraftItemEvent event) {handleEvent(event);}; //
+	// already handled by InventoryClickEvent
 	@EventHandler
-	public void onInventoryClick(InventoryClickEvent event) {handleEvent(event);}
+	public void onInventoryClick(InventoryClickEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onInventoryDrag(InventoryDragEvent event) {handleEvent(event);}
+	public void onInventoryDrag(InventoryDragEvent event) {
+		handleEvent(event);
+	}
 
 	// player events
 	@EventHandler
-	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {handleEvent(event);}
+	public void onAsyncPlayerChat(AsyncPlayerChatEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {handleEvent(event);}
-//	@EventHandler
-//	public void onPlayerAnimation(PlayerAnimationEvent event) {handleEvent(event);}
+	public void onAsyncPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
+		handleEvent(event);
+	}
+
+	// @EventHandler
+	// public void onPlayerAnimation(PlayerAnimationEvent event)
+	// {handleEvent(event);}
 	@EventHandler
-	public void onPlayerBedEnter(PlayerBedEnterEvent event) {handleEvent(event);}
+	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerBedLeave(PlayerBedLeaveEvent event) {handleEvent(event);}
+	public void onPlayerBedLeave(PlayerBedLeaveEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {handleEvent(event);}
+	public void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerBucketFill(PlayerBucketFillEvent event) {handleEvent(event);}
+	public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {handleEvent(event);}
+	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerChatTabComplete(PlayerChatTabCompleteEvent event) {handleEvent(event);}
+	public void onPlayerChatTabComplete(PlayerChatTabCompleteEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {handleEvent(event);}
+	public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerDropItem(PlayerDropItemEvent event) {handleEvent(event);}
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerEditBook(PlayerEditBookEvent event) {handleEvent(event);}
+	public void onPlayerEditBook(PlayerEditBookEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerEggThrow(PlayerEggThrowEvent event) {handleEvent(event);}
+	public void onPlayerEggThrow(PlayerEggThrowEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerExpChange(PlayerExpChangeEvent event) {handleEvent(event);}
+	public void onPlayerExpChange(PlayerExpChangeEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerFish(PlayerFishEvent event) {handleEvent(event);}
+	public void onPlayerFish(PlayerFishEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {handleEvent(event);}
+	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {handleEvent(event);}
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) {handleEvent(event);}
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerItemBreak(PlayerItemBreakEvent event) {handleEvent(event);}
+	public void onPlayerItemBreak(PlayerItemBreakEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerItemConsume(PlayerItemConsumeEvent event) {handleEvent(event);}
+	public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerItemHeld(PlayerItemHeldEvent event) {handleEvent(event);}
+	public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {handleEvent(event);}
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerKick(PlayerKickEvent event) {handleEvent(event);}
+	public void onPlayerKick(PlayerKickEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerLevelChange(PlayerLevelChangeEvent event) {handleEvent(event);}
+	public void onPlayerLevelChange(PlayerLevelChangeEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerLogin(PlayerLoginEvent event) {handleEvent(event);}
+	public void onPlayerLogin(PlayerLoginEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerMove(PlayerMoveEvent event) {handleEvent(event);}
+	public void onPlayerMove(PlayerMoveEvent event) {
+		//handleEvent(event);
+		System.out.println("movement event");
+	}
+
 	@EventHandler
-	public void onPlayerPickupItem(PlayerPickupItemEvent event) {handleEvent(event);}
+	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerPortal(PlayerPortalEvent event) {handleEvent(event);}
+	public void onPlayerPortal(PlayerPortalEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerQuit(PlayerQuitEvent event) {handleEvent(event);}
+	public void onPlayerQuit(PlayerQuitEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerRegisterChannel(PlayerRegisterChannelEvent event) {handleEvent(event);}
+	public void onPlayerRegisterChannel(PlayerRegisterChannelEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerRespawn(PlayerRespawnEvent event) {handleEvent(event);}
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerShearEntity(PlayerShearEntityEvent event) {handleEvent(event);}
+	public void onPlayerShearEntity(PlayerShearEntityEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerTeleport(PlayerTeleportEvent event) {handleEvent(event);}
+	public void onPlayerTeleport(PlayerTeleportEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {handleEvent(event);}
+	public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {handleEvent(event);}
+	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {handleEvent(event);}
+	public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerUnleashEntity(PlayerUnleashEntityEvent event) {handleEvent(event);}
+	public void onPlayerUnleashEntity(PlayerUnleashEntityEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerUnregisterChannel(PlayerUnregisterChannelEvent event) {handleEvent(event);}
+	public void onPlayerUnregisterChannel(PlayerUnregisterChannelEvent event) {
+		handleEvent(event);
+	}
+
 	@EventHandler
-	public void onPlayerVelocity(PlayerVelocityEvent event) {handleEvent(event);}
+	public void onPlayerVelocity(PlayerVelocityEvent event) {
+		handleEvent(event);
+	}
 
 	// world events
 	@EventHandler
-	public void onStructureGrow(StructureGrowEvent event) {handleEvent(event);}
+	public void onStructureGrow(StructureGrowEvent event) {
+		handleEvent(event);
+	}
 }
