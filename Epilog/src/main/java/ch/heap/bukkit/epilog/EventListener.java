@@ -401,7 +401,7 @@ public class EventListener implements Listener {
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		//handleEvent(event);
-		System.out.println("movement event");
+		//System.out.println("movement event");
 	}
 
 	@EventHandler
