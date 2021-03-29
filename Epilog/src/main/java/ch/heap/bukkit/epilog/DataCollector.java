@@ -55,35 +55,35 @@ import org.bukkit.projectiles.ProjectileSource;
 
 public class DataCollector {
 	Epilog epilog = null;
-	
+
 	public ArrayList<ItemTypeStringProvider> itemTypeStringProviders = new ArrayList<ItemTypeStringProvider>();
-	
+
 	public DataCollector(Epilog epilog) {
 		this.epilog = epilog;
 	}
-	
+
 	public void addData(LogEvent logEvent) {
 		logEvent.needsData = false;
 		// check if event is valid
 		Event event = logEvent.event;
-		if (event==null) {
+		if (event == null) {
 			logEvent.ignore = true;
 			return;
 		}
 		logEvent.eventName = event.getEventName();
 		if (event instanceof Cancellable) {
-			if (((Cancellable)event).isCancelled()) {
+			if (((Cancellable) event).isCancelled()) {
 				logEvent.ignore = true;
 				return;
 			}
 		}
 		// add data
 		if (event instanceof PlayerMoveEvent) {
-			addMovementData(logEvent, (PlayerMoveEvent)event);
-		} else if (event instanceof EntityDamageEvent||event instanceof EntityRegainHealthEvent) {
-			addDamageData(logEvent, (EntityEvent)event);
+			addMovementData(logEvent, (PlayerMoveEvent) event);
+		} else if (event instanceof EntityDamageEvent || event instanceof EntityRegainHealthEvent) {
+			addDamageData(logEvent, (EntityEvent) event);
 		} else if (event instanceof AsyncPlayerChatEvent) {
-			AsyncPlayerChatEvent chatEvent = (AsyncPlayerChatEvent)event;
+			AsyncPlayerChatEvent chatEvent = (AsyncPlayerChatEvent) event;
 			logEvent.player = chatEvent.getPlayer();
 			if (this.epilog.logChats) {
 				logEvent.data.put("msg", chatEvent.getMessage());
@@ -92,21 +92,22 @@ public class DataCollector {
 			// add data by introspection
 			addGenericData(logEvent, event);
 		}
-		if (logEvent.player==null) {
+		if (logEvent.player == null) {
 			logEvent.ignore = true;
 			return;
 		}
 	}
-	
+
 	public void addItemTypeStringProvider(Object obj, Method method) {
 		this.itemTypeStringProviders.add(new ItemTypeStringProvider(obj, method));
 	}
-	
+
 	public String itemTypeString(ItemStack item) {
 		String ans = null;
 		for (ItemTypeStringProvider sp : this.itemTypeStringProviders) {
 			ans = sp.stringForItem(item);
-			if (ans!=null) return ans;
+			if (ans != null)
+				return ans;
 		}
 		ans = item.getType().toString();
 		Map<Enchantment, Integer> enchantments = item.getEnchantments();
@@ -116,10 +117,10 @@ public class DataCollector {
 		// TODO: potion effects
 		return ans;
 	}
-	
+
 	private static void addMovementData(LogEvent logEvent, PlayerMoveEvent event) {
 		logEvent.player = event.getPlayer();
-		Map <String, Object> data = logEvent.data;
+		Map<String, Object> data = logEvent.data;
 		Location loc = event.getTo();
 		data.put("x", loc.getX());
 		data.put("y", loc.getY());
@@ -127,50 +128,51 @@ public class DataCollector {
 		data.put("pitch", loc.getPitch());
 		data.put("yaw", loc.getYaw());
 	}
-	
+
 	private static void addDamageData(LogEvent logEvent, EntityEvent event) {
-		Map <String, Object> data = logEvent.data;
+		Map<String, Object> data = logEvent.data;
 		Entity e1 = event.getEntity();
 		double health = -1;
 		if (e1 instanceof LivingEntity) {
-			health = ((LivingEntity)e1).getHealth() / ((LivingEntity)e1).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+			health = ((LivingEntity) e1).getHealth()
+					/ ((LivingEntity) e1).getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 			data.put("health", health);
 		}
-		
+
 		boolean e1IsPlayer = e1 instanceof Player;
 		if (e1IsPlayer) {
-			logEvent.player = (Player)e1;
+			logEvent.player = (Player) e1;
 		}
-		
+
 		if (event instanceof EntityRegainHealthEvent) {
 			logEvent.eventName = "PlayerRegainHealthEvent";
-			EntityRegainHealthEvent ehe = (EntityRegainHealthEvent)event;
+			EntityRegainHealthEvent ehe = (EntityRegainHealthEvent) event;
 			data.put("damage", -ehe.getAmount());
 			data.put("cause", ehe.getRegainReason().name());
 			return;
 		}
-		
-		EntityDamageEvent ede = (EntityDamageEvent)event;
+
+		EntityDamageEvent ede = (EntityDamageEvent) event;
 		data.put("damage", ede.getDamage());
-		
+
 		Block block = null;
-		
+
 		data.put("cause", ede.getCause().name());
 		if (event instanceof EntityDamageByEntityEvent) {
 			EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
 			Entity e2 = evt.getDamager();
 			Projectile projectile = null;
 			if (e2 instanceof Projectile) {
-				projectile = (Projectile)e2;
+				projectile = (Projectile) e2;
 				data.put("projectile", projectile.getType().name());
 				ProjectileSource shooter = projectile.getShooter();
 				if (shooter instanceof Entity) {
-					e2 = (Entity)shooter;
+					e2 = (Entity) shooter;
 				} else if (shooter instanceof BlockProjectileSource) {
-					block = ((BlockProjectileSource)shooter).getBlock();
+					block = ((BlockProjectileSource) shooter).getBlock();
 				}
 			}
-			if (block==null) {
+			if (block == null) {
 				boolean e2IsPlayer = e2 instanceof Player;
 				if (e1IsPlayer) {
 					data.put("entityID", e2.getUniqueId().toString());
@@ -182,7 +184,7 @@ public class DataCollector {
 					}
 				} else if (e2IsPlayer) {
 					logEvent.eventName = "EntityDamageByPlayerEvent";
-					logEvent.player = (Player)e2;
+					logEvent.player = (Player) e2;
 					data.put("entityID", e1.getUniqueId().toString());
 					data.put("entity", e1.getType().name());
 				}
@@ -191,20 +193,22 @@ public class DataCollector {
 			EntityDamageByBlockEvent evt = (EntityDamageByBlockEvent) event;
 			block = evt.getDamager();
 		} else if (event instanceof EntityDamageEvent) {
-			if (e1IsPlayer) logEvent.eventName = "PlayerDamageEvent";
+			if (e1IsPlayer)
+				logEvent.eventName = "PlayerDamageEvent";
 		}
-		if (block!=null) {
-			if (e1IsPlayer) logEvent.eventName = "PlayerDamageByBlockEvent";
+		if (block != null) {
+			if (e1IsPlayer)
+				logEvent.eventName = "PlayerDamageByBlockEvent";
 			data.put("material", block.getType().name());
 			data.put("blockX", block.getX());
-	    	data.put("blockY", block.getY());
-	    	data.put("blockZ", block.getZ());
+			data.put("blockY", block.getY());
+			data.put("blockZ", block.getZ());
 		}
 	}
-	
+
 	private void addGenericData(LogEvent logEvent, Event event) {
-		Map <String, Object> data = logEvent.data;
-		
+		Map<String, Object> data = logEvent.data;
+
 		Player player = null;
 		Object entity = null;
 		Block block = null;
@@ -212,135 +216,141 @@ public class DataCollector {
 		BlockFace blockFace = null;
 		ItemStack itemStack = null;
 		boolean doIntrospection = false;
-		
+
 		// figure out what kind of data we can get
 		if (event instanceof PlayerToggleFlightEvent) {
-			data.put("var", ((PlayerToggleFlightEvent)event).isFlying()?1:0);
+			data.put("var", ((PlayerToggleFlightEvent) event).isFlying() ? 1 : 0);
 		} else if (event instanceof PlayerToggleSprintEvent) {
-			data.put("var", ((PlayerToggleSprintEvent)event).isSprinting()?1:0);
+			data.put("var", ((PlayerToggleSprintEvent) event).isSprinting() ? 1 : 0);
 		} else if (event instanceof PlayerToggleSneakEvent) {
-			data.put("var", ((PlayerToggleSneakEvent)event).isSneaking()?1:0);
+			data.put("var", ((PlayerToggleSneakEvent) event).isSneaking() ? 1 : 0);
 		} else if (event instanceof PlayerItemHeldEvent) {
-			data.put("var", ((PlayerItemHeldEvent)event).getNewSlot());
+			data.put("var", ((PlayerItemHeldEvent) event).getNewSlot());
 		} else if (event instanceof PlayerExpChangeEvent) {
 			PlayerExpChangeEvent pexcEvent = (PlayerExpChangeEvent) event;
-			data.put("var", pexcEvent.getAmount()+pexcEvent.getPlayer().getTotalExperience());
+			data.put("var", pexcEvent.getAmount() + pexcEvent.getPlayer().getTotalExperience());
 		} else if (event instanceof PlayerInteractEvent) {
-			blockFace = ((PlayerInteractEvent)event).getBlockFace();
-			block = ((PlayerInteractEvent)event).getClickedBlock();
-			data.put("enum", ((PlayerInteractEvent)event).getAction().name());
+			blockFace = ((PlayerInteractEvent) event).getBlockFace();
+			block = ((PlayerInteractEvent) event).getClickedBlock();
+			data.put("enum", ((PlayerInteractEvent) event).getAction().name());
 		} else if (event instanceof FurnaceExtractEvent) {
-			material = ((FurnaceExtractEvent)event).getItemType();
-			block = ((FurnaceExtractEvent)event).getBlock();
-			data.put("var", ((FurnaceExtractEvent)event).getItemAmount());
+			material = ((FurnaceExtractEvent) event).getItemType();
+			block = ((FurnaceExtractEvent) event).getBlock();
+			data.put("var", ((FurnaceExtractEvent) event).getItemAmount());
 		} else if (event instanceof PlayerLevelChangeEvent) {
-			data.put("var", ((PlayerLevelChangeEvent)event).getNewLevel());
+			data.put("var", ((PlayerLevelChangeEvent) event).getNewLevel());
 		} else if (event instanceof PlayerTeleportEvent) { // is instance of PlayerMoveEvent
-			data.put("enum", ((PlayerTeleportEvent)event).getCause().name());
+			data.put("enum", ((PlayerTeleportEvent) event).getCause().name());
 		} else if (event instanceof FoodLevelChangeEvent) { // entity event
-			data.put("var", ((FoodLevelChangeEvent)event).getFoodLevel());
+			data.put("var", ((FoodLevelChangeEvent) event).getFoodLevel());
 		} else if (event instanceof PlayerCommandPreprocessEvent) {
-			String cmd = ((PlayerCommandPreprocessEvent)event).getMessage();
+			String cmd = ((PlayerCommandPreprocessEvent) event).getMessage();
 			data.put("cmd", cmd.split(" ", 2)[0]);
 		} else if (event instanceof CraftItemEvent) {
-			itemStack = ((CraftItemEvent)event).getRecipe().getResult();
-			entity = ((CraftItemEvent)event).getWhoClicked();
+			itemStack = ((CraftItemEvent) event).getRecipe().getResult();
+			entity = ((CraftItemEvent) event).getWhoClicked();
 			doIntrospection = true;
 		} else if (event instanceof ProjectileLaunchEvent) {
-			Projectile projectile = ((ProjectileLaunchEvent)event).getEntity();
+			Projectile projectile = ((ProjectileLaunchEvent) event).getEntity();
 			data.put("enum", projectile.getType().name());
 			ProjectileSource shooter = projectile.getShooter();
-			if (shooter instanceof Entity) entity = shooter;
+			if (shooter instanceof Entity)
+				entity = shooter;
 			doIntrospection = true;
 		} else if (event instanceof InventoryClickEvent || event instanceof InventoryDragEvent) {
-			entity = ((InventoryInteractEvent)event).getWhoClicked();
+			entity = ((InventoryInteractEvent) event).getWhoClicked();
 			doIntrospection = true;
 			logEvent.ignore = true; // don't send to server
 		} else {
 			doIntrospection = true;
-			for (Method method : event.getClass().getMethods()){
+			for (Method method : event.getClass().getMethods()) {
 				String methodName = method.getName();
-			    try {
-			    	if (methodName.equals("getBlock")) {
-				    	block = (Block) method.invoke(event);
-				    } else if (methodName.equals("getMaterial")) {
-				    	material = (Material) method.invoke(event);
-				    } else if (methodName.equals("getBlockFace")) {
-				    	blockFace = (BlockFace) method.invoke(event);
-				    } else if (methodName.equals("getItem")||methodName.equals("getItemStack")||methodName.equals("getItemDrop")) {
-				    	Object item = method.invoke(event);
-				    	if (item instanceof Item) itemStack = ((Item)item).getItemStack();
-				    	else itemStack = (ItemStack) item;
-				    } else if (methodName.equals("getPlayer")) {
-				    	player = (Player) method.invoke(event);
-				    } else if (methodName.equals("getEntity")) {
-				    	entity = method.invoke(event);
-				    }
-			    } catch (Exception e) {
-			    	this.epilog.getLogger().warning("unable to get generic data for event: " + event.getEventName());
-			    	e.printStackTrace();
-			    }
+				try {
+					if (methodName.equals("getBlock")) {
+						block = (Block) method.invoke(event);
+					} else if (methodName.equals("getMaterial")) {
+						material = (Material) method.invoke(event);
+					} else if (methodName.equals("getBlockFace")) {
+						blockFace = (BlockFace) method.invoke(event);
+					} else if (methodName.equals("getItem") || methodName.equals("getItemStack")
+							|| methodName.equals("getItemDrop")) {
+						Object item = method.invoke(event);
+						if (item instanceof Item)
+							itemStack = ((Item) item).getItemStack();
+						else
+							itemStack = (ItemStack) item;
+					} else if (methodName.equals("getPlayer")) {
+						player = (Player) method.invoke(event);
+					} else if (methodName.equals("getEntity")) {
+						entity = method.invoke(event);
+					}
+				} catch (Exception e) {
+					this.epilog.getLogger().warning("unable to get generic data for event: " + event.getEventName());
+					e.printStackTrace();
+				}
 			}
 		}
-		
-		if (doIntrospection==false) {
+
+		if (doIntrospection == false) {
 			try {
 				entity = (Player) event.getClass().getMethod("getPlayer", (Class<?>[]) null).invoke(event);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 			try {
 				entity = event.getClass().getMethod("getEntity", (Class<?>[]) null).invoke(event);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			}
 		}
-		
+
 		// fill out generic data fields
-	    if (block!=null) {
-	    	data.put("blockX", block.getX());
-	    	data.put("blockY", block.getY());
-	    	data.put("blockZ", block.getZ());
-	    	if (material==null) {
-	    		material = block.getType();
-	    	}
-	    }
-	    if (logEvent.material!=null) {
-	    	material = logEvent.material;
-	    }
-	    if (material!=null) {
-	    	data.put("material", material.name());
-	    }
-	    if (blockFace!=null) {
-	    	data.put("blockFace", blockFace.name());
-	    }
-	    if (itemStack!=null) {
-	    	data.put("material", this.itemTypeString(itemStack));
-	    	data.put("var", itemStack.getAmount());
-	    }
-	    if (player!=null) {
-	    	logEvent.player = player;
-	    } else if (entity instanceof Player) {
-	    	logEvent.player = (Player) entity;
-	    }
-//	    if (material!=null) {
-//	    	System.out.println(event.getEventName() + ": " + material.name());
-//	    }
+		if (block != null) {
+			data.put("blockX", block.getX());
+			data.put("blockY", block.getY());
+			data.put("blockZ", block.getZ());
+			if (material == null) {
+				material = block.getType();
+			}
+		}
+		if (logEvent.material != null) {
+			material = logEvent.material;
+		}
+		if (material != null) {
+			data.put("material", material.name());
+		}
+		if (blockFace != null) {
+			data.put("blockFace", blockFace.name());
+		}
+		if (itemStack != null) {
+			data.put("material", this.itemTypeString(itemStack));
+			data.put("var", itemStack.getAmount());
+		}
+		if (player != null) {
+			logEvent.player = player;
+		} else if (entity instanceof Player) {
+			logEvent.player = (Player) entity;
+		}
+		// if (material!=null) {
+		// System.out.println(event.getEventName() + ": " + material.name());
+		// }
 	}
-	
+
 	public List<String> getOnlinePlayers() {
 		return playerArray(this.epilog.getServer().getOnlinePlayers());
 	}
-	
+
 	// collect server data
 	public void addServerMetaData(LogEvent logEvent) {
 		Server server = this.epilog.getServer();
 		Map<String, Object> data = new HashMap<>();
-		
-		// get loaded plugins 
+
+		// get loaded plugins
 		List<Map<String, Object>> plugins = new ArrayList<>();
 		for (Plugin plugin : server.getPluginManager().getPlugins()) {
 			plugins.add(getPluginMetaData(plugin));
 		}
 		data.put("plugins", plugins);
-		
-		//TODO fix comments
+
+		// TODO fix comments
 		// collect some more possibly usefull properties
 		data.put("name", server.getName()); // String
 		data.put("version", server.getVersion()); // String
@@ -350,7 +360,7 @@ public class DataCollector {
 		data.put("viewDistance", server.getViewDistance()); // int
 		data.put("ip", server.getIp()); // String
 		data.put("serverName", server.getName()); // String
-		//TODO this method was removed in (I think?) Bukkit 1.14
+		// TODO this method was removed in (I think?) Bukkit 1.14
 		// data.put("serverId", server.getId()); // String
 		data.put("worldType", server.getWorldType()); // String
 		data.put("generateStructures", server.getGenerateStructures() ? 1 : 0); // boolean
@@ -363,14 +373,14 @@ public class DataCollector {
 		data.put("spawnRadius", server.getSpawnRadius()); // int
 		data.put("onlineMode", server.getOnlineMode() ? 1 : 0); // boolean
 		data.put("allowFlight", server.getAllowFlight() ? 1 : 0); // boolean
-		
+
 		data.put("ipBans", asList(server.getIPBans())); // Set<String>
 		data.put("bannedPlayers", playerArray(server.getBannedPlayers())); // Set<OfflinePlayer>
 		data.put("operators", playerArray(server.getOperators())); // Set<OfflinePlayer>
-		
+
 		logEvent.data.put("serverMeta", data);
 	}
-	
+
 	private static Map<String, Object> getPluginMetaData(Plugin plugin) {
 		Map<String, Object> data = new HashMap<>();
 		PluginDescriptionFile desc = plugin.getDescription();
@@ -378,50 +388,51 @@ public class DataCollector {
 		data.put("version", desc.getVersion());
 		// TODO why do we need this ???
 		// if (desc.getCommands()!=null) {
-		// 	data.put("commands", desc.getCommands().keySet().toArray());
+		// data.put("commands", desc.getCommands().keySet().toArray());
 		// }
 		return data;
 	}
-	
+
 	public Map<String, Object> getWorlds(World only) {
 		Server server = this.epilog.getServer();
 		Map<String, Object> worlds = new HashMap<>();
 		for (World world : server.getWorlds()) {
-			if (only!=null && !world.equals(only)) continue;
+			if (only != null && !world.equals(only))
+				continue;
 			worlds.put(world.getUID().toString(), getWorldMetaData(world));
 		}
 		return worlds;
 	}
-	
+
 	private static Map<String, Object> getWorldMetaData(World world) {
 		Map<String, Object> data = new HashMap<>();
-		
+
 		// collect some more possibly usefull properties
-//		data.put("entities", world.getEntities()); // List<Entity>
-//		data.put("livingEntities", world.getLivingEntities()); // List<LivingEntity>
-//		data.put("players", world.getPlayers()); // List<Player>
+		// data.put("entities", world.getEntities()); // List<Entity>
+		// data.put("livingEntities", world.getLivingEntities()); // List<LivingEntity>
+		// data.put("players", world.getPlayers()); // List<Player>
 		data.put("name", world.getName()); // String
 		data.put("uuid", world.getUID().toString()); // UUID
 		data.put("time", world.getTime()); // long
 		data.put("fullTime", world.getFullTime()); // long
-//		data.put("weatherDuration", world.getWeatherDuration()); // int
-//		data.put("thunderDuration", world.getThunderDuration()); // int
+		// data.put("weatherDuration", world.getWeatherDuration()); // int
+		// data.put("thunderDuration", world.getThunderDuration()); // int
 		data.put("environment", world.getEnvironment().name()); // Environment
 		data.put("seed", world.getSeed()); // long
 		data.put("pvp", world.getPVP() ? 1 : 0); // boolean
-//		data.put("generator", world.getGenerator()); // ChunkGenerator
-//		data.put("populators", world.getPopulators()); // List<BlockPopulator>
+		// data.put("generator", world.getGenerator()); // ChunkGenerator
+		// data.put("populators", world.getPopulators()); // List<BlockPopulator>
 		data.put("allowAnimals", world.getAllowAnimals() ? 1 : 0); // boolean
 		data.put("allowMonsters", world.getAllowMonsters() ? 1 : 0); // boolean
 		data.put("maxHeight", world.getMaxHeight()); // int
 		data.put("seaLevel", world.getSeaLevel()); // int
 		data.put("keepSpawnInMemory", world.getKeepSpawnInMemory() ? 1 : 0); // boolean
 		data.put("difficulty", world.getDifficulty().name()); // Difficulty
-//		data.put("worldFolder", world.getWorldFolder()); // File
+		// data.put("worldFolder", world.getWorldFolder()); // File
 		data.put("worldType", world.getWorldType().name()); // WorldType
 		data.put("ticksPerAnimalSpawns", world.getTicksPerAnimalSpawns()); // long
 		data.put("ticksPerMonsterSpawns", world.getTicksPerMonsterSpawns()); // long
-		
+
 		data.put("uuid", world.getUID().toString()); // string
 		Map<String, Object> spawnLocation = new HashMap<>();
 		Location loc = world.getSpawnLocation();
@@ -431,7 +442,7 @@ public class DataCollector {
 		spawnLocation.put("pitch", loc.getPitch());
 		spawnLocation.put("yaw", loc.getYaw());
 		data.put("spawnLocation", spawnLocation);
-		
+
 		return data;
 	}
 
@@ -440,7 +451,7 @@ public class DataCollector {
 		result.addAll(set);
 		return result;
 	}
-	
+
 	private static List<String> playerArray(Collection<? extends OfflinePlayer> playerSet) {
 		List<String> result = new ArrayList<>();
 		for (OfflinePlayer p : playerSet) {
@@ -448,18 +459,20 @@ public class DataCollector {
 		}
 		return result;
 	}
-	
+
 	private class ItemTypeStringProvider {
 		private Object obj;
 		private Method method;
+
 		public ItemTypeStringProvider(Object obj, Method method) {
 			this.obj = obj;
 			this.method = method;
 		}
+
 		public String stringForItem(ItemStack item) {
 			String ans = null;
 			try {
-				ans = (String)this.method.invoke(obj, item);
+				ans = (String) this.method.invoke(obj, item);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

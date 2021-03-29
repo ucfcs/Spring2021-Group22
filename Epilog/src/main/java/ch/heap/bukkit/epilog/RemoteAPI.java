@@ -47,7 +47,7 @@ public class RemoteAPI {
 			@Override
 			public void run() {
 				for (Player p : plugin.getServer().getOnlinePlayers()) {
-					
+
 					Location loc = p.getLocation();
 					Location prev = prevLocation.get(p.getUniqueId());
 
@@ -109,6 +109,8 @@ public class RemoteAPI {
 	}
 
 	public void addLogEvent(LogEvent event) {
+
+		System.out.println("113" + event.toString());
 		documentQueue.add(event.toDocument());
 	}
 

@@ -1,5 +1,10 @@
 package ch.heap.bukkit.epilog;
 
+import java.io.Console;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -77,6 +82,10 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
+import org.bukkit.event.server.ServerCommandEvent;
+
+import org.bukkit.event.HandlerList;
+
 public class EventListener implements Listener {
 	public Epilog epilog;
 
@@ -91,6 +100,35 @@ public class EventListener implements Listener {
 		logEvent.needsData = true;
 		epilog.postEvent(logEvent);
 	}
+
+	// Custom command listener from command blocks
+	@EventHandler
+	public void onServerCommandEvent(ServerCommandEvent event) {
+		String command = event.getCommand();
+
+		String[] arr = command.split(" ");
+
+		if (arr[0].equals("epilog")) {
+			MapEvent mapEvent = new MapEvent("test");
+
+			epilog.getServer().getPluginManager().callEvent(mapEvent);
+		}
+	}
+
+	// custom event listener
+	@EventHandler
+	public void onMapEvent(MapEvent event) {
+		// Custom handle event that bypasses DataCollector due to custom event
+		LogEvent logEvent = new LogEvent();
+		logEvent.event = event;
+		logEvent.eventName = "MapEvent";
+		logEvent.data.put("Event", event.getMessage());
+		logEvent.time = System.currentTimeMillis();
+		logEvent.needsData = false;
+		epilog.postEvent(logEvent);
+	}
+
+	// Default events ---------
 
 	@EventHandler
 	public void onWorldLoad(WorldLoadEvent event) {
@@ -400,8 +438,8 @@ public class EventListener implements Listener {
 
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
-		//handleEvent(event);
-		//System.out.println("movement event");
+		// handleEvent(event);
+		// System.out.println("movement event");
 	}
 
 	@EventHandler

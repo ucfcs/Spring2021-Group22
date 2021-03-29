@@ -26,11 +26,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-
-import ch.heap.bukkit.epilog.DatabaseDriver;
-import ch.heap.bukkit.epilog.LogEvent;
-import ch.heap.bukkit.epilog.EpilogCommandExecutor;
-
 public class Epilog extends JavaPlugin {
 	public RemoteAPI remote;
 	public PlayerNotifications informant;
@@ -264,11 +259,13 @@ public class Epilog extends JavaPlugin {
 				} catch (InterruptedException e) {
 					return;
 				}
+
 				if (event!=null) {
 					// collect data (do work in event thread to avoid server lag)
 					if (event.needsData) {
 						dataCollector.addData(event);
 					}
+
 					// let observers handle event
 					Iterator<Observer> it = observers.iterator();
 					while (it.hasNext()) {
@@ -294,7 +291,9 @@ public class Epilog extends JavaPlugin {
 			if (eventNames==null || eventNames.contains(eventName)) {
 				try {
 					method.invoke(obj, event);
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					System.out.println("failed to invoke event" + e);
+				}
 			}
 		}
 	}
