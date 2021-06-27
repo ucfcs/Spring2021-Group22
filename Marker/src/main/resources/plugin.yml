@@ -1,0 +1,22 @@
+name: Marker
+main: com.falcinspire.marker.Marker
+version: 0.0.1-dev
+author: GoldTeam
+api-version: 1.16
+
+commands:
+  mark:
+    description: Add a marker to the block in line of sight
+    usage: /mark
+  markat:
+    description: Add a marker to the block at the location
+    usage: /markat x y z
+  markreveal:
+    description: Show all markers
+    usage: /markreveal
+  markedit:
+    description: Open and edit the inventory of the marker in line of sight
+    usage: /markedit
+  marktrace:
+    description: Reveal the marker in line of sight
+    usage: /marktrace
