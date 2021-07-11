@@ -20,3 +20,6 @@ commands:
   marktrace:
     description: Reveal the marker in line of sight
     usage: /marktrace
+  walkpath:
+    description: Reveal the marker in line of sight
+    usage: /walkpath [start,end] <name>
