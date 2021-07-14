@@ -173,7 +173,8 @@ public class DataCollector {
 			if (block==null) {
 				boolean e2IsPlayer = e2 instanceof Player;
 				if (e1IsPlayer) {
-					data.put("entityID", e2.getUniqueId().toString());
+					// HASH .hashCode
+					data.put("entityID", e2.getUniqueId().toString().hashCode());
 					data.put("entity", e2.getType().name());
 					if (e2IsPlayer) {
 						logEvent.eventName = "PlayerDamageByPlayerEvent";
@@ -183,7 +184,7 @@ public class DataCollector {
 				} else if (e2IsPlayer) {
 					logEvent.eventName = "EntityDamageByPlayerEvent";
 					logEvent.player = (Player)e2;
-					data.put("entityID", e1.getUniqueId().toString());
+					data.put("entityID", e1.getUniqueId().toString().hashCode());
 					data.put("entity", e1.getType().name());
 				}
 			}
@@ -324,7 +325,7 @@ public class DataCollector {
 //	    }
 	}
 	
-	public List<String> getOnlinePlayers() {
+	public List<Integer> getOnlinePlayers() {
 		return playerArray(this.epilog.getServer().getOnlinePlayers());
 	}
 	
@@ -441,10 +442,10 @@ public class DataCollector {
 		return result;
 	}
 	
-	private static List<String> playerArray(Collection<? extends OfflinePlayer> playerSet) {
-		List<String> result = new ArrayList<>();
+	private static List<Integer> playerArray(Collection<? extends OfflinePlayer> playerSet) {
+		List<Integer> result = new ArrayList<>();
 		for (OfflinePlayer p : playerSet) {
-			result.add(p.getUniqueId().toString());
+			result.add(p.getUniqueId().toString().hashCode());
 		}
 		return result;
 	}

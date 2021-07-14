@@ -30,7 +30,7 @@ public class LogEvent {
 
 		Player p = this.player;
 		if (p!=null) {
-			doc.append("player", p.getUniqueId().toString());
+			doc.append("player", p.getUniqueId().toString().hashCode());
 		}
 		doc.append("time", this.time);
 		doc.append("event", this.eventName);
@@ -42,7 +42,7 @@ public class LogEvent {
 		Map<String, Object> data = new HashMap<>(this.data);
 		Player p = this.player;
 		if (p!=null) {
-			data.put("player", p.getUniqueId().toString());
+			data.put("player", p.getUniqueId().toString().hashCode());
 		}
 		data.put("time", this.time);
 		data.put("event", this.eventName);

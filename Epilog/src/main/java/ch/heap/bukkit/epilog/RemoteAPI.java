@@ -40,7 +40,7 @@ public class RemoteAPI {
 			postman.start();
 		}
 
-		Map<UUID, Location> prevLocation = new HashMap<>();
+		Map<Integer, Location> prevLocation = new HashMap<>();
 
 		BukkitScheduler scheduler = plugin.getServer().getScheduler();
 		scheduler.scheduleSyncRepeatingTask(plugin, new Runnable() {
@@ -49,13 +49,13 @@ public class RemoteAPI {
 				for (Player p : plugin.getServer().getOnlinePlayers()) {
 					
 					Location loc = p.getLocation();
-					Location prev = prevLocation.get(p.getUniqueId());
+					Location prev = prevLocation.get(p.getUniqueId().toString().hashCode());
 
-					if (prev != null && prevLocation.get(p.getUniqueId()).equals(loc)) {
+					if (prev != null && prevLocation.get(p.getUniqueId().toString().hashCode()).equals(loc)) {
 						return;
 					}
 
-					prevLocation.put(p.getUniqueId(), loc);
+					prevLocation.put(p.getUniqueId().toString().hashCode(), loc);
 
 					Map<String, Object> data = new HashMap<>();
 
@@ -65,7 +65,7 @@ public class RemoteAPI {
 					data.put("pitch", loc.getPitch());
 					data.put("yaw", loc.getYaw());
 
-					data.put("player", p.getUniqueId().toString());
+					data.put("player", p.getUniqueId().toString().hashCode());
 
 					data.put("time", System.currentTimeMillis());
 

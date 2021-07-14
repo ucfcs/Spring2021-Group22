@@ -30,13 +30,19 @@ import ch.heap.bukkit.epilog.LogEvent;
 
 public class InventoryTracker {
 	private Epilog epilog;
-	private Map<UUID, String> playerItemInHand = new HashMap <UUID, String>();
-	private Map<UUID, InventoryContent> playerInventory = new HashMap <UUID, InventoryContent>();
-	private Map<UUID, InventoryContent> playerArmor = new HashMap <UUID, InventoryContent>();
-	private Map<UUID, InventoryContent> playerEnderChest = new HashMap <UUID, InventoryContent>();
+	// private Map<UUID, String> playerItemInHand = new HashMap <UUID, String>();
+	// private Map<UUID, InventoryContent> playerInventory = new HashMap <UUID, InventoryContent>();
+	// private Map<UUID, InventoryContent> playerArmor = new HashMap <UUID, InventoryContent>();
+	// private Map<UUID, InventoryContent> playerEnderChest = new HashMap <UUID, InventoryContent>();
+	// private Map<Location, InventoryContent> chestInventory = new HashMap <Location, InventoryContent>();
+	// private Map<UUID, Map<Location, InventoryContent>> chestInventoryBuffer = new HashMap <UUID, Map<Location, InventoryContent>>();
+	private Map<Integer, String> playerItemInHand = new HashMap <Integer, String>();
+	private Map<Integer, InventoryContent> playerInventory = new HashMap <Integer, InventoryContent>();
+	private Map<Integer, InventoryContent> playerArmor = new HashMap <Integer, InventoryContent>();
+	private Map<Integer, InventoryContent> playerEnderChest = new HashMap <Integer, InventoryContent>();
 	private Map<Location, InventoryContent> chestInventory = new HashMap <Location, InventoryContent>();
-	private Map<UUID, Map<Location, InventoryContent>> chestInventoryBuffer = new HashMap <UUID, Map<Location, InventoryContent>>();
-	
+	private Map<Integer, Map<Location, InventoryContent>> chestInventoryBuffer = new HashMap <Integer, Map<Location, InventoryContent>>();
+
 	public InventoryTracker(Epilog el) {
 		epilog = el;
 		try {
@@ -119,9 +125,9 @@ public class InventoryTracker {
 		ItemStack item = p.getInventory().getItemInMainHand();
 		// ItemStack item = p.getItemInHand(); // Old code.
 		String itemType = epilog.dataCollector.itemTypeString(item);
-		String previousType = playerItemInHand.get(p.getUniqueId());
+		String previousType = playerItemInHand.get(p.getUniqueId().toString().hashCode());
 		if (itemType.equals(previousType)==false) {
-			playerItemInHand.put(p.getUniqueId(), itemType);
+			playerItemInHand.put(p.getUniqueId().toString().hashCode(), itemType);
 			LogEvent logEvent = new LogEvent("PlayerItemInHandEvent", time, p);
 			logEvent.data.put("material", itemType);
 			epilog.postEvent(logEvent);
@@ -129,8 +135,8 @@ public class InventoryTracker {
 		}
 	}
 	
-	private void checkInventory(String eventName, Player player, long time, Map<UUID, InventoryContent> state, ItemStack[] content) {
-		UUID uid = player.getUniqueId();
+	private void checkInventory(String eventName, Player player, long time, Map<Integer, InventoryContent> state, ItemStack[] content) {
+		int uid = player.getUniqueId().toString().hashCode();
 		InventoryContent previous = state.get(uid);
 		InventoryContent current = new InventoryContent(content);
 		InventoryContent diff = null;
@@ -163,7 +169,7 @@ public class InventoryTracker {
 				player = null;
 			} else {
 				this.chestInventory.put(location, current);
-				InventoryContent buffer = getChestInventoryBuffer(player.getUniqueId(), location);
+				InventoryContent buffer = getChestInventoryBuffer(player.getUniqueId().toString().hashCode(),location);
 				buffer.add(diff);
 				return;
 			}
@@ -183,7 +189,7 @@ public class InventoryTracker {
 		this.chestInventory.put(location, current);
 	}
 	private void flushChestInventoryBuffer(Player player, long time) {
-		Map<Location, InventoryContent> inventories = chestInventoryBuffer.get(player.getUniqueId());
+		Map<Location, InventoryContent> inventories = chestInventoryBuffer.get(player.getUniqueId().toString().hashCode());
 		if (inventories==null) return;
 		for (Entry<Location, InventoryContent> entry : inventories.entrySet()) {
 			if (entry.getValue().amount.size()==0) continue;
@@ -196,7 +202,7 @@ public class InventoryTracker {
 			logEvent.data.put("delta", entry.getValue().amount);
 			epilog.postEvent(logEvent);
 		}
-		chestInventoryBuffer.remove(player.getUniqueId());
+		chestInventoryBuffer.remove(player.getUniqueId().toString().hashCode());
 	}
 	
 	private void checkChest(InventoryHolder ih, Player player, long time) {
@@ -214,7 +220,7 @@ public class InventoryTracker {
 		}
 	}
 	
-	private InventoryContent getChestInventoryBuffer(UUID uid, Location location) {
+	private InventoryContent getChestInventoryBuffer(int uid, Location location) {
 		if (!chestInventoryBuffer.containsKey(uid)) {
 			chestInventoryBuffer.put(uid, new HashMap<Location, InventoryContent>());
 		}
