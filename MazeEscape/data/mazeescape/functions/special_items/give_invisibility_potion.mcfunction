@@ -1,0 +1,1 @@
+give @s potion{Potion:"minecraft:long_invisibility",display:{Lore:["\"Be granted invisibility.\"", "\"Hostile mobs cannot see you while you are invisible.\"","\"Hold right-click to drink the potion.\""]}} 1

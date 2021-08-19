@@ -1,0 +1,1 @@
+give @s lead{display:{Name:'[{"text":"Escape Rope","italic":false}]',Lore:['[{"text":"Return to the home area.","italic":false}]','[{"text":"Crouch and press \\"Q\\" to use this item.","italic":false}]']}} 1

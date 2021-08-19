@@ -1,7 +1,8 @@
 {
     "values": [
       "mazeescape:tick",
-      "mazeescape:test",
-      "mazeescape:mansion/give_blindness"
+      "mazeescape:mansion/give_blindness",
+      "mazeescape:special_items/escape_rope/check_for_rope_usage",
+      "mazeescape:special_items/sneak_detection/reset_sneaking_trigger"
     ]
   }

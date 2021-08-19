@@ -1,0 +1,1 @@
+give @s potion{Potion:"minecraft:strong_healing",display:{Lore:["\"Restore health.\"","\"Hold right-click to drink the potion.\""]}} 1
