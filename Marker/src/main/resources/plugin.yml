@@ -1,5 +1,5 @@
 name: Marker
-main: com.falcinspire.marker.Marker
+main: com.falcinspire.marker.MarkerPlugin
 version: 0.0.1-dev
 author: GoldTeam
 api-version: 1.16
@@ -8,18 +8,33 @@ commands:
   mark:
     description: Add a marker to the block in line of sight
     usage: /mark
-  markat:
+  mark-at:
     description: Add a marker to the block at the location
-    usage: /markat x y z
-  markreveal:
+    usage: /mark-at
+  mark-remove:
+    description: Remove the marker in line of sight
+    usage: /mark-remove
+  mark-reveal:
     description: Show all markers
-    usage: /markreveal
-  markedit:
+    usage: /mark-reveal
+  mark-edit:
     description: Open and edit the inventory of the marker in line of sight
-    usage: /markedit
-  marktrace:
+    usage: /mark-edit
+  mark-trace:
     description: Reveal the marker in line of sight
-    usage: /marktrace
-  walkpath:
-    description: Reveal the marker in line of sight
-    usage: /walkpath [start,end] <name>
+    usage: /mark-trace
+  walkpath-gen:
+    description: Record a path
+    usage: /walkpath-gen
+  walkpath-describe:
+    description: Record a path
+    usage: /walkpath-describe
+  walkpath-size:
+    description: Record a path
+    usage: /walkpath-size
+  walkpath-remove:
+    description: Record a path
+    usage: /walkpath-remove
+  walkpath-install:
+    description: Install a path to the datapack
+    usage: /walkpath-install

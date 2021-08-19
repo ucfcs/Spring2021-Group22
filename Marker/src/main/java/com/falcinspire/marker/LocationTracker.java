@@ -22,11 +22,15 @@ public class LocationTracker implements Listener {
         this.recordedPath = new HashSet<>();
     }
 
-    public List<Position> stopTracking() {
+    public List<Vector3i> stopTracking() {
         this.trackingPlayer = null;
         List<Position> list = new ArrayList<>(this.recordedPath);
         Collections.sort(list);
-        return list;
+        List<Vector3i> returnList = new ArrayList<>(list.size());
+        for (Position position : list) {
+            returnList.add(new Vector3i(position.x, position.y, position.z));
+        }
+        return returnList;
     }
     
     @EventHandler
