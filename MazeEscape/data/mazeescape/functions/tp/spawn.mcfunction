@@ -1,0 +1,1 @@
+execute in mazeescape:spawn run tp @s 0 100 0 0 0

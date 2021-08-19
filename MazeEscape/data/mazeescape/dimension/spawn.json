@@ -1,0 +1,13 @@
+{
+  "generator": {
+    "type": "minecraft:flat",
+    "settings": {
+      "structures": {
+        "structures": {}
+      },
+      "layers": [],
+      "biome": "mazeescape:spawn"
+    }
+  },
+  "type": "mazeescape:spawn"
+}
