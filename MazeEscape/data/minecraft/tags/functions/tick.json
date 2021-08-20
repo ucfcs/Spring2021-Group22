@@ -3,6 +3,7 @@
       "mazeescape:tick",
       "mazeescape:mansion/give_blindness",
       "mazeescape:special_items/escape_rope/check_for_rope_usage",
+      "mazeescape:special_items/reveal_players/check_for_reveal_players_usage",
       "mazeescape:special_items/sneak_detection/reset_sneaking_trigger"
     ]
   }

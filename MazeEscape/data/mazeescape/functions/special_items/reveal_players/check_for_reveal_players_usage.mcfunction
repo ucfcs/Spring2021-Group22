@@ -1,0 +1,1 @@
+execute as @e[type=item,nbt={Item:{id:"minecraft:lantern",tag:{display:{Name:'[{"text":"Reveal Teammates","italic":false}]'}}}}] at @s run execute if entity @p[scores={sneak_time=1..},distance=..3] run function mazeescape:special_items/reveal_players/reveal_players_usage_callback
