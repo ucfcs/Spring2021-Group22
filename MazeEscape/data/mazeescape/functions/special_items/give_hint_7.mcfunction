@@ -1,0 +1,1 @@
+give @s written_book{pages:['{"text":"Follow these directions about paintings: Make a left at a green painting, a left at a blue painting, a left at black painting, a right at a shell painting, straight at a cactus painting, and a left at a shell painting."}'],title:"Hint #7",author:"N/A",display:{Lore:['[{"text":"Right-click to view hint.","italic":false}]']}}

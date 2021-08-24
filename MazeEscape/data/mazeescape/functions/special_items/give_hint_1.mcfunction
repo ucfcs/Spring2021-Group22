@@ -1,0 +1,1 @@
+give @s written_book{pages:['{"text":"Follow a pattern of colored blocks. Follow 2 red, then 1 yellow, then 2 blue. Repeat."}'],title:"Hint #1",author:"N/A",display:{Lore:['[{"text":"Right-click to view hint.","italic":false}]']}}

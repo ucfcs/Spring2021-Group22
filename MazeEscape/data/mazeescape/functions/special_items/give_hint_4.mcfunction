@@ -1,0 +1,1 @@
+give @s written_book{pages:['{"text":"Follow the way the pumpkins face. Only follow pumpkins with thick stems at the top."}'],title:"Hint #4",author:"N/A",display:{Lore:['[{"text":"Right-click to view hint.","italic":false}]']}}

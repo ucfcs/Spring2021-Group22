@@ -1,0 +1,1 @@
+give @s written_book{pages:['{"text":"There are 2 main entrances to the maze on the sides of the center square. However, there are 2 more entrances hidden behind red bricks on the other sides. These blocks can be removed with a certain item."}'],title:"Hint #13",author:"N/A",display:{Lore:['[{"text":"Right-click to view hint.","italic":false}]']}}
