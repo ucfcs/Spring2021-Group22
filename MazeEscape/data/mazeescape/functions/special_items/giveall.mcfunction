@@ -7,6 +7,7 @@ function mazeescape:special_items/give_diamond_leggings
 function mazeescape:special_items/give_diamond_sword
 function mazeescape:special_items/give_escape_rope
 function mazeescape:special_items/give_fireworks
+function mazeescape:special_items/give_glowing_path
 function mazeescape:special_items/give_health_potion
 function mazeescape:special_items/give_hint_0
 function mazeescape:special_items/give_hint_1
@@ -27,6 +28,8 @@ function mazeescape:special_items/give_iron_chestplate
 function mazeescape:special_items/give_iron_helmet
 function mazeescape:special_items/give_iron_leggings
 function mazeescape:special_items/give_iron_sword
+function mazeescape:special_items/give_markers
 function mazeescape:special_items/give_nether_brick_breaking_pickaxe
 function mazeescape:special_items/give_reveal_players
 function mazeescape:special_items/give_speed_potion
+function mazeescape:special_items/give_torches
