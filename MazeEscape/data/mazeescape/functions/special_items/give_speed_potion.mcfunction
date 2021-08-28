@@ -1,1 +1,1 @@
-give @s potion{Potion:"minecraft:long_swiftness",display:{Lore:["\"Move faster.\"","\"Hold right-click to drink the potion.\""]}} 1
+give @s potion{Potion:"minecraft:long_swiftness",display:{Lore:['{"text":"Move quicker for some time."}','[{"text":"Hold "},{"keybind":"key.use"},{"text":" to drink the potion."}]']}} 1

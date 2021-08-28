@@ -1,1 +1,1 @@
-give @s potion{Potion:"minecraft:strong_healing",display:{Lore:["\"Restore health.\"","\"Hold right-click to drink the potion.\""]}} 1
+give @s potion{Potion:"minecraft:strong_healing",display:{Lore:['{"text":"Restore health."}','[{"text":"Hold "},{"keybind":"key.use"},{"text":" to drink the potion."}]']}} 1
