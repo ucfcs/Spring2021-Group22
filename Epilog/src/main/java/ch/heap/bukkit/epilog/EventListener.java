@@ -82,6 +82,8 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
+import ch.heap.bukkit.epilog.special_items.EpilogUseSpecialItemEvent;
+
 import org.bukkit.event.server.ServerCommandEvent;
 
 import org.bukkit.event.HandlerList;
@@ -510,6 +512,12 @@ public class EventListener implements Listener {
 	// world events
 	@EventHandler
 	public void onStructureGrow(StructureGrowEvent event) {
+		handleEvent(event);
+	}
+
+	// custom events
+	@EventHandler
+	public void onSpecialItemUsed(EpilogUseSpecialItemEvent event) {
 		handleEvent(event);
 	}
 }

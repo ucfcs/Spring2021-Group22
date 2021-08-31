@@ -26,6 +26,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import ch.heap.bukkit.epilog.special_items.EpilogItemCallbackCommandExecutor;
+
 public class Epilog extends JavaPlugin {
 	public RemoteAPI remote;
 	public PlayerNotifications informant;
@@ -126,6 +128,7 @@ public class Epilog extends JavaPlugin {
 		listener.epilog = this;
 		getServer().getPluginManager().registerEvents(listener, this);
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));
+		this.getCommand("recorditemusage").setExecutor(new EpilogItemCallbackCommandExecutor(this));
 		// send onEnable to sub modules
 		inventoryTracker.onEnable();
 	}

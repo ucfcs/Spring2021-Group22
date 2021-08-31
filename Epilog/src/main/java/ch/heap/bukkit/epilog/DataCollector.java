@@ -53,6 +53,8 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
 
+import ch.heap.bukkit.epilog.special_items.EpilogUseSpecialItemEvent;
+
 public class DataCollector {
 	Epilog epilog = null;
 
@@ -88,6 +90,14 @@ public class DataCollector {
 			if (this.epilog.logChats) {
 				logEvent.data.put("msg", chatEvent.getMessage());
 			}
+		} else if (event instanceof EpilogUseSpecialItemEvent) {
+			EpilogUseSpecialItemEvent typedEvent = (EpilogUseSpecialItemEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Map<String, Object> data = logEvent.data;
+			data.put("enum", typedEvent.getItemID());
+			data.put("x", typedEvent.getLocation().getX());
+			data.put("y", typedEvent.getLocation().getY());
+			data.put("z", typedEvent.getLocation().getZ());
 		} else {
 			// add data by introspection
 			addGenericData(logEvent, event);
