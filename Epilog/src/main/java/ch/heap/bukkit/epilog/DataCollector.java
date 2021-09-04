@@ -53,7 +53,8 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
 
-import ch.heap.bukkit.epilog.special_items.EpilogUseSpecialItemEvent;
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeCollectTrophyEvent;
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeUseSpecialItemEvent;
 
 public class DataCollector {
 	Epilog epilog = null;
@@ -90,11 +91,20 @@ public class DataCollector {
 			if (this.epilog.logChats) {
 				logEvent.data.put("msg", chatEvent.getMessage());
 			}
-		} else if (event instanceof EpilogUseSpecialItemEvent) {
-			EpilogUseSpecialItemEvent typedEvent = (EpilogUseSpecialItemEvent) event;
+		} else if (event instanceof MazeEscapeUseSpecialItemEvent) {
+			MazeEscapeUseSpecialItemEvent typedEvent = (MazeEscapeUseSpecialItemEvent) event;
 			logEvent.player = typedEvent.getPlayer();
 			Map<String, Object> data = logEvent.data;
-			data.put("enum", typedEvent.getItemID());
+			data.put("name", typedEvent.getItemStack().getItemMeta().getDisplayName());
+			data.put("x", typedEvent.getLocation().getX());
+			data.put("y", typedEvent.getLocation().getY());
+			data.put("z", typedEvent.getLocation().getZ());
+		} else if (event instanceof MazeEscapeCollectTrophyEvent) {
+			// refactor these two into common method maybe
+			MazeEscapeCollectTrophyEvent typedEvent = (MazeEscapeCollectTrophyEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Map<String, Object> data = logEvent.data;
+			data.put("id", typedEvent.getTrophyNumber());
 			data.put("x", typedEvent.getLocation().getX());
 			data.put("y", typedEvent.getLocation().getY());
 			data.put("z", typedEvent.getLocation().getZ());

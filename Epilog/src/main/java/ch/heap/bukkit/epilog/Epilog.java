@@ -26,7 +26,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import ch.heap.bukkit.epilog.special_items.EpilogItemCallbackCommandExecutor;
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeListener;
 
 public class Epilog extends JavaPlugin {
 	public RemoteAPI remote;
@@ -74,7 +74,6 @@ public class Epilog extends JavaPlugin {
 	
 	@Override
 	public void onLoad() {
-
 		// Setup/Load Configuration
 		this.saveDefaultConfig();
 		this.getConfig().options().copyDefaults(true);
@@ -95,9 +94,7 @@ public class Epilog extends JavaPlugin {
 		observers = new ArrayList<Observer>();
 		// load observers (they add themselves)
 		inventoryTracker = new InventoryTracker(this);
-		informant = new PlayerNotifications(this);
-		
-		
+		informant = new PlayerNotifications(this);		
 	}
 	
 	public void loadConfig(FileConfiguration config) {
@@ -127,8 +124,8 @@ public class Epilog extends JavaPlugin {
 		listener = new EventListener();
 		listener.epilog = this;
 		getServer().getPluginManager().registerEvents(listener, this);
+		getServer().getPluginManager().registerEvents(new MazeEscapeListener(), this);
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));
-		this.getCommand("recorditemusage").setExecutor(new EpilogItemCallbackCommandExecutor(this));
 		// send onEnable to sub modules
 		inventoryTracker.onEnable();
 	}

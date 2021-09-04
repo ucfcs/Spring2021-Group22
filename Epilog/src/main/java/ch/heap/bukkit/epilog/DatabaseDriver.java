@@ -24,7 +24,12 @@ public class DatabaseDriver {
 	}
 
 	public void sendData(Document doc) {
-		collection.insertOne(doc);
+		try {
+			collection.insertOne(doc);
+		} catch (Exception e) {
+			System.out.println("AHHHHHHHHHHHHHHHHHHHHHH");
+			System.out.println(doc.toString());
+		}
 	}
 
 	public void sendData(LogEvent event) {

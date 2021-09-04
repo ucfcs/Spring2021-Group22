@@ -8,9 +8,6 @@ commands:
    el:
       description: Change Epilog settings.
       usage: Unknown command. try /<command> help
-   recorditemusage:
-      description: Record a custom item use
-      usage: Unknown command. try /<command> help
 
 permissions:
     epilog.*:

@@ -1,20 +1,20 @@
-package ch.heap.bukkit.epilog.special_items;
+package ch.heap.bukkit.epilog.mazeescape;
  
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
  
-public class EpilogUseSpecialItemEvent extends Event  {
+public class MazeEscapeCollectTrophyEvent extends Event  {
 
     private static final HandlerList handlers = new HandlerList();
 
-    private String itemID;
+    private int trophyNumber;
     private Player player;
     private Location location;
 
-    public EpilogUseSpecialItemEvent(String itemID, Player player, Location location) {
-        this.itemID = itemID;
+    public MazeEscapeCollectTrophyEvent(int trophyNumber, Player player, Location location) {
+        this.trophyNumber = trophyNumber;
         this.player = player;
         this.location = location;
     }
@@ -28,8 +28,8 @@ public class EpilogUseSpecialItemEvent extends Event  {
         return handlers;
     }
 
-    public String getItemID() {
-        return itemID;
+    public int getTrophyNumber() {
+        return trophyNumber;
     }
 
     public Player getPlayer() {

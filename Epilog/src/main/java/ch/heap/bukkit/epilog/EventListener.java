@@ -82,7 +82,7 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
-import ch.heap.bukkit.epilog.special_items.EpilogUseSpecialItemEvent;
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeUseSpecialItemEvent;
 
 import org.bukkit.event.server.ServerCommandEvent;
 
@@ -517,7 +517,7 @@ public class EventListener implements Listener {
 
 	// custom events
 	@EventHandler
-	public void onSpecialItemUsed(EpilogUseSpecialItemEvent event) {
+	public void onSpecialItemUsed(MazeEscapeUseSpecialItemEvent event) {
 		handleEvent(event);
 	}
 }

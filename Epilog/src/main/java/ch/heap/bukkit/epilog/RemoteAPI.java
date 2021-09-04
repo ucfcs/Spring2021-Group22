@@ -110,7 +110,7 @@ public class RemoteAPI {
 
 	public void addLogEvent(LogEvent event) {
 
-		System.out.println("113" + event.toString());
+		// System.out.println("113" + event.toString());
 		documentQueue.add(event.toDocument());
 	}
 
@@ -127,9 +127,9 @@ public class RemoteAPI {
 			try {
 				while (true) {
 					doc = documentQueue.take();
-					System.out.println("logging");
+					// System.out.println("logging");
 
-					System.out.println(doc);
+					// System.out.println(doc);
 
 					db.sendData(doc);
 				}
