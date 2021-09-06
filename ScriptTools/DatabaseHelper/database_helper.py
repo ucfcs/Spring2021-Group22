@@ -33,7 +33,7 @@ common_event_names = [
         'PlayerDeathEvent',
         'PlayerDamageByEntityEvent',
         'InventoryOpenEvent',
-        'InventoryCloseEvent', # decide which of these to use
+        'InventoryCloseEvent',
         'PlayerItemConsumeEvent',
     ];
 
