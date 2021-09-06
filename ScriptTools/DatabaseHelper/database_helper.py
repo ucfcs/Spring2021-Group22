@@ -1,3 +1,4 @@
+## Simple tool for querying the database for common events
 
 import pymongo
 import argparse
