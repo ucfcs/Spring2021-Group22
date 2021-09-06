@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
 import org.bukkit.event.entity.EntityPortalExitEvent;
@@ -82,7 +83,9 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeCollectTrophyEvent;
 import ch.heap.bukkit.epilog.mazeescape.MazeEscapeUseSpecialItemEvent;
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeVillagerTradeEvent;
 
 import org.bukkit.event.server.ServerCommandEvent;
 
@@ -444,8 +447,15 @@ public class EventListener implements Listener {
 		// System.out.println("movement event");
 	}
 
+	//TODO depracated
 	@EventHandler
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+		handleEvent(event);
+	}
+
+	//TODO move this to entity section
+	@EventHandler
+	public void onEntityPickupItem(EntityPickupItemEvent event) {
 		handleEvent(event);
 	}
 
@@ -518,6 +528,16 @@ public class EventListener implements Listener {
 	// custom events
 	@EventHandler
 	public void onSpecialItemUsed(MazeEscapeUseSpecialItemEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onTrophyCollected(MazeEscapeCollectTrophyEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onVillagerTraded(MazeEscapeVillagerTradeEvent event) {
 		handleEvent(event);
 	}
 }

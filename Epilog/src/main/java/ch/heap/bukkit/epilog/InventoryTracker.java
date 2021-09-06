@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -25,6 +26,7 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import ch.heap.bukkit.epilog.LogEvent;
 
@@ -83,7 +85,17 @@ public class InventoryTracker {
 	public void inventoryHandler(LogEvent event) {
 		Player p = event.player;
 		if (p==null) return;
-		inventoryChange(p, event.time);
+
+		// Delay the check for inventory differences. Otherwise, in 1.16.5 spigot, the inventories
+		// will be the same until (I believe) the event completes, which is after the current tick.
+		// I don't know how nicely this integrates into Epilog threading or whatnot, but this works 
+		// for now.
+		new BukkitRunnable(){
+			@Override
+			public void run() {
+				inventoryChange(p, event.time);
+			}
+		}.runTask(this.epilog);
 	}
 	private void inventoryChange(Player p, long time) {
 		checkItemInHand(p, time);
@@ -145,6 +157,16 @@ public class InventoryTracker {
 		} else {
 			logEvent.data.put("delta", diff.amount);
 		}
+		int contentUniqueSize = 0;
+		int contentSize = 0;
+		for (ItemStack item : content) {
+			if (item != null) {
+				contentUniqueSize++;
+				contentSize += item.getAmount();
+			}
+		}
+		logEvent.data.put("totalUniqueSize", contentUniqueSize);
+		logEvent.data.put("totalSize", contentSize);
 		epilog.postEvent(logEvent);
 		state.put(uid, current);
 	}

@@ -55,6 +55,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import ch.heap.bukkit.epilog.mazeescape.MazeEscapeCollectTrophyEvent;
 import ch.heap.bukkit.epilog.mazeescape.MazeEscapeUseSpecialItemEvent;
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeVillagerTradeEvent;
 
 public class DataCollector {
 	Epilog epilog = null;
@@ -92,15 +93,16 @@ public class DataCollector {
 				logEvent.data.put("msg", chatEvent.getMessage());
 			}
 		} else if (event instanceof MazeEscapeUseSpecialItemEvent) {
+			// refactor these 3 into common method maybe
 			MazeEscapeUseSpecialItemEvent typedEvent = (MazeEscapeUseSpecialItemEvent) event;
 			logEvent.player = typedEvent.getPlayer();
 			Map<String, Object> data = logEvent.data;
-			data.put("name", typedEvent.getItemStack().getItemMeta().getDisplayName());
+			String itemName = typedEvent.getItemStack().hasItemMeta() ? typedEvent.getItemStack().getItemMeta().getDisplayName() : "";
+			data.put("item", itemName);
 			data.put("x", typedEvent.getLocation().getX());
 			data.put("y", typedEvent.getLocation().getY());
 			data.put("z", typedEvent.getLocation().getZ());
 		} else if (event instanceof MazeEscapeCollectTrophyEvent) {
-			// refactor these two into common method maybe
 			MazeEscapeCollectTrophyEvent typedEvent = (MazeEscapeCollectTrophyEvent) event;
 			logEvent.player = typedEvent.getPlayer();
 			Map<String, Object> data = logEvent.data;
@@ -108,6 +110,13 @@ public class DataCollector {
 			data.put("x", typedEvent.getLocation().getX());
 			data.put("y", typedEvent.getLocation().getY());
 			data.put("z", typedEvent.getLocation().getZ());
+		} else if (event instanceof MazeEscapeVillagerTradeEvent) { 
+			MazeEscapeVillagerTradeEvent typedEvent = (MazeEscapeVillagerTradeEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			String itemName = typedEvent.getItemStack().hasItemMeta() ? typedEvent.getItemStack().getItemMeta().getDisplayName() : "";
+			Map<String, Object> data = logEvent.data;
+			data.put("villager", typedEvent.getVillager().getName());
+			data.put("item", itemName);
 		} else {
 			// add data by introspection
 			addGenericData(logEvent, event);
@@ -277,10 +286,14 @@ public class DataCollector {
 			if (shooter instanceof Entity)
 				entity = shooter;
 			doIntrospection = true;
-		} else if (event instanceof InventoryClickEvent || event instanceof InventoryDragEvent) {
-			entity = ((InventoryInteractEvent) event).getWhoClicked();
-			doIntrospection = true;
-			logEvent.ignore = true; // don't send to server
+		} else if (event instanceof InventoryDragEvent) {
+			InventoryDragEvent typedEvent = (InventoryDragEvent) event;
+			entity = typedEvent.getWhoClicked();
+			itemStack = typedEvent.getCursor();
+		} else if (event instanceof InventoryClickEvent) {
+			InventoryClickEvent typedEvent = (InventoryClickEvent) event;
+			entity = typedEvent.getWhoClicked();
+			itemStack = typedEvent.getCurrentItem();
 		} else {
 			doIntrospection = true;
 			for (Method method : event.getClass().getMethods()) {
@@ -343,6 +356,7 @@ public class DataCollector {
 		if (itemStack != null) {
 			data.put("material", this.itemTypeString(itemStack));
 			data.put("var", itemStack.getAmount());
+			data.put("item", itemStack.hasItemMeta() ? itemStack.getItemMeta().getDisplayName() : "");
 		}
 		if (player != null) {
 			logEvent.player = player;

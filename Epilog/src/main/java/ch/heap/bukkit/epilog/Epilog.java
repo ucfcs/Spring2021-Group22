@@ -19,13 +19,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.mongodb.ConnectionString;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeInventorySizeSnapshotEvent;
 import ch.heap.bukkit.epilog.mazeescape.MazeEscapeListener;
 
 public class Epilog extends JavaPlugin {
@@ -292,7 +295,7 @@ public class Epilog extends JavaPlugin {
 				try {
 					method.invoke(obj, event);
 				} catch (Exception e) {
-					System.out.println("failed to invoke event" + e);
+					System.out.println("failed to invoke event: " + e);
 				}
 			}
 		}

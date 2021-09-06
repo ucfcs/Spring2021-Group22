@@ -10,7 +10,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
+
+import ch.heap.bukkit.epilog.mazeescape.MazeEscapeInventorySizeSnapshotEvent;
+
 import org.bson.Document;
 
 public class RemoteAPI {
