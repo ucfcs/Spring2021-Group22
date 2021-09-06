@@ -13,20 +13,8 @@ if (MONGO_URI not in os.environ.keys()):
 
 # Global connection var
 mongo_connection_uri = os.environ.get(MONGO_URI);
-
-# Parse arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('--event', help='the name of the event to query for')
-parser.add_argument('--limit', help='limit the query to the last <x> values')
-parser.add_argument('--listCommonEventNames', action='store_true', help='print out common queryable events');
-parser.add_argument('--queryAllEventNames', action='store_true', help='query the entire database for unique events');
-
-args = parser.parse_args()
-
-## List out the common event names. These are the ones that I thought would
-## be the most useful to plot/analyze
-if (args.listCommonEventNames):
-    print([
+# Global common event names var
+common_event_names = [
         'PlayerLocationEvent',
         'MazeEscapeUseSpecialItemEvent',
         'MazeEscapeVillagerTradeEvent',
@@ -47,7 +35,22 @@ if (args.listCommonEventNames):
         'InventoryOpenEvent',
         'InventoryCloseEvent', # decide which of these to use
         'PlayerItemConsumeEvent',
-    ])
+    ];
+
+# Parse arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--event', help='the name of the event to query for')
+parser.add_argument('--limit', help='limit the query to the last <x> values')
+parser.add_argument('--listCommonEventNames', action='store_true', help='print out common queryable events');
+parser.add_argument('--queryAllEventNames', action='store_true', help='query the entire database for unique events');
+parser.add_argument('--queryAllCommonEventProperties', action='store_true', help='query the entire database for unique events and their properties');
+
+args = parser.parse_args()
+
+## List out the common event names. These are the ones that I thought would
+## be the most useful to plot/analyze
+if (args.listCommonEventNames):
+    print(common_event_names)
     exit(0);
 
 # Give default value
@@ -79,6 +82,17 @@ if (args.queryAllEventNames):
     print(events_list)
     exit(0)
 
+## Print out all event docs
+if (args.queryAllCommonEventProperties):
+    print('Querying the database for all common event names and properties. This could take a second...')
+    try:
+        for event_name in common_event_names:
+            document = collection.find_one({ "event": event_name }, sort=[('time', pymongo.DESCENDING)]);
+            print(event_name + ": " + repr(document.keys()))
+    except Exception as e:
+        print(e)
+    exit(0)
+
 ## Main behavior. Query the database for records for the requested event
 
 # Verify event is provided
@@ -91,7 +105,7 @@ event = args.event;
 print("Querying '" + event + "' for the last " + str(limit) + " values...");
 try:
     collection = client.epilog.data2;
-    items = list(collection.find({ "event": event }).limit(limit).sort("time", -1));
+    items = list(collection.find({ "event": event }).limit(limit).sort("time", pymongo.DESCENDING));
     print(str(len(items)) + " items found...");
     for document in items:
         print(document)
