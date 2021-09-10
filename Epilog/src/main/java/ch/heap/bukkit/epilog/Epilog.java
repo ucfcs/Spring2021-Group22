@@ -66,6 +66,8 @@ public class Epilog extends JavaPlugin {
 	public int heartbeatSendPeriod = 5*60*1000;
 	
 	public String version = "unknown";
+
+	public String activeExperimentLabel = null;
 	
 	public void versionCheck() {
 		String[] v = this.getDescription().getVersion().split("-");
@@ -216,6 +218,7 @@ public class Epilog extends JavaPlugin {
 		event.time = System.currentTimeMillis();
 		event.eventName = eventName;
 		event.player = player;
+		event.experimentLabel = activeExperimentLabel;
 		if (data!=null) for (Entry<String, Object> entry : data.entrySet()) {
 			event.data.put(entry.getKey(), entry.getValue());
 		}
