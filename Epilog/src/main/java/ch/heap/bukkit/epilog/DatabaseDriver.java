@@ -26,7 +26,6 @@ public class DatabaseDriver {
 
 	public void sendData(Document doc) {
 		try {
-			Bukkit.broadcastMessage(doc.getString("event") + ": " + doc.getString("experimentLabel"));
 			collection.insertOne(doc);
 		} catch (Exception e) {
 			System.out.println(doc.toString());
@@ -34,7 +33,6 @@ public class DatabaseDriver {
 	}
 
 	public void sendData(LogEvent event) {
-		Bukkit.broadcastMessage("Sending packet");
 		collection.insertOne(event.toDocument());
 	}
 }
