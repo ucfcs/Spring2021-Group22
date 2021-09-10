@@ -9,6 +9,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClient;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 
 public class DatabaseDriver {
 	private MongoClient mongoClient;
@@ -25,14 +26,15 @@ public class DatabaseDriver {
 
 	public void sendData(Document doc) {
 		try {
+			Bukkit.broadcastMessage(doc.getString("event") + ": " + doc.getString("experimentLabel"));
 			collection.insertOne(doc);
 		} catch (Exception e) {
-			System.out.println("AHHHHHHHHHHHHHHHHHHHHHH");
 			System.out.println(doc.toString());
 		}
 	}
 
 	public void sendData(LogEvent event) {
+		Bukkit.broadcastMessage("Sending packet");
 		collection.insertOne(event.toDocument());
 	}
 }

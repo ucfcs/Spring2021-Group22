@@ -157,7 +157,7 @@ public class Epilog extends JavaPlugin {
 	}
 	
 	public LogEvent epilogStateEvent(String trigger, boolean includeConfig) {
-		LogEvent event = new LogEvent("EpilogState", System.currentTimeMillis(), null);
+		LogEvent event = new LogEvent("EpilogState", System.currentTimeMillis(), activeExperimentLabel, null);
 		event.data.put("trigger", trigger);
 		event.data.put("onlinePlayers", this.dataCollector.getOnlinePlayers());
 		if (this.config!=null) {

@@ -20,9 +20,10 @@ public class LogEvent {
 	public Map <String, Object> data = new HashMap <String, Object>();
 	
 	public LogEvent() {};
-	public LogEvent(String name, long time, Player player) {
+	public LogEvent(String name, long time, String experimentLabel, Player player) {
 		this.eventName = name;
 		this.time = time;
+		this.experimentLabel = experimentLabel;
 		this.player = player;
 	}
 
