@@ -139,11 +139,9 @@ public class DataCollector {
 				return ans;
 		}
 		ans = item.getType().toString();
-		Map<Enchantment, Integer> enchantments = item.getEnchantments();
-		for (Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-			ans += ":" + entry.getKey().getName() + "." + entry.getValue();
+		if (item.hasItemMeta()) {
+			ans += ":" + item.getItemMeta().getDisplayName();
 		}
-		// TODO: potion effects
 		return ans;
 	}
 
