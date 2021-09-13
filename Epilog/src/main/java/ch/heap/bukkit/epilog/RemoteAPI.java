@@ -70,6 +70,8 @@ public class RemoteAPI {
 
 					data.put("time", System.currentTimeMillis());
 
+					data.put("experimentLabel", plugin.activeExperimentLabel);
+
 					data.put("event", "PlayerLocationEvent");
 
 					Document doc = new Document(data);
@@ -128,10 +130,7 @@ public class RemoteAPI {
 			try {
 				while (true) {
 					doc = documentQueue.take();
-					// System.out.println("logging");
-
-					// System.out.println(doc);
-
+					
 					db.sendData(doc);
 				}
 			} catch (InterruptedException ignore) {

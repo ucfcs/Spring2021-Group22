@@ -134,7 +134,7 @@ public class InventoryTracker {
 		String previousType = playerItemInHand.get(p.getUniqueId());
 		if (itemType.equals(previousType)==false) {
 			playerItemInHand.put(p.getUniqueId(), itemType);
-			LogEvent logEvent = new LogEvent("PlayerItemInHandEvent", time, p);
+			LogEvent logEvent = new LogEvent("PlayerItemInHandEvent", time, epilog.activeExperimentLabel, p);
 			logEvent.data.put("material", itemType);
 			epilog.postEvent(logEvent);
 			// System.out.println("PlayerItemInHandEvent: "+itemType);
@@ -151,7 +151,7 @@ public class InventoryTracker {
 			if (diff.amount.size()==0) return;
 		}
 		// inventory content has changed
-		LogEvent logEvent = new LogEvent(eventName, time, player);
+		LogEvent logEvent = new LogEvent(eventName, time, epilog.activeExperimentLabel, player);
 		if (previous==null || previous.amount.size()==0 || current.amount.size()==0) {
 			logEvent.data.put("content", current.amount);
 		} else {
@@ -191,7 +191,7 @@ public class InventoryTracker {
 			}
 		}
 		// chest content has changed
-		LogEvent logEvent = new LogEvent("ChestContent", time, player);
+		LogEvent logEvent = new LogEvent("ChestContent", time, epilog.activeExperimentLabel, player);
 		logEvent.data.put("blockX", location.getX());
 		logEvent.data.put("blockY", location.getY());
 		logEvent.data.put("blockZ", location.getZ());
@@ -210,7 +210,7 @@ public class InventoryTracker {
 		for (Entry<Location, InventoryContent> entry : inventories.entrySet()) {
 			if (entry.getValue().amount.size()==0) continue;
 			Location location = entry.getKey();
-			LogEvent logEvent = new LogEvent("ChestContent", time, player);
+			LogEvent logEvent = new LogEvent("ChestContent", time, epilog.activeExperimentLabel, player);
 			logEvent.data.put("blockX", location.getX());
 			logEvent.data.put("blockY", location.getY());
 			logEvent.data.put("blockZ", location.getZ());

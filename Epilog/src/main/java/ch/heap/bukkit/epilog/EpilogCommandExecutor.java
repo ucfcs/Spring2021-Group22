@@ -75,6 +75,9 @@ public class EpilogCommandExecutor implements CommandExecutor {
 				sender.sendMessage("/el access <email>");
 			} else if (arg0.equalsIgnoreCase("ping")) {
 				sender.sendMessage("removed ping functionality");
+			} else if (arg0.equalsIgnoreCase("experiment")) { 
+				plugin.activeExperimentLabel = !arg1.isEmpty() ? arg1 : null;
+				sender.sendMessage("updated experiment label to " + (plugin.activeExperimentLabel != null ? ("\"" + plugin.activeExperimentLabel + "\"") : null));
 			} else {
 				return false;
 			}
