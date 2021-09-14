@@ -6,15 +6,16 @@ import json
 import math
 
 from pymongo.message import MAX_INT32, MIN_INT32
-from bson.json_util import dumps
+from bson.json_util import dumps, loads
 
 load_dotenv()
 
 time_offset = True
 
+
 def main():
 
-    print("Connecting to Mongo")
+    print('Connecting to Mongo')
 
     client = pymongo.MongoClient(os.getenv('MONGO_URI'))
     collection = client.epilog.data2
@@ -43,22 +44,26 @@ def main():
 
     data = dict()
     data['time'] = {'min': min_time, 'max': max_time}
+    data['timeline'] = dict()
 
     index = 0
     for doc in collection.find().sort('time', pymongo.ASCENDING):
         printProgressBar(index, doc_count, prefix='Progress:',
                          suffix='Complete', length=50)
         index = index + 1
+        
+        doc['_id'] = str(doc['_id'])
+        
         if time_offset:
             time = str(math.floor(doc['time'] / 1000) - _time_offset)
             doc['time'] -= _time_offset
         else:
             time = str(math.floor(doc['time'] / 1000))
-        
+
         if time in data:
-            data[time].append(dumps(doc))
+            data['timeline'][time].append(doc)
         else:
-            data[time] = [dumps(doc)]
+            data['timeline'][time] = [doc]
     print('')
 
     print('Writing data to file')
@@ -67,20 +72,24 @@ def main():
     return 0
 
 # write to file and increment file name if it already exists
+
+
 def writeToFile(data, filename, extension='json'):
     i = 0
     istr = ''
     while os.path.exists(f'{filename}{istr}.{extension}'):
         i += 1
         istr = str(i)
-    
+
+    print(data)
+
     with open(f'{filename}{istr}.{extension}', 'w') as outfile:
         json.dump(data, outfile)
 
 
 # Print iterations progress
-def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd="\r"):
-    """
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd='\r'):
+    '''
     Call in a loop to create terminal progress bar
     @params:
         iteration   - Required  : current iteration (Int)
@@ -90,9 +99,9 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
         decimals    - Optional  : positive number of decimals in percent complete (Int)
         length      - Optional  : character length of bar (Int)
         fill        - Optional  : bar fill character (Str)
-        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-    """
-    percent = ("{0:." + str(decimals) + "f}").format(100 *
+        printEnd    - Optional  : end character (e.g. '\r', '\r\n') (Str)
+    '''
+    percent = ('{0:.' + str(decimals) + 'f}').format(100 *
                                                      (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
@@ -102,5 +111,5 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
         print()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
