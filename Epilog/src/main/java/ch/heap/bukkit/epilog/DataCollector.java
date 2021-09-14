@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -18,6 +19,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -27,7 +29,9 @@ import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -38,11 +42,13 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -238,6 +244,7 @@ public class DataCollector {
 
 		Player player = null;
 		Object entity = null;
+		Item itemEntity = null;
 		Block block = null;
 		Material material = null;
 		BlockFace blockFace = null;
@@ -292,6 +299,19 @@ public class DataCollector {
 			InventoryClickEvent typedEvent = (InventoryClickEvent) event;
 			entity = typedEvent.getWhoClicked();
 			itemStack = typedEvent.getCurrentItem();
+		} else if (event instanceof PlayerDropItemEvent) { 
+			PlayerDropItemEvent typedEvent = (PlayerDropItemEvent) event;
+			player = (Player) typedEvent.getPlayer();
+			itemEntity = typedEvent.getItemDrop();
+			itemStack = typedEvent.getItemDrop().getItemStack();
+		} else if (event instanceof EntityPickupItemEvent) { 
+			EntityPickupItemEvent typedEvent = (EntityPickupItemEvent) event;
+			if (typedEvent.getEntity().getType() == EntityType.PLAYER) {
+				player = (Player) typedEvent.getEntity();
+				itemEntity = typedEvent.getItem();
+				itemStack = typedEvent.getItem().getItemStack();
+				data.put("droppedBy", epilog.exchangeItemListener.itemDroppedByMap.get(typedEvent.getItem().getUniqueId()).toString());
+			}
 		} else {
 			doIntrospection = true;
 			for (Method method : event.getClass().getMethods()) {
@@ -306,8 +326,10 @@ public class DataCollector {
 					} else if (methodName.equals("getItem") || methodName.equals("getItemStack")
 							|| methodName.equals("getItemDrop")) {
 						Object item = method.invoke(event);
-						if (item instanceof Item)
+						if (item instanceof Item) {
 							itemStack = ((Item) item).getItemStack();
+							itemEntity = (Item) item;
+						}
 						else
 							itemStack = (ItemStack) item;
 					} else if (methodName.equals("getPlayer")) {
@@ -355,6 +377,9 @@ public class DataCollector {
 			data.put("material", this.itemTypeString(itemStack));
 			data.put("var", itemStack.getAmount());
 			data.put("item", itemStack.hasItemMeta() ? itemStack.getItemMeta().getDisplayName() : "");
+		}
+		if (itemEntity != null) {
+			data.put("itemID", itemEntity.getEntityId());
 		}
 		if (player != null) {
 			logEvent.player = player;

@@ -67,7 +67,6 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRegisterChannelEvent;
@@ -447,12 +446,6 @@ public class EventListener implements Listener {
 	public void onPlayerMove(PlayerMoveEvent event) {
 		// handleEvent(event);
 		// System.out.println("movement event");
-	}
-
-	//TODO depracated
-	@EventHandler
-	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
-		handleEvent(event);
 	}
 
 	//TODO move this to entity section
