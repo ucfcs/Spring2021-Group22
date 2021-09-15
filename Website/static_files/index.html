@@ -6,12 +6,13 @@
 <meta name="keywords" content="html tutorial template">
 </head>
 <body>
-<div id="chart"/>
+<p>Look at this raw data from /inventory_size_over_time.json. Such cool</p>
+<div id="raw"/>
 <script>
 (async () => {
     const raw = await fetch('/inventory_size_over_time.json');
     const data = await raw.json();
-    document.getElementById('chart').innerHTML = JSON.stringify(data);
+    document.getElementById('raw').innerHTML = JSON.stringify(data);
 })();
 </script>
 </body>

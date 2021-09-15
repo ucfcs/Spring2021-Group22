@@ -47,16 +47,8 @@ def precomputeJSON(experimentLabel):
         data[event['player']]['y'].append(event['totalSize']);
     return data
 
-# Simulate the client. THIS IS A SERVER SIDE MOCK. THE ACTUAL VISUALIZATIONS
-# WILL BE JS.
-def generatePlot(data):
-    plt.title('Inventory Sizes Over Time')
-    for player in data:
-        x = [datetime.fromtimestamp(x) for x in data[player]['x']]
-        y = data[player]['y'];
-        plt.plot(x, y);
-    plt.show();
-
+# Write the results to a precomputed file. This file will likely be in the static_files 
+# directory.
 def writeToFile(data, file):
     with open(file, 'w+') as out:
         json.dump(data, out)
