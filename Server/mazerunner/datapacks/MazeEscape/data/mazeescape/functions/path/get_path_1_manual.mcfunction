@@ -1,0 +1,1 @@
+give @s written_book{pages:['{"text":"right\\nleft\\n2nd left\\nright\\nleft\\nright\\nleft\\nleft\\nright"}'],title:"Hint #1 Manual",author:"Gold Team"}

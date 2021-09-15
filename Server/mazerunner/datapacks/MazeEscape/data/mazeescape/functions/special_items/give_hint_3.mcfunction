@@ -1,0 +1,1 @@
+give @s written_book{pages:['{"text":"Follow the paintings that are extruded on pillars from the wall. Only follow the paintings on pillars that are covered in green moss."}'],title:"Hint #3",author:"N/A",display:{Lore:['[{"text":"Use "},{"keybind":"key.use"},{"text":" to view hint."}]']}}

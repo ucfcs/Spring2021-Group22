@@ -1,0 +1,1 @@
+give @s potion{Potion:"minecraft:long_invisibility",display:{Lore:['{"text":"Become hidden from players and mobs."}','[{"text":"Hold "},{"keybind":"key.use"},{"text":" to drink the potion."}]']}} 1

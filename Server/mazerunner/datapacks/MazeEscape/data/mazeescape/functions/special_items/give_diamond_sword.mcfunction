@@ -1,0 +1,1 @@
+give @s diamond_sword{display:{Name:'[{"text":"Strong Sword","italic":false}]',Lore:['[{"text":"Attack and defeat hostile mobs.","italic":false}]','[{"text":"Swing the sword with left-click.","italic":false}]']}} 1

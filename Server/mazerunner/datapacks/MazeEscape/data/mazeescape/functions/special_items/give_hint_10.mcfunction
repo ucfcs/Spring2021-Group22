@@ -1,0 +1,1 @@
+give @s book{display:{Name:'[{"text":"Hint #10","color":"light_purple"}]',Lore:['[{"text":"Hold this item to reveal a path.","italic":false}]','[{"text":"The path starts at the center of the map.","italic":false}]']}}

@@ -1,0 +1,1 @@
+setblock 45 65 57 redstone_wall_torch[facing=west]
