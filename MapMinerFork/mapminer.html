@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<body>
+	<script src="https://d3js.org/d3.v7.js"></script>
+
+	<title>Map</title>
+
+	<div id="map"></div>
+
+	<script>
+		// Initial Values
+		let width = 417 * 2, height = 417 * 2;
+
+		let data = [
+			{ x: 0, y: 0 },
+			{ x: 0, y: 0 }
+		]
+
+		// Select map div and set attributes
+		let map = d3.select("div#map")
+			.style("width", width + "px")
+			.style("height", height + "px")
+
+		// create base svg
+		let svg = map
+			.append("svg")
+			.style("width", width + "px")
+			.style("height", height + "px")
+			.append("g")
+
+		// add image to svg
+		let image = svg.append("image")
+			.attr("width", width + "px")
+			.attr("height", height + "px")
+			.attr("xlink:href", "highresmap.png")
+
+		// handle pan and zoom of svg
+		let zoom = d3.zoom()
+			.scaleExtent([1, 5])
+			.translateExtent([[0, 0], [width, height]])
+			.on('zoom', handleZoom);
+
+
+		svg.append('line')
+			.style("stroke", "lightgreen")
+			.style("stroke-width", 10)
+			.attr("x1", 0)
+			.attr("y1", 0)
+			.attr("x2", 200)
+			.attr("y2", 200);
+
+		function initZoom() {
+			d3.select('svg')
+				.call(zoom);
+		}
+
+		function handleZoom(e) {
+
+			// let transform = { k: Math.round(e.transform.k), x: Math.round(e.transform.x), y: Math.round(e.transform.y) }
+			// e.transform.k = Math.round(e.transform.k)
+			e.transform.x = Math.round(e.transform.x)
+			e.transform.y = Math.round(e.transform.y)
+
+			console.log(e.transform)
+			// console.log(e.transform, transform)
+
+			d3.select('svg g')
+				.attr('transform', e.transform);
+		}
+
+		initZoom();
+	</script>
+</body>
