@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<title>Hello World</title>
+<meta name="description" content="Our first page">
+<meta name="keywords" content="html tutorial template">
+</head>
+<body>
+<div id="chart"/>
+<script>
+(async () => {
+    const raw = await fetch('/inventory_size_over_time.json');
+    const data = await raw.json();
+    document.getElementById('chart').innerHTML = JSON.stringify(data);
+})();
+</script>
+</body>
+</html>
