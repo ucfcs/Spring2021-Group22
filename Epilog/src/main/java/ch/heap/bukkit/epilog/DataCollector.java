@@ -292,6 +292,8 @@ public class DataCollector {
 			InventoryClickEvent typedEvent = (InventoryClickEvent) event;
 			entity = typedEvent.getWhoClicked();
 			itemStack = typedEvent.getCurrentItem();
+			data.put("slot", typedEvent.getSlot());
+			data.put("slotType", typedEvent.getSlotType().toString());
 		} else {
 			doIntrospection = true;
 			for (Method method : event.getClass().getMethods()) {
