@@ -1,0 +1,11 @@
+{
+    "values": [
+      "mazeescape:tick",
+      "mazeescape:mansion/give_blindness",
+      "mazeescape:special_items/escape_rope/check_for_rope_usage",
+      "mazeescape:special_items/reveal_players/check_for_reveal_players_usage",
+      "mazeescape:special_items/sneak_detection/reset_sneaking_trigger",
+      "mazeescape:special_items/glow_path/check_for_glow_path_usage",
+      "mazeescape:special_items/glow_path/manage_glowing_paths"
+    ]
+  }

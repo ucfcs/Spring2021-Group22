@@ -1,0 +1,1 @@
+effect give @e[x=40,y=70,z=23,dx=16,dy=5,dz=38,gamemode=!creative] blindness 2 2 true

@@ -1,0 +1,1 @@
+execute as @a run function mazeescape:special_items/sneak_detection/reset_sneaking

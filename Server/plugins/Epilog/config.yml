@@ -1,0 +1,11 @@
+auto-update: true
+logging-enabled: true
+log-chats: true
+use-evaluation-server: false
+player-notifications: true
+logging-info: true
+ingame-commands: true
+world-download: true
+offline-mode: false
+logging-server-url: http://localhost:2345
+mongo-uri: mongodb+srv://epilog:0BZpFnbqzSDbbs0a@cluster0.wvs6a.mongodb.net

@@ -1,0 +1,1 @@
+execute if entity @p[x=40,y=64,z=24,dx=1,dy=1,dz=1] run function mazeescape:mansion/open_iron_door_2

@@ -1,0 +1,1 @@
+give @s bow{display:{Lore:['{"text":"Shoot arrows from your inventory."}','[{"text":"Hold and release "},{"keybind":"key.use"},{"text":" to use this item."}]']},Enchantments:[{id:"minecraft:power",lvl:2s}]} 1

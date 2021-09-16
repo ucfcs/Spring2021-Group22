@@ -1,0 +1,1 @@
+give @s potion{display:{Lore:['{"text":"See better in the dark"}','[{"text":"Hold \'"},{"keybind":"key.use"},{"text":"\' to drink the potion."}]']},Potion:"minecraft:long_night_vision"} 1

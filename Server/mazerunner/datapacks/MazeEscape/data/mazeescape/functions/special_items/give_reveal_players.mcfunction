@@ -1,0 +1,1 @@
+give @s lantern{display:{Name:'[{"text":"Reveal Teammates","italic":false}]',Lore:['[{"text":"Highlight all the players on the map for a short period of time.","italic":false}]','[{"text":"Crouch and press \\""},{"keybind":"key.drop"},{"text":"\\" to use this item."}]']}} 1
