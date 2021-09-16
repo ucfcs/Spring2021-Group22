@@ -82,13 +82,7 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
-import ch.heap.bukkit.epilog.mazeescape.MazeEscapeCollectTrophyEvent;
-import ch.heap.bukkit.epilog.mazeescape.MazeEscapeUseSpecialItemEvent;
-import ch.heap.bukkit.epilog.mazeescape.MazeEscapeVillagerTradeEvent;
-
 import org.bukkit.event.server.ServerCommandEvent;
-
-import org.bukkit.event.HandlerList;
 
 public class EventListener implements Listener {
 	public Epilog epilog;
@@ -522,17 +516,7 @@ public class EventListener implements Listener {
 
 	// custom events
 	@EventHandler
-	public void onSpecialItemUsed(MazeEscapeUseSpecialItemEvent event) {
-		handleEvent(event);
-	}
-
-	@EventHandler
-	public void onTrophyCollected(MazeEscapeCollectTrophyEvent event) {
-		handleEvent(event);
-	}
-
-	@EventHandler
-	public void onVillagerTraded(MazeEscapeVillagerTradeEvent event) {
+	public void onCustomAction(CustomActionEvent event) {
 		handleEvent(event);
 	}
 }

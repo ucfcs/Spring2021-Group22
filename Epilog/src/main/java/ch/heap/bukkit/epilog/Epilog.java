@@ -26,8 +26,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import ch.heap.bukkit.epilog.mazeescape.MazeEscapeListener;
-
 public class Epilog extends JavaPlugin {
 	public RemoteAPI remote;
 	public PlayerNotifications informant;
@@ -127,7 +125,7 @@ public class Epilog extends JavaPlugin {
 		listener = new EventListener();
 		listener.epilog = this;
 		getServer().getPluginManager().registerEvents(listener, this);
-		getServer().getPluginManager().registerEvents(new MazeEscapeListener(), this);
+		getServer().getPluginManager().registerEvents(new CustomActionListener(), this);
 		exchangeItemListener = new ExchangeItemListener(this);
 		getServer().getPluginManager().registerEvents(exchangeItemListener, this);
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));

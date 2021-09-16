@@ -1,1 +1,0 @@
-execute as @e[type=item,nbt={Item:{id:"minecraft:wither_rose",tag:{display:{Name:'[{"text":"Doom Wish","italic":false}]'}}}}] at @s run execute if entity @p[scores={sneak_time=1..},distance=..3] run function mazeescape:special_items/doom_wish/doom_wish_usage_callback

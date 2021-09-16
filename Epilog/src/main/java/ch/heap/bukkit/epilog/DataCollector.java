@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.List;
@@ -59,10 +60,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
 
-import ch.heap.bukkit.epilog.mazeescape.MazeEscapeCollectTrophyEvent;
-import ch.heap.bukkit.epilog.mazeescape.MazeEscapeUseSpecialItemEvent;
-import ch.heap.bukkit.epilog.mazeescape.MazeEscapeVillagerTradeEvent;
-
 public class DataCollector {
 	Epilog epilog = null;
 
@@ -98,31 +95,15 @@ public class DataCollector {
 			if (this.epilog.logChats) {
 				logEvent.data.put("msg", chatEvent.getMessage());
 			}
-		} else if (event instanceof MazeEscapeUseSpecialItemEvent) {
-			// refactor these 3 into common method maybe
-			MazeEscapeUseSpecialItemEvent typedEvent = (MazeEscapeUseSpecialItemEvent) event;
+		} else if (event instanceof CustomActionEvent) {
+			CustomActionEvent typedEvent = (CustomActionEvent) event;
 			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getPlayer().getLocation();
 			Map<String, Object> data = logEvent.data;
-			String itemName = typedEvent.getItemStack().hasItemMeta() ? typedEvent.getItemStack().getItemMeta().getDisplayName() : "";
-			data.put("item", itemName);
-			data.put("x", typedEvent.getLocation().getX());
-			data.put("y", typedEvent.getLocation().getY());
-			data.put("z", typedEvent.getLocation().getZ());
-		} else if (event instanceof MazeEscapeCollectTrophyEvent) {
-			MazeEscapeCollectTrophyEvent typedEvent = (MazeEscapeCollectTrophyEvent) event;
-			logEvent.player = typedEvent.getPlayer();
-			Map<String, Object> data = logEvent.data;
-			data.put("id", typedEvent.getTrophyNumber());
-			data.put("x", typedEvent.getLocation().getX());
-			data.put("y", typedEvent.getLocation().getY());
-			data.put("z", typedEvent.getLocation().getZ());
-		} else if (event instanceof MazeEscapeVillagerTradeEvent) { 
-			MazeEscapeVillagerTradeEvent typedEvent = (MazeEscapeVillagerTradeEvent) event;
-			logEvent.player = typedEvent.getPlayer();
-			String itemName = typedEvent.getItemStack().hasItemMeta() ? typedEvent.getItemStack().getItemMeta().getDisplayName() : "";
-			Map<String, Object> data = logEvent.data;
-			data.put("villager", typedEvent.getVillager().getName());
-			data.put("item", itemName);
+			data.put("action", typedEvent.getAction());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
 		} else {
 			// add data by introspection
 			addGenericData(logEvent, event);
@@ -253,30 +234,31 @@ public class DataCollector {
 
 		// figure out what kind of data we can get
 		if (event instanceof PlayerToggleFlightEvent) {
-			data.put("var", ((PlayerToggleFlightEvent) event).isFlying() ? 1 : 0);
+			data.put("isFlying", ((PlayerToggleFlightEvent) event).isFlying());
 		} else if (event instanceof PlayerToggleSprintEvent) {
-			data.put("var", ((PlayerToggleSprintEvent) event).isSprinting() ? 1 : 0);
+			data.put("isSprinting", ((PlayerToggleSprintEvent) event).isSprinting());
 		} else if (event instanceof PlayerToggleSneakEvent) {
-			data.put("var", ((PlayerToggleSneakEvent) event).isSneaking() ? 1 : 0);
+			data.put("isSneaking", ((PlayerToggleSneakEvent) event).isSneaking());
 		} else if (event instanceof PlayerItemHeldEvent) {
-			data.put("var", ((PlayerItemHeldEvent) event).getNewSlot());
+			data.put("newSlot", ((PlayerItemHeldEvent) event).getNewSlot());
 		} else if (event instanceof PlayerExpChangeEvent) {
 			PlayerExpChangeEvent pexcEvent = (PlayerExpChangeEvent) event;
-			data.put("var", pexcEvent.getAmount() + pexcEvent.getPlayer().getTotalExperience());
+			//TODO I'm not 100% sure what the expression calculates
+			data.put("totalExperience", pexcEvent.getAmount() + pexcEvent.getPlayer().getTotalExperience());
 		} else if (event instanceof PlayerInteractEvent) {
 			blockFace = ((PlayerInteractEvent) event).getBlockFace();
 			block = ((PlayerInteractEvent) event).getClickedBlock();
-			data.put("enum", ((PlayerInteractEvent) event).getAction().name());
+			data.put("action", ((PlayerInteractEvent) event).getAction().name());
 		} else if (event instanceof FurnaceExtractEvent) {
 			material = ((FurnaceExtractEvent) event).getItemType();
 			block = ((FurnaceExtractEvent) event).getBlock();
-			data.put("var", ((FurnaceExtractEvent) event).getItemAmount());
+			data.put("amount", ((FurnaceExtractEvent) event).getItemAmount());
 		} else if (event instanceof PlayerLevelChangeEvent) {
-			data.put("var", ((PlayerLevelChangeEvent) event).getNewLevel());
+			data.put("newLevel", ((PlayerLevelChangeEvent) event).getNewLevel());
 		} else if (event instanceof PlayerTeleportEvent) { // is instance of PlayerMoveEvent
-			data.put("enum", ((PlayerTeleportEvent) event).getCause().name());
+			data.put("cause", ((PlayerTeleportEvent) event).getCause().name());
 		} else if (event instanceof FoodLevelChangeEvent) { // entity event
-			data.put("var", ((FoodLevelChangeEvent) event).getFoodLevel());
+			data.put("foodLevel", ((FoodLevelChangeEvent) event).getFoodLevel());
 		} else if (event instanceof PlayerCommandPreprocessEvent) {
 			String cmd = ((PlayerCommandPreprocessEvent) event).getMessage();
 			data.put("cmd", cmd.split(" ", 2)[0]);
@@ -286,7 +268,7 @@ public class DataCollector {
 			doIntrospection = true;
 		} else if (event instanceof ProjectileLaunchEvent) {
 			Projectile projectile = ((ProjectileLaunchEvent) event).getEntity();
-			data.put("enum", projectile.getType().name());
+			data.put("projectileType", projectile.getType().name());
 			ProjectileSource shooter = projectile.getShooter();
 			if (shooter instanceof Entity)
 				entity = shooter;
@@ -308,11 +290,12 @@ public class DataCollector {
 			itemStack = typedEvent.getItemDrop().getItemStack();
 		} else if (event instanceof EntityPickupItemEvent) { 
 			EntityPickupItemEvent typedEvent = (EntityPickupItemEvent) event;
-			if (typedEvent.getEntity().getType() == EntityType.PLAYER) {
+		if (typedEvent.getEntity().getType() == EntityType.PLAYER) {
 				player = (Player) typedEvent.getEntity();
 				itemEntity = typedEvent.getItem();
 				itemStack = typedEvent.getItem().getItemStack();
-				data.put("droppedBy", epilog.exchangeItemListener.itemDroppedByMap.get(typedEvent.getItem().getUniqueId()).toString());
+				UUID droppedBy = epilog.exchangeItemListener.itemDroppedByMap.get(typedEvent.getItem().getUniqueId());
+				data.put("droppedBy", droppedBy != null ? droppedBy.toString() : null);
 			}
 		} else {
 			doIntrospection = true;
@@ -376,12 +359,12 @@ public class DataCollector {
 			data.put("blockFace", blockFace.name());
 		}
 		if (itemStack != null) {
-			data.put("material", this.itemTypeString(itemStack));
-			data.put("var", itemStack.getAmount());
-			data.put("item", itemStack.hasItemMeta() ? itemStack.getItemMeta().getDisplayName() : "");
+			data.put("item", this.itemTypeString(itemStack));
+			data.put("amount", itemStack.getAmount());
 		}
 		if (itemEntity != null) {
 			data.put("itemID", itemEntity.getEntityId());
+			data.put("tags", new ArrayList<>(itemEntity.getScoreboardTags()));
 		}
 		if (player != null) {
 			logEvent.player = player;
