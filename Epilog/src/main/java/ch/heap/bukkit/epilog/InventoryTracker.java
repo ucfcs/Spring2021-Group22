@@ -51,7 +51,7 @@ public class InventoryTracker {
 					"inventoryChange", // extern event (e.g. DiviningRod)
 					"PlayerRespawnEvent",
 					"PlayerItemHeldEvent",
-					"PlayerPickupItemEvent",
+					"EntityPickupItemEvent",
 					"PlayerDropItemEvent",
 					"InventoryCloseEvent",
 					"PlayerItemBreakEvent",

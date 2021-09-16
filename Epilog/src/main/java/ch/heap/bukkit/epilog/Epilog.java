@@ -36,6 +36,7 @@ public class Epilog extends JavaPlugin {
 	private EventNotifier eventNotifier;
 	private List<Observer> observers;
 	private InventoryTracker inventoryTracker;
+	public ExchangeItemListener exchangeItemListener;
 
 	private DatabaseDriver db;
 	
@@ -127,6 +128,8 @@ public class Epilog extends JavaPlugin {
 		listener.epilog = this;
 		getServer().getPluginManager().registerEvents(listener, this);
 		getServer().getPluginManager().registerEvents(new MazeEscapeListener(), this);
+		exchangeItemListener = new ExchangeItemListener(this);
+		getServer().getPluginManager().registerEvents(exchangeItemListener, this);
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));
 		// send onEnable to sub modules
 		inventoryTracker.onEnable();
