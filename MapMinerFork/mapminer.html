@@ -2,6 +2,7 @@
 <meta charset="utf-8">
 
 <body>
+	<script src="data.js"></script>
 	<script src="https://d3js.org/d3.v7.js"></script>
 
 	<title>Map</title>
@@ -11,11 +12,45 @@
 	<script>
 		// Initial Values
 		let width = 417 * 2, height = 417 * 2;
+		const CENTER = { x: width / 2, y: height / 2 };
 
-		let data = [
-			{ x: 0, y: 0 },
-			{ x: 0, y: 0 }
-		]
+		let colors = ["red", "green", "blue", "orage", "purple", "yellow", "cyan", "black"];
+		// let colorindex = 0;
+
+
+
+		// data = arrToPairedArr(_data)
+
+		// console.log(_jsondata.timeline);
+
+		// jsondata = objFilter(_jsondata.timeline, { event: "PlayerLocationEvent", player: -1982006789 });
+
+
+		// prob not the best way to do this but it works
+		let jsondata = {}
+		for (const [key, value] of Object.entries(_jsondata.timeline)) {
+			// console.log(`${key}: ${value}`);
+
+			let res = value.filter(f => f.event === "PlayerLocationEvent") // && f.player === -1982006789
+			if (res.length > 0) {
+				// jsondata[f].push(...res)
+				res.forEach(r => {
+					if (r.player in jsondata) {
+						jsondata[r.player].pos.push(r)
+					}
+					else {
+						jsondata[r.player] = { player: r.player, color: colors.shift(), pos: [r] }
+					}
+				});
+			}
+		}
+		for (const [key, value] of Object.entries(jsondata)) {
+			jsondata[key].pos = arrToPairedArr(value.pos)
+		}
+
+		// jsondata = arrToPairedArr(jsondata)
+
+		// console.log(jsondata)
 
 		// Select map div and set attributes
 		let map = d3.select("div#map")
@@ -35,34 +70,62 @@
 			.attr("height", height + "px")
 			.attr("xlink:href", "highresmap.png")
 
+		let heatmap = svg.append("g").attr("id", 'heatmap')
+
 		// handle pan and zoom of svg
 		let zoom = d3.zoom()
 			.scaleExtent([1, 5])
 			.translateExtent([[0, 0], [width, height]])
 			.on('zoom', handleZoom);
 
+		// create group <g id={id}> for each player in data
+		let players = heatmap
+			.selectAll("g")
+			.data(Object.values(jsondata))
+			.enter()
+			.append("g")
+			.attr("id", function (d) { return (d.player) })
 
-		svg.append('line')
-			.style("stroke", "lightgreen")
-			.style("stroke-width", 10)
-			.attr("x1", 0)
-			.attr("y1", 0)
-			.attr("x2", 200)
-			.attr("y2", 200);
+		// for each player, draw path with unique color
+		// TODO: convert to path instead of a bunch of line segments
+		players
+			.selectAll("line")
+			.data(function (d) { return d.pos.map(m => ({ pos: m, color: d.color })) })
+			.join('line')
+			.attr("x1", function (d) { return (coord(d.pos[0].x, 0).x) }) //console.log(d); 
+			.attr("y1", function (d) { return (coord(0, d.pos[0].z).y) })
+			.attr("x2", function (d) { return (coord(d.pos[1].x, 0).x) })
+			.attr("y2", function (d) { return (coord(0, d.pos[1].z).y) })
+			.style("stroke", function (d) { return d.color })
+			.style("stroke-width", 1)
 
 		function initZoom() {
 			d3.select('svg')
 				.call(zoom);
 		}
 
+		function coord(x, y) {
+			return { x: Math.floor(x + CENTER.x), y: Math.floor(y + CENTER.y) }
+		}
+
+		function arrToPairedArr(arr) {
+			let result = []
+
+			for (var i = 0; i < arr.length - 1; i++) {
+				result.push([arr[i], arr[i + 1]]);
+			}
+
+			return result;
+		}
+
 		function handleZoom(e) {
 
 			// let transform = { k: Math.round(e.transform.k), x: Math.round(e.transform.x), y: Math.round(e.transform.y) }
 			// e.transform.k = Math.round(e.transform.k)
-			e.transform.x = Math.round(e.transform.x)
-			e.transform.y = Math.round(e.transform.y)
+			// e.transform.x = Math.round(e.transform.x)
+			// e.transform.y = Math.round(e.transform.y)
 
-			console.log(e.transform)
+			// console.log(e.transform)
 			// console.log(e.transform, transform)
 
 			d3.select('svg g')
