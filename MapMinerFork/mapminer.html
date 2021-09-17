@@ -20,7 +20,7 @@
 		let width = 417 * 2, height = 417 * 2;
 		const CENTER = { x: width / 2, y: height / 2 };
 
-		let colors = ["red", "green", "blue", "orage", "purple", "yellow", "cyan", "black"];
+		let colors = ["red", "green", "blue", "orange", "purple", "yellow", "cyan", "black"];
 
 
 		// console.log(_jsondata.timeline);
@@ -72,9 +72,10 @@
 
 		let input = d3.select("div#input")
 
-		input.append("p")
+		input.append("h3")
 			.text("Toggle Visibility of player")
-			.append("br")
+		input.append("p")
+			.text("rises to top on reshowing")
 
 		// Select map div and set attributes
 		let map = d3.select("div#map")
@@ -130,16 +131,21 @@
 
 		//<label for="quantity">Quantity:</label>
 		function createButton(selection, player, d) {
-			console.log('create button', selection, d)
-			selection.append("g")
+			// console.log('create button', selection, d)
+			// selection.append("g")
 			input.append("input")
 				.attr("type", "checkbox")
 				.attr("name", d.player)
 				.attr("value", d.player)
 				.property("checked", true)
 				.on("click", function () {
-					let state = d3.select(this).property("checked");
+					let button = d3.select(this);
+					let state = button.property("checked");
 					selection.attr("visibility", state ? "visible" : "hidden")
+					if (state) {
+						// button.raise()	// need to move label and </br> as well
+						selection.raise()
+					}
 				})
 			input.append("label")
 				.attr("for", d.player)
