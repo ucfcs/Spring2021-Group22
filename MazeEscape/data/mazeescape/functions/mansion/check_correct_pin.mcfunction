@@ -1,1 +1,1 @@
-execute if entity @a[scores={pin=3549}] run function mazeescape:mansion/clear_pin_wall
+execute if entity @p[scores={pin=3549}] run function mazeescape:mansion/clear_pin_wall
