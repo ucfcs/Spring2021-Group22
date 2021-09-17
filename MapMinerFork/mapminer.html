@@ -4,10 +4,16 @@
 <body>
 	<script src="data.js"></script>
 	<script src="https://d3js.org/d3.v7.js"></script>
+	<script src="https://unpkg.com/d3-simple-slider"></script>
 
 	<title>Map</title>
 
+	<p id="value"></p>
+	<div id="slider"></div>
+
 	<div id="map"></div>
+
+	<div id="input"></div>
 
 	<script>
 		// Initial Values
@@ -15,16 +21,30 @@
 		const CENTER = { x: width / 2, y: height / 2 };
 
 		let colors = ["red", "green", "blue", "orage", "purple", "yellow", "cyan", "black"];
-		// let colorindex = 0;
 
-
-
-		// data = arrToPairedArr(_data)
 
 		// console.log(_jsondata.timeline);
 
 		// jsondata = objFilter(_jsondata.timeline, { event: "PlayerLocationEvent", player: -1982006789 });
 
+		// var slider = d3
+		// 	.sliderHorizontal()
+		// 	.min(0)
+		// 	.max(10)
+		// 	.step(1)
+		// 	.width(300)
+		// 	.displayValue(false)
+		// 	.on('onchange', (val) => {
+		// 		d3.select('#value').text(val);
+		// 	});
+
+		// d3.select('#slider')
+		// 	.append('svg')
+		// 	.attr('width', 500)
+		// 	.attr('height', 100)
+		// 	.append('g')
+		// 	.attr('transform', 'translate(30,30)')
+		// 	.call(slider);
 
 		// prob not the best way to do this but it works
 		let jsondata = {}
@@ -45,12 +65,16 @@
 			}
 		}
 		for (const [key, value] of Object.entries(jsondata)) {
-			jsondata[key].pos = arrToPairedArr(value.pos)
+			jsondata[key].pos = jsondata[key].pos.map(p => coord(p.x, p.z))
 		}
 
-		// jsondata = arrToPairedArr(jsondata)
+		console.log(jsondata)
 
-		// console.log(jsondata)
+		let input = d3.select("div#input")
+
+		input.append("p")
+			.text("Toggle Visibility of player")
+			.append("br")
 
 		// Select map div and set attributes
 		let map = d3.select("div#map")
@@ -79,25 +103,50 @@
 			.on('zoom', handleZoom);
 
 		// create group <g id={id}> for each player in data
+		// draw path for each player with unique color
 		let players = heatmap
 			.selectAll("g")
 			.data(Object.values(jsondata))
 			.enter()
-			.append("g")
-			.attr("id", function (d) { return (d.player) })
+			// .append("g")
+			.append("path")
+			.attr("id", function (d) { return d.player })
+			.attr("d", function (d) { return d3.line()(d.pos) })
+			// .attr("stroke", "black")
+			.attr("fill", "none")
+			.attr("stroke", function (d) { return d.color })
+			.attr("visibility", "visible")
+		// .call(createButton, function (d) { return d }, null)
+		// .select("#input")
+		// .append("button")
 
-		// for each player, draw path with unique color
-		// TODO: convert to path instead of a bunch of line segments
-		players
-			.selectAll("line")
-			.data(function (d) { return d.pos.map(m => ({ pos: m, color: d.color })) })
-			.join('line')
-			.attr("x1", function (d) { return (coord(d.pos[0].x, 0).x) }) //console.log(d); 
-			.attr("y1", function (d) { return (coord(0, d.pos[0].z).y) })
-			.attr("x2", function (d) { return (coord(d.pos[1].x, 0).x) })
-			.attr("y2", function (d) { return (coord(0, d.pos[1].z).y) })
-			.style("stroke", function (d) { return d.color })
-			.style("stroke-width", 1)
+		// console.log(players)
+
+		players.each(function (player, i) {
+			console.log("p: " + player, "i: " + i);
+			// player.append("g")
+			d3.select(this).call(createButton, this, player, function (d) { return d })
+		});
+
+		//<label for="quantity">Quantity:</label>
+		function createButton(selection, player, d) {
+			console.log('create button', selection, d)
+			selection.append("g")
+			input.append("input")
+				.attr("type", "checkbox")
+				.attr("name", d.player)
+				.attr("value", d.player)
+				.property("checked", true)
+				.on("click", function () {
+					let state = d3.select(this).property("checked");
+					selection.attr("visibility", state ? "visible" : "hidden")
+				})
+			input.append("label")
+				.attr("for", d.player)
+				.text(d.player)
+				.style("color", d.color)
+			input.append("br")
+		}
 
 		function initZoom() {
 			d3.select('svg')
@@ -105,18 +154,10 @@
 		}
 
 		function coord(x, y) {
-			return { x: Math.floor(x + CENTER.x), y: Math.floor(y + CENTER.y) }
+			return [Math.floor(x + CENTER.x), Math.floor(y + CENTER.y)]
 		}
 
-		function arrToPairedArr(arr) {
-			let result = []
 
-			for (var i = 0; i < arr.length - 1; i++) {
-				result.push([arr[i], arr[i + 1]]);
-			}
-
-			return result;
-		}
 
 		function handleZoom(e) {
 
