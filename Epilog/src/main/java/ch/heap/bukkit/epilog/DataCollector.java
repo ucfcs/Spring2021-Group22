@@ -27,6 +27,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -278,6 +280,7 @@ public class DataCollector {
 			entity = typedEvent.getWhoClicked();
 			itemStack = typedEvent.getCursor();
 		} else if (event instanceof InventoryClickEvent) {
+			//TODO seperate item types
 			InventoryClickEvent typedEvent = (InventoryClickEvent) event;
 			entity = typedEvent.getWhoClicked();
 			itemStack = typedEvent.getCurrentItem();
@@ -290,13 +293,23 @@ public class DataCollector {
 			itemStack = typedEvent.getItemDrop().getItemStack();
 		} else if (event instanceof EntityPickupItemEvent) { 
 			EntityPickupItemEvent typedEvent = (EntityPickupItemEvent) event;
-		if (typedEvent.getEntity().getType() == EntityType.PLAYER) {
+			if (typedEvent.getEntity().getType() == EntityType.PLAYER) {
 				player = (Player) typedEvent.getEntity();
 				itemEntity = typedEvent.getItem();
 				itemStack = typedEvent.getItem().getItemStack();
 				UUID droppedBy = epilog.exchangeItemListener.itemDroppedByMap.get(typedEvent.getItem().getUniqueId());
 				data.put("droppedBy", droppedBy != null ? droppedBy.toString() : null);
 			}
+		} else if (event instanceof BlockBreakEvent) { 
+			BlockBreakEvent typedEvent = (BlockBreakEvent) event;
+			player = typedEvent.getPlayer();
+			block = typedEvent.getBlock();
+			itemStack = typedEvent.getPlayer().getItemOnCursor(); //TODO test
+		} else if (event instanceof BlockPlaceEvent) { 
+			BlockPlaceEvent typedEvent = (BlockPlaceEvent) event;
+			player = typedEvent.getPlayer();
+			block = typedEvent.getBlockPlaced();
+			itemStack = typedEvent.getItemInHand();
 		} else {
 			doIntrospection = true;
 			for (Method method : event.getClass().getMethods()) {

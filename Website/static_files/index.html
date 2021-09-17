@@ -1,19 +1,62 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-<title>Hello World</title>
-<meta name="description" content="Our first page">
-<meta name="keywords" content="html tutorial template">
-</head>
-<body>
-<p>Look at this raw data from /inventory_size_over_time.json. Such cool</p>
-<div id="raw"/>
-<script>
-(async () => {
-    const raw = await fetch('/inventory_size_over_time.json');
-    const data = await raw.json();
-    document.getElementById('raw').innerHTML = JSON.stringify(data);
-})();
-</script>
-</body>
+  <head>
+    <title>Hello World</title>
+    <meta name="description" content="Our first page" />
+    <meta name="keywords" content="html tutorial template" />
+  </head>
+  <body>
+    <p>Look at this raw data from /inventory_size_over_time.json. Such cool</p>
+    <div id="raw" />
+    <div id="sharing_is_caring" />
+    <div id="chart" />
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+      ;(async () => {
+        {
+          // const raw = await fetch('/inventory_size_over_time.json')
+          // const data = await raw.json()
+          // document.getElementById('raw').innerHTML = JSON.stringify(data)
+        }
+        {
+          const raw = await fetch('/sharing_column_chart.json')
+          const data = await raw.json()
+
+          const series = [
+            {
+              name: 'Given',
+              data: Object.keys(data).map((player) => data[player].given),
+            },
+            {
+              name: 'Taken',
+              data: Object.keys(data).map((player) => data[player].taken),
+            },
+          ]
+          const categories = Object.keys(data)
+
+          var options = {
+            series,
+            chart: {
+              type: 'bar',
+              height: 350,
+            },
+            xaxis: {
+              categories,
+            },
+            yaxis: {
+              title: {
+                text: 'Count',
+              },
+            },
+          }
+
+          var chart = new ApexCharts(
+            document.querySelector('#sharing_is_caring'),
+            options
+          )
+          chart.render()
+        }
+      })()
+    </script>
+  </body>
 </html>
