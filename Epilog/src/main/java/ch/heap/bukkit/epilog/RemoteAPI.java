@@ -1,15 +1,10 @@
 package ch.heap.bukkit.epilog;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitScheduler;
 
 
 import org.bson.Document;
@@ -35,50 +30,11 @@ public class RemoteAPI {
 		if (!this.plugin.isEnabled())
 			return;
 		// loadLogCache();
-		this.addLogEvent(this.plugin.epilogStateEvent("connect", true));
+		plugin.postEvent(this.plugin.epilogStateEvent("connect", true));
 		if (postman == null) {
 			postman = new Postman();
 			postman.start();
 		}
-
-		Map<UUID, Location> prevLocation = new HashMap<>();
-
-		BukkitScheduler scheduler = plugin.getServer().getScheduler();
-		scheduler.scheduleSyncRepeatingTask(plugin, new Runnable() {
-			@Override
-			public void run() {
-				for (Player p : plugin.getServer().getOnlinePlayers()) {
-
-					Location loc = p.getLocation();
-					Location prev = prevLocation.get(p.getUniqueId());
-
-					if (prev != null && prevLocation.get(p.getUniqueId()).equals(loc)) {
-						return;
-					}
-
-					prevLocation.put(p.getUniqueId(), loc);
-
-					Map<String, Object> data = new HashMap<>();
-
-					data.put("x", loc.getX());
-					data.put("y", loc.getY());
-					data.put("z", loc.getZ());
-					data.put("pitch", loc.getPitch());
-					data.put("yaw", loc.getYaw());
-
-					data.put("player", p.getUniqueId().toString());
-
-					data.put("time", System.currentTimeMillis());
-
-					data.put("experimentLabel", plugin.activeExperimentLabel);
-
-					data.put("event", "PlayerLocationEvent");
-
-					Document doc = new Document(data);
-					documentQueue.add(doc);
-				}
-			}
-		}, 0L, 20L);
 	}
 
 	public void stop() {
@@ -93,7 +49,7 @@ public class RemoteAPI {
 			}
 			postman = null;
 		}
-		this.addLogEvent(this.plugin.epilogStateEvent("disconnect", false));
+		plugin.postEvent(this.plugin.epilogStateEvent("disconnect", false));
 
 		try {
 			while (!documentQueue.isEmpty()) {

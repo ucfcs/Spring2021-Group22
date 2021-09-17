@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
@@ -19,12 +20,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.mongodb.ConnectionString;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 
 public class Epilog extends JavaPlugin {
 	public RemoteAPI remote;
@@ -52,6 +56,7 @@ public class Epilog extends JavaPlugin {
 	public boolean notifications = false;
 	public boolean loggingInfo = false;
 	public boolean ingameCommands = false;
+	public List<String> blacklist = new ArrayList<>();
 
 	public boolean debugMode = false;
 	public boolean bukkitMode = false;
@@ -105,13 +110,13 @@ public class Epilog extends JavaPlugin {
 		this.config = conf;
 		LogEvent changeEvent = initial ? null : epilogStateEvent("configChange", true);
 		if (changeEvent!=null && this.loggingEnabled) {
-			this.remote.addLogEvent(changeEvent);
+			this.postEvent(changeEvent);
 			changeEvent = null;
 		}
 		this.loadConfig(conf);
 		if (changeEvent!=null) {
 			// maybe we can post now?
-			this.remote.addLogEvent(changeEvent);
+			this.postEvent(changeEvent);
 		}
 	}
 	
@@ -131,6 +136,35 @@ public class Epilog extends JavaPlugin {
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));
 		// send onEnable to sub modules
 		inventoryTracker.onEnable();
+
+		// Start tracking player locations
+		final Map<UUID, Location> prevLocation = new HashMap<>();
+		final Epilog plugin = this;
+
+		(new BukkitRunnable(){
+			@Override
+			public void run() {
+				for (Player p : getServer().getOnlinePlayers()) {
+					Location loc = p.getLocation();
+					Location prev = prevLocation.get(p.getUniqueId());
+					if (prev != null && prevLocation.get(p.getUniqueId()).equals(loc)) {
+						return;
+					}
+
+					prevLocation.put(p.getUniqueId(), loc);
+
+					LogEvent event = new LogEvent("PlayerLocationEvent", System.currentTimeMillis(), activeExperimentLabel, p);
+					Map<String, Object> data = event.data;
+					data.put("x", loc.getX());
+					data.put("y", loc.getY());
+					data.put("z", loc.getZ());
+					data.put("pitch", loc.getPitch());
+					data.put("yaw", loc.getYaw());
+
+					plugin.postEvent(event);
+				}
+			}
+		}).runTaskTimer(this, 0L, 20L);
 	}
 	
 	@Override
@@ -270,6 +304,10 @@ public class Epilog extends JavaPlugin {
 						dataCollector.addData(event);
 					}
 
+					if (event.player != null && blacklist.contains(event.player.getUniqueId().toString())) {
+						continue;
+					}
+
 					// let observers handle event
 					Iterator<Observer> it = observers.iterator();
 					while (it.hasNext()) {
@@ -316,6 +354,7 @@ public class Epilog extends JavaPlugin {
 		conf.put("ingameCommands", config.getBoolean("ingame-commands", true));
 		conf.put("debugMode", config.getBoolean("debug-mode", false));
 		conf.put("mongoURI", config.getString("mongo-uri", "mongodb://localhost:27017"));
+		conf.put("blacklist", config.getStringList("blacklist"));
 		return conf;
 	}
 	
@@ -330,6 +369,7 @@ public class Epilog extends JavaPlugin {
 		this.ingameCommands = ((Boolean) conf.get("ingameCommands")).booleanValue();
 		this.debugMode = ((Boolean) conf.get("debugMode")).booleanValue();
 		this.mongoURI = ((String) conf.get("mongoURI"));
+		this.blacklist = (List<String>) conf.get("blacklist");
 	}
 
 	public String getCurrentVersion() {
