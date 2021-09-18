@@ -38,11 +38,8 @@ def precomputeJSON(experimentLabel):
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
-    intermediary_data = {}
     zone_names = [zone['name'] for zone in ALL_ZONES]
-    #TODO refactor to be by player
-    for zone in zone_names:
-        intermediary_data[zone] = {}
+    intermediary_data = {}
     intermediary_player_set = set()
     for event in cursor:
         if not isGoodData(event):
@@ -50,17 +47,18 @@ def precomputeJSON(experimentLabel):
         
         intermediary_player_set.add(event['player'])
         event_zone = getZone(event['x'], event['y'], event['z'])
-        if event['player'] not in intermediary_data[event_zone]:
-            intermediary_data[event_zone][event['player']] = 0
-        intermediary_data[event_zone][event['player']]+=1;
+        if event['player'] not in intermediary_data:
+            init_data = {}
+            for zone in zone_names:
+                init_data[zone] = 0
+            intermediary_data[event['player']] = init_data
+        intermediary_data[event['player']][event_zone]+=1;
 
     players = list(intermediary_player_set)
     data = {
         'series': [{ 
                 'name': player, 
-                'data': [
-                    (intermediary_data[event_zone][player] if player in intermediary_data[event_zone] else 0) 
-                for event_zone in zone_names] 
+                'data': [intermediary_data[player][event_zone] for event_zone in zone_names] 
             } for player in players],
         'categories': zone_names,
     }
