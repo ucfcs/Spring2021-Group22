@@ -283,9 +283,12 @@ public class DataCollector {
 			//TODO seperate item types
 			InventoryClickEvent typedEvent = (InventoryClickEvent) event;
 			entity = typedEvent.getWhoClicked();
-			itemStack = typedEvent.getCurrentItem();
 			data.put("slot", typedEvent.getSlot());
 			data.put("slotType", typedEvent.getSlotType().toString());
+			data.put("currentItem", this.itemTypeString(typedEvent.getCurrentItem()));
+			data.put("currentAmount", typedEvent.getCurrentItem().getAmount());
+			data.put("cursorItem", this.itemTypeString(typedEvent.getCursor()));
+			data.put("cursorAmount", typedEvent.getCursor().getAmount());
 		} else if (event instanceof PlayerDropItemEvent) { 
 			PlayerDropItemEvent typedEvent = (PlayerDropItemEvent) event;
 			player = (Player) typedEvent.getPlayer();

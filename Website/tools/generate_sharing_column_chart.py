@@ -37,22 +37,35 @@ def precomputeJSON(experimentLabel):
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
-    data = {};
+    actions = ['given', 'taken']
+    intermediary_data = {};
+    for action in actions:
+        intermediary_data[action] = {}
+    intermediary_player_set = set()
     for event in cursor:
         if not isGoodData(event):
             continue
         if event['droppedBy'] == None:
             continue
-        if event['droppedBy'] == event['player']:
-            continue
+        # if event['droppedBy'] == event['player']:
+        #     continue
 
-        if event['player'] not in data:
-            data[event['player']] = { "taken": 0, "given": 0 }
-        if event['droppedBy'] not in data:
-            data[event['droppedBy']] = { "taken": 0, "given": 0 }
-        data[event['player']]['taken']+=1;
-        data[event['droppedBy']]['given']+=1;
-        
+        intermediary_player_set.add(event['player'])
+        if event['player'] not in intermediary_data['taken']:
+            intermediary_data['taken'][event['player']] = 0
+        intermediary_data['taken'][event['player']]+=1;
+        if event['droppedBy'] not in intermediary_data['given']:
+            intermediary_data['given'][event['droppedBy']] = 0
+        intermediary_data['given'][event['droppedBy']]+=1;
+
+    players = list(intermediary_player_set)
+    data = {
+        'series': [{ 
+                'name': action, 
+                'data': [intermediary_data[action][player] for player in players] 
+            } for action in actions],
+        'categories': players,
+    }
     return data
 
 # Write the results to a precomputed file. This file will likely be in the static_files 
@@ -62,4 +75,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/sharing_column_chart.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/sharing_column_chart.json')

@@ -1,4 +1,4 @@
-## DEPRECATED - DO NOT REFERENCE/USE
+## Simple tool for querying the database for common events
 
 import pymongo
 import argparse
@@ -7,6 +7,7 @@ import os
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import json
+from zoning_util import ALL_ZONES, getZone
 
 load_dotenv();
 
@@ -20,31 +21,49 @@ mongo_connection_uri = os.environ.get(MONGO_URI);
 # I've changed the schema so without this the script crashes. This check will
 # eventually be unnecessary
 def isGoodData(event):
-    return 'totalSize' in event;
+    return True;
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--out', help='where to write the data to');
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
 args = parser.parse_args()
 
-# Precompute the data structure needed for the inventory size time series. This would be
+# Precompute the data structure needed for the sharing column chart. This would be
 # the "tools" part of the process. This would be run once for each team we have run
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
     collection = client.epilog.data2;
-    query = { "event": "InventoryContent" }
+    query = { "event": "PlayerLocationEvent" }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
-    data = {};
+    intermediary_data = {}
+    zone_names = [zone['name'] for zone in ALL_ZONES]
+    #TODO refactor to be by player
+    for zone in zone_names:
+        intermediary_data[zone] = {}
+    intermediary_player_set = set()
     for event in cursor:
         if not isGoodData(event):
             continue
-        if event['player'] not in data:
-            data[event['player']] = {'x': [], 'y': []}
-        data[event['player']]['x'].append(event['time'] // 1000);
-        data[event['player']]['y'].append(event['totalSize']);
+        
+        intermediary_player_set.add(event['player'])
+        event_zone = getZone(event['x'], event['y'], event['z'])
+        if event['player'] not in intermediary_data[event_zone]:
+            intermediary_data[event_zone][event['player']] = 0
+        intermediary_data[event_zone][event['player']]+=1;
+
+    players = list(intermediary_player_set)
+    data = {
+        'series': [{ 
+                'name': player, 
+                'data': [
+                    (intermediary_data[event_zone][player] if player in intermediary_data[event_zone] else 0) 
+                for event_zone in zone_names] 
+            } for player in players],
+        'categories': zone_names,
+    }
     return data
 
 # Write the results to a precomputed file. This file will likely be in the static_files 
@@ -54,4 +73,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/inventory_size_over_time.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/locations_total_time_column_chart_v2.json')
