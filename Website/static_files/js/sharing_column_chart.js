@@ -1,9 +1,9 @@
-async function renderLocationsTotalTimeColumnChart(element) {
-  const data = await getData('locations_total_time_column_chart.json')
-
+async function renderSharingColumnChart(element) {
+  const data = await getData('sharing_column_chart.json')
+  
   const options = {
     title: {
-      text: 'Approximate Seconds Spent in Locations by Player',
+      text: 'Items Shared Among Us',
     },
     chart: {
       type: 'bar',
@@ -15,9 +15,10 @@ async function renderLocationsTotalTimeColumnChart(element) {
     },
     yaxis: {
       title: {
-        text: 'Seconds',
+        text: 'Count',
       },
     },
   }
+  
   new ApexCharts(element, options).render();
 }

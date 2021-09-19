@@ -1,10 +1,9 @@
-
-async function renderLocationsTotalTimeColumnChartV2(element) {
-  const data = await getData('locations_total_time_column_chart_v2.json')
+async function renderTimeInLocationByPlayerColumnChart(element) {
+  const data = await getData('time_in_location_by_player_column_chart.json')
 
   const options = {
     title: {
-      text: 'Approximate Seconds Spent in Locations by Player V2',
+      text: 'Time in Location by Each Player',
     },
     chart: {
       type: 'bar',
@@ -20,5 +19,6 @@ async function renderLocationsTotalTimeColumnChartV2(element) {
       },
     },
   }
+  
   new ApexCharts(element, options).render();
 }

@@ -38,8 +38,10 @@ def precomputeJSON(experimentLabel):
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
-    zone_names = [zone['name'] for zone in ALL_ZONES]
     intermediary_data = {}
+    zone_names = [zone['name'] for zone in ALL_ZONES]
+    for zone in zone_names:
+        intermediary_data[zone] = {}
     intermediary_player_set = set()
     for event in cursor:
         if not isGoodData(event):
@@ -47,20 +49,19 @@ def precomputeJSON(experimentLabel):
         
         intermediary_player_set.add(event['player'])
         event_zone = getZone(event['x'], event['y'], event['z'])
-        if event['player'] not in intermediary_data:
-            init_data = {}
-            for zone in zone_names:
-                init_data[zone] = 0
-            intermediary_data[event['player']] = init_data
-        intermediary_data[event['player']][event_zone]+=1;
+        if event['player'] not in intermediary_data[event_zone]:
+            intermediary_data[event_zone][event['player']] = 0
+        intermediary_data[event_zone][event['player']]+=1;
 
     players = list(intermediary_player_set)
     data = {
         'series': [{ 
-                'name': player, 
-                'data': [intermediary_data[player][event_zone] for event_zone in zone_names] 
-            } for player in players],
-        'categories': zone_names,
+                'name': event_zone, 
+                'data': [
+                    (intermediary_data[event_zone][player] if player in intermediary_data[event_zone] else 0) 
+                for player in players] 
+            } for event_zone in zone_names],
+        'categories': players,
     }
     return data
 
@@ -71,4 +72,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/locations_total_time_column_chart_v2.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/time_in_location_by_player_column_chart.json')

@@ -1,9 +1,10 @@
-async function renderSharingColumnChart(element) {
-  const data = await getData('sharing_column_chart.json')
-  
+
+async function renderTimeOfPlayerByLocationColumnChart(element) {
+  const data = await getData('time_of_player_by_location_column_chart.json')
+
   const options = {
     title: {
-      text: 'Items Shared Among Us',
+      text: 'Time of Player by Location',
     },
     chart: {
       type: 'bar',
@@ -15,11 +16,10 @@ async function renderSharingColumnChart(element) {
     },
     yaxis: {
       title: {
-        text: 'Count',
+        text: 'Seconds',
       },
     },
   }
   
   new ApexCharts(element, options).render();
 }
-//document.querySelector('#sharing_is_caring')
