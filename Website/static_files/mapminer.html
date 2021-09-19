@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<body>
+	<script src="https://d3js.org/d3.v7.js"></script>
+	<script src="https://unpkg.com/d3-simple-slider"></script>
+
+	<title>Map</title>
+
+	<p id="value"></p>
+	<div id="slider"></div>
+
+	<div id="map"></div>
+
+	<div id="input"></div>
+
+	<script>
+	(async () => {
+		// Initial Values
+		let width = 417 * 2, height = 417 * 2;
+		const CENTER = { x: width / 2, y: height / 2 };
+
+		let colors = ["red", "green", "blue", "orange", "purple", "yellow", "cyan", "black"];
+
+
+		// console.log(_jsondata.timeline);
+
+		// jsondata = objFilter(_jsondata.timeline, { event: "PlayerLocationEvent", player: -1982006789 });
+
+		// var slider = d3
+		// 	.sliderHorizontal()
+		// 	.min(0)
+		// 	.max(10)
+		// 	.step(1)
+		// 	.width(300)
+		// 	.displayValue(false)
+		// 	.on('onchange', (val) => {
+		// 		d3.select('#value').text(val);
+		// 	});
+
+		// d3.select('#slider')
+		// 	.append('svg')
+		// 	.attr('width', 500)
+		// 	.attr('height', 100)
+		// 	.append('g')
+		// 	.attr('transform', 'translate(30,30)')
+		// 	.call(slider);
+
+		const raw = await fetch('/data/rawdata_timestamp.json')
+      	const _jsondata = await raw.json()
+
+		// prob not the best way to do this but it works
+		let jsondata = {}
+		for (const [key, value] of Object.entries(_jsondata.timeline)) {
+			// console.log(`${key}: ${value}`);
+
+			let res = value.filter(f => f.event === "PlayerLocationEvent") // && f.player === -1982006789
+			if (res.length > 0) {
+				// jsondata[f].push(...res)
+				res.forEach(r => {
+					if (r.player in jsondata) {
+						jsondata[r.player].pos.push(r)
+					}
+					else {
+						jsondata[r.player] = { player: r.player, color: colors.shift(), pos: [r] }
+					}
+				});
+			}
+		}
+		for (const [key, value] of Object.entries(jsondata)) {
+			jsondata[key].pos = jsondata[key].pos.map(p => coord(p.x*2, p.z*2))
+		}
+
+		console.log(jsondata)
+
+		let input = d3.select("div#input")
+
+		input.append("h3")
+			.text("Toggle Visibility of player")
+		input.append("p")
+			.text("rises to top on reshowing")
+
+		// Select map div and set attributes
+		let map = d3.select("div#map")
+			.style("width", width + "px")
+			.style("height", height + "px")
+
+		// create base svg
+		let svg = map
+			.append("svg")
+			.style("width", width + "px")
+			.style("height", height + "px")
+			.append("g")
+
+		// add image to svg
+		let image = svg.append("image")
+			.attr("width", width + "px")
+			.attr("height", height + "px")
+			.attr("xlink:href", "img/highresmap.png")
+
+		let heatmap = svg.append("g").attr("id", 'heatmap')
+
+		// handle pan and zoom of svg
+		let zoom = d3.zoom()
+			.scaleExtent([1, 5])
+			.translateExtent([[0, 0], [width, height]])
+			.on('zoom', handleZoom);
+
+		// create group <g id={id}> for each player in data
+		// draw path for each player with unique color
+		let players = heatmap
+			.selectAll("g")
+			.data(Object.values(jsondata))
+			.enter()
+			// .append("g")
+			.append("path")
+			.attr("id", function (d) { return d.player })
+			.attr("d", function (d) { return d3.line()(d.pos) })
+			// .attr("stroke", "black")
+			.attr("fill", "none")
+			.attr("stroke", function (d) { return d.color })
+			.attr("visibility", "visible")
+		// .call(createButton, function (d) { return d }, null)
+		// .select("#input")
+		// .append("button")
+
+		// console.log(players)
+
+		players.each(function (player, i) {
+			console.log("p: " + player, "i: " + i);
+			// player.append("g")
+			d3.select(this).call(createButton, this, player, function (d) { return d })
+		});
+
+		//<label for="quantity">Quantity:</label>
+		function createButton(selection, player, d) {
+			// console.log('create button', selection, d)
+			// selection.append("g")
+			input.append("input")
+				.attr("type", "checkbox")
+				.attr("name", d.player)
+				.attr("value", d.player)
+				.property("checked", true)
+				.on("click", function () {
+					let button = d3.select(this);
+					let state = button.property("checked");
+					selection.attr("visibility", state ? "visible" : "hidden")
+					if (state) {
+						// button.raise()	// need to move label and </br> as well
+						selection.raise()
+					}
+				})
+			input.append("label")
+				.attr("for", d.player)
+				.text(d.player)
+				.style("color", d.color)
+			input.append("br")
+		}
+
+		function initZoom() {
+			d3.select('svg')
+				.call(zoom);
+		}
+
+		function coord(x, y) {
+			return [Math.floor(x + CENTER.x), Math.floor(y + CENTER.y)]
+		}
+
+
+
+		function handleZoom(e) {
+
+			// let transform = { k: Math.round(e.transform.k), x: Math.round(e.transform.x), y: Math.round(e.transform.y) }
+			// e.transform.k = Math.round(e.transform.k)
+			// e.transform.x = Math.round(e.transform.x)
+			// e.transform.y = Math.round(e.transform.y)
+
+			// console.log(e.transform)
+			// console.log(e.transform, transform)
+
+			d3.select('svg g')
+				.attr('transform', e.transform);
+		}
+
+		initZoom();
+	})();
+	</script>
+</body>
