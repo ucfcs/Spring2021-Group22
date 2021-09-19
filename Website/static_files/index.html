@@ -17,6 +17,14 @@
       <div id="location_time_v2" />
     </div>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script src="js/script.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/show_locations_total_time_column_chart.js"></script>
+    <script src="js/show_locations_total_time_column_chart_v2.js"></script>
+    <script src="js/show_sharing_column_chart.js"></script>
+    <script>
+      renderSharingColumnChart(document.querySelector('#sharing_is_caring'));
+      renderLocationsTotalTimeColumnChart(document.querySelector('#location_time'));
+      renderLocationsTotalTimeColumnChartV2(document.querySelector('#location_time_v2'));
+    </script>
   </body>
 </html>
