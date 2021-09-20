@@ -56,7 +56,7 @@ def main():
         
         if time_offset:
             time = str(math.floor(doc['time'] / 1000) - _time_offset)
-            doc['time'] -= _time_offset
+            doc['time'] = doc['time'] - (_time_offset * 1000)
         else:
             time = str(math.floor(doc['time'] / 1000))
 
