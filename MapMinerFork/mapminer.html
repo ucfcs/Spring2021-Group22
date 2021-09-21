@@ -4,12 +4,27 @@
 <body>
 	<script src="data.js"></script>
 	<script src="https://d3js.org/d3.v7.js"></script>
-	<script src="https://unpkg.com/d3-simple-slider"></script>
+
+	<!-- Range slider code -->
+	<script src="d3slider.js"></script>
+
+	<!-- Range slider style -->
+	<link href="d3slider.css" rel="stylesheet">
+
+	<style type="text/css">
+		#slider-container {
+			position: relative;
+			height: 30px;
+			background-color: #eeeef5;
+		}
+	</style>
 
 	<title>Map</title>
 
 	<p id="value"></p>
-	<div id="slider"></div>
+
+	<div id="slider-container"></div>
+	<div id="range-label"></div>
 
 	<div id="map"></div>
 
@@ -17,10 +32,14 @@
 
 	<script>
 		// Initial Values
-		let width = 417 * 2, height = 417 * 2;
+		const SCALE = 2
+		let width = 417 * SCALE, height = 417 * SCALE; // 417 is image size
 		const CENTER = { x: width / 2, y: height / 2 };
 
-		let colors = ["red", "green", "blue", "orange", "purple", "yellow", "cyan", "black"];
+
+
+
+		// console.log(_jsondata)
 
 
 		// console.log(_jsondata.timeline);
@@ -47,28 +66,56 @@
 		// 	.call(slider);
 
 		// prob not the best way to do this but it works
-		let jsondata = {}
-		for (const [key, value] of Object.entries(_jsondata.timeline)) {
-			// console.log(`${key}: ${value}`);
+		function generateData(data, lowerTime, upperTime) {
+			let _data = {}
+			let colors = ["red", "green", "blue", "orange", "purple", "yellow", "cyan", "black"];
+			for (const [key, value] of Object.entries(data)) {
+				// console.log(`${key}: ${value}`);
 
-			let res = value.filter(f => f.event === "PlayerLocationEvent") // && f.player === -1982006789
-			if (res.length > 0) {
-				// jsondata[f].push(...res)
-				res.forEach(r => {
-					if (r.player in jsondata) {
-						jsondata[r.player].pos.push(r)
-					}
-					else {
-						jsondata[r.player] = { player: r.player, color: colors.shift(), pos: [r] }
-					}
-				});
+				let res = value.filter(f => f.event === "PlayerLocationEvent") // && f.player === -1982006789
+				if (res.length > 0) {
+					// jsondata[f].push(...res)
+					res.forEach(r => {
+						// console.log(Math.floor(r.time / 1000), lowerTime, upperTime, Math.floor(r.time / 1000) >= lowerTime && Math.floor(r.time / 1000) <= upperTime)
+						if (Math.floor(r.time / 1000) >= lowerTime && Math.floor(r.time / 1000) <= upperTime) {
+							console.log(r.time)
+							if (r.player in _data) {
+								_data[r.player].pos.push(r)
+							}
+							else {
+								_data[r.player] = { player: r.player, color: colors.shift(), pos: [r] }
+							}
+						}
+
+					});
+				}
 			}
+			for (const [key, value] of Object.entries(_data)) {
+				_data[key].pos = _data[key].pos.map(p => coord(p.x, p.z))
+			}
+
+			return _data;
 		}
-		for (const [key, value] of Object.entries(jsondata)) {
-			jsondata[key].pos = jsondata[key].pos.map(p => coord(p.x, p.z))
-		}
+
+		let jsondata = generateData(_jsondata.timeline, _jsondata.time.min, _jsondata.time.max)
+
 
 		console.log(jsondata)
+
+		var slider = createD3RangeSlider(_jsondata.time.min, _jsondata.time.max, "#slider-container", true);
+
+		slider.onChangeEnd(function (newRange) {
+
+			console.log(newRange);
+			let data = generateData(_jsondata.timeline, newRange.begin, newRange.end)
+
+			console.log(data)
+
+			drawPlayers(data)
+
+
+			d3.select("#range-label").html(newRange.begin + " &mdash; " + newRange.end);
+		});
 
 		let input = d3.select("div#input")
 
@@ -83,11 +130,11 @@
 			.style("height", height + "px")
 
 		// create base svg
-		let svg = map
+		let _svg = map
 			.append("svg")
 			.style("width", width + "px")
 			.style("height", height + "px")
-			.append("g")
+		let svg = _svg.append("g")
 
 		// add image to svg
 		let image = svg.append("image")
@@ -99,24 +146,69 @@
 
 		// handle pan and zoom of svg
 		let zoom = d3.zoom()
-			.scaleExtent([1, 5])
 			.translateExtent([[0, 0], [width, height]])
+			.scaleExtent([1, 5])
 			.on('zoom', handleZoom);
 
 		// create group <g id={id}> for each player in data
 		// draw path for each player with unique color
-		let players = heatmap
-			.selectAll("g")
-			.data(Object.values(jsondata))
-			.enter()
-			// .append("g")
-			.append("path")
-			.attr("id", function (d) { return d.player })
-			.attr("d", function (d) { return d3.line()(d.pos) })
-			// .attr("stroke", "black")
-			.attr("fill", "none")
-			.attr("stroke", function (d) { return d.color })
-			.attr("visibility", "visible")
+		function drawPlayers(data) {
+
+			console.log('draw players', data)
+
+			let path = heatmap
+				.selectAll("path")
+				.data(Object.values(data))
+			// .enter()
+			// // .append("g")
+			// .append("path")
+			// .attr("id", function (d) { return d.player })
+			// .attr("d", function (d) { return d3.line()(d.pos) })
+			// // .attr("stroke", "black")
+			// .attr("fill", "none")
+			// .attr("stroke", function (d) { return d.color })
+			// .attr("visibility", "visible")
+			// .exit().attr("visibility", "hidden")
+
+			console.log(path)
+
+			path.enter().append("path")//.attr("id", function (d) { return d.player })
+				.attr("id", function (d) { return d.player })
+				.attr("stroke", function (d) { return d.color })
+				.attr("fill", "none")
+				.attr("visibility", "visible")
+
+			path
+				.attr("d", function (d) {
+					console.log(d.pos, d3.line()(d.pos))
+					return d3.line()(d.pos)
+				})
+				.attr("visibility", "visible")
+
+			path.exit().attr("visibility", "hidden")
+
+
+			return path
+
+
+
+			// x.enter()
+			// 	// .append("g")
+			// 	.append("path")
+			// 	.attr("id", function (d) { return d.player })
+			// 	.attr("d", function (d) { return d3.line()(d.pos) })
+			// 	// .attr("stroke", "black")
+			// 	.attr("fill", "none")
+			// 	.attr("stroke", function (d) { return d.color })
+			// 	.attr("visibility", "visible")
+
+			// x.update()
+			// 	.select("path")
+			// 	.attr("d", function (d) { return d3.line()(d.pos) })
+
+			// x.exit().remove()
+		}
+		let players = drawPlayers(jsondata)
 		// .call(createButton, function (d) { return d }, null)
 		// .select("#input")
 		// .append("button")
@@ -155,28 +247,27 @@
 		}
 
 		function initZoom() {
-			d3.select('svg')
-				.call(zoom);
+			// d3.select('svg')
+			svg.call(zoom);
 		}
 
 		function coord(x, y) {
-			return [Math.floor(x + CENTER.x), Math.floor(y + CENTER.y)]
+			return [Math.floor(x * SCALE + CENTER.x), Math.floor(y * SCALE + CENTER.y)]
 		}
 
 
 
 		function handleZoom(e) {
-
 			// let transform = { k: Math.round(e.transform.k), x: Math.round(e.transform.x), y: Math.round(e.transform.y) }
 			// e.transform.k = Math.round(e.transform.k)
-			// e.transform.x = Math.round(e.transform.x)
-			// e.transform.y = Math.round(e.transform.y)
+			// e.transform.x = e.transform.x * e.transform.k
+			// e.transform.y = e.transform.y * e.transform.k
 
 			// console.log(e.transform)
 			// console.log(e.transform, transform)
 
-			d3.select('svg g')
-				.attr('transform', e.transform);
+			// d3.select('svg g')
+			svg.attr('transform', e.transform);
 		}
 
 		initZoom();
