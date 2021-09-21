@@ -97,6 +97,11 @@ public class DataCollector {
 			if (this.epilog.logChats) {
 				logEvent.data.put("msg", chatEvent.getMessage());
 			}
+			Map<String, Object> data = logEvent.data;
+			Location loc = chatEvent.getPlayer().getLocation();
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
 		} else if (event instanceof CustomActionEvent) {
 			CustomActionEvent typedEvent = (CustomActionEvent) event;
 			logEvent.player = typedEvent.getPlayer();
