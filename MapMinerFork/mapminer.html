@@ -35,79 +35,106 @@
 		const SCALE = 2
 		let width = 417 * SCALE, height = 417 * SCALE; // 417 is image size
 		const CENTER = { x: width / 2, y: height / 2 };
+		let colors = ["red", "green", "blue", "orange", "purple", "yellow", "cyan", "black"];
+
+
+		let inputdata = _jsondata;
+
+		const _minTime = inputdata.time.min;
+		const _maxTime = inputdata.time.max;
+
+		let data = {};
+		let dataMin = _minTime;
+		let dataMax = _maxTime;
 
 
 
-
-		// console.log(_jsondata)
-
-
-		// console.log(_jsondata.timeline);
-
-		// jsondata = objFilter(_jsondata.timeline, { event: "PlayerLocationEvent", player: -1982006789 });
-
-		// var slider = d3
-		// 	.sliderHorizontal()
-		// 	.min(0)
-		// 	.max(10)
-		// 	.step(1)
-		// 	.width(300)
-		// 	.displayValue(false)
-		// 	.on('onchange', (val) => {
-		// 		d3.select('#value').text(val);
-		// 	});
-
-		// d3.select('#slider')
-		// 	.append('svg')
-		// 	.attr('width', 500)
-		// 	.attr('height', 100)
-		// 	.append('g')
-		// 	.attr('transform', 'translate(30,30)')
-		// 	.call(slider);
 
 		// prob not the best way to do this but it works
-		function generateData(data, lowerTime, upperTime) {
-			let _data = {}
-			let colors = ["red", "green", "blue", "orange", "purple", "yellow", "cyan", "black"];
-			for (const [key, value] of Object.entries(data)) {
-				// console.log(`${key}: ${value}`);
+		for (const [key, value] of Object.entries(inputdata.timeline)) {
+			let res = value.filter(f => f.event === "PlayerLocationEvent")
+			if (res.length > 0) {
+				res.forEach(r => {
+					if (Math.floor(r.time / 1000) >= _minTime && Math.floor(r.time / 1000) <= _maxTime) {
 
-				let res = value.filter(f => f.event === "PlayerLocationEvent") // && f.player === -1982006789
+						console.log(r, r.pos)
+
+						if (r.player in data) {
+							data[r.player].pos.push(coord(r.x, r.z))
+						}
+						else {
+							data[r.player] = { player: r.player, color: colors.shift(), pos: [coord(r.x, r.z)] } //, pos: coord(r.x, r.z)
+							// data[r.player].pos.push(coord(r.x, r.z))
+
+						}
+					}
+
+				});
+			}
+		}
+		// for (const [key, value] of Object.entries(_data)) {
+		// 	_data[key].pos = _data[key].pos.map(p => coord(p.x, p.z))
+		// }
+
+
+		function generateData(lowerTime, upperTime) {
+			if (lowerTime == dataMin && upperTime == dataMax) {
+				return;
+			}
+
+			console.log('a')
+			// Object.keys(data).forEach(player => {
+			// 	data[player].pos = [];
+			// 	console.log(player, data[player]);
+			// })
+
+			for (const player in data) {
+				data[player].pos.length = 0;
+				console.log(player, data[player]);
+			}
+
+			console.log('b')
+
+			console.log(data);
+
+			console.log('c')
+
+
+			console.log(Object.entries(inputdata.timeline))
+
+			for (const [key, value] of Object.entries(inputdata.timeline)) {
+				let res = value.filter(f => f.event === "PlayerLocationEvent")
 				if (res.length > 0) {
-					// jsondata[f].push(...res)
 					res.forEach(r => {
-						// console.log(Math.floor(r.time / 1000), lowerTime, upperTime, Math.floor(r.time / 1000) >= lowerTime && Math.floor(r.time / 1000) <= upperTime)
-						if (Math.floor(r.time / 1000) >= lowerTime && Math.floor(r.time / 1000) <= upperTime) {
-							console.log(r.time)
-							if (r.player in _data) {
-								_data[r.player].pos.push(r)
+						if (Math.floor(r.time / 1000) >= _minTime && Math.floor(r.time / 1000) <= _maxTime) {
+							if (r.player in data) {
+								data[r.player].pos.push(coord(r.x, r.z))
 							}
 							else {
-								_data[r.player] = { player: r.player, color: colors.shift(), pos: [r] }
+								data[r.player] = { player: r.player, color: colors.shift(), pos: [coord(r.x, r.z)] }
 							}
 						}
 
 					});
 				}
 			}
-			for (const [key, value] of Object.entries(_data)) {
-				_data[key].pos = _data[key].pos.map(p => coord(p.x, p.z))
-			}
 
-			return _data;
+			// return _data;
 		}
 
-		let jsondata = generateData(_jsondata.timeline, _jsondata.time.min, _jsondata.time.max)
+
+		// let jsondata = data
 
 
-		console.log(jsondata)
+		// console.log(jsondata)
 
 		var slider = createD3RangeSlider(_jsondata.time.min, _jsondata.time.max, "#slider-container", true);
 
 		slider.onChangeEnd(function (newRange) {
 
 			console.log(newRange);
-			let data = generateData(_jsondata.timeline, newRange.begin, newRange.end)
+			// let data = 
+			generateData(newRange.begin, newRange.end)
 
 			console.log(data)
 
@@ -154,7 +181,7 @@
 		// draw path for each player with unique color
 		function drawPlayers(data) {
 
-			console.log('draw players', data)
+			console.log('draw players', data, Object.values(data), Object.values(data))
 
 			let path = heatmap
 				.selectAll("path")
@@ -177,13 +204,17 @@
 				.attr("stroke", function (d) { return d.color })
 				.attr("fill", "none")
 				.attr("visibility", "visible")
-
-			path
 				.attr("d", function (d) {
-					console.log(d.pos, d3.line()(d.pos))
+					// console.log(d.pos, d3.line()(d.pos))
 					return d3.line()(d.pos)
 				})
+
+			path
 				.attr("visibility", "visible")
+				.attr("d", function (d) {
+					// console.log(d.pos, d3.line()(d.pos))
+					return d3.line()(d.pos)
+				})
 
 			path.exit().attr("visibility", "hidden")
 
@@ -208,7 +239,7 @@
 
 			// x.exit().remove()
 		}
-		let players = drawPlayers(jsondata)
+		let players = drawPlayers(data)
 		// .call(createButton, function (d) { return d }, null)
 		// .select("#input")
 		// .append("button")
