@@ -51,30 +51,22 @@
 
 
 		// prob not the best way to do this but it works
+		// duplicated? can prob be merged
 		for (const [key, value] of Object.entries(inputdata.timeline)) {
 			let res = value.filter(f => f.event === "PlayerLocationEvent")
 			if (res.length > 0) {
 				res.forEach(r => {
 					if (Math.floor(r.time / 1000) >= _minTime && Math.floor(r.time / 1000) <= _maxTime) {
-
-						console.log(r, r.pos)
-
 						if (r.player in data) {
 							data[r.player].pos.push(coord(r.x, r.z))
 						}
 						else {
-							data[r.player] = { player: r.player, color: colors.shift(), pos: [coord(r.x, r.z)] } //, pos: coord(r.x, r.z)
-							// data[r.player].pos.push(coord(r.x, r.z))
-
+							data[r.player] = { player: r.player, color: colors.shift(), pos: [coord(r.x, r.z)] }
 						}
 					}
-
 				});
 			}
 		}
-		// for (const [key, value] of Object.entries(_data)) {
-		// 	_data[key].pos = _data[key].pos.map(p => coord(p.x, p.z))
-		// }
 
 
 		function generateData(lowerTime, upperTime) {
@@ -82,31 +74,15 @@
 				return;
 			}
 
-			console.log('a')
-			// Object.keys(data).forEach(player => {
-			// 	data[player].pos = [];
-			// 	console.log(player, data[player]);
-			// })
-
+			// Reset players
 			for (const player in data) {
 				data[player].pos.length = 0;
-				console.log(player, data[player]);
 			}
-
-			console.log('b')
-
-			console.log(data);
-
-			console.log('c')
-
-
-			console.log(Object.entries(inputdata.timeline))
-
 			for (const [key, value] of Object.entries(inputdata.timeline)) {
 				let res = value.filter(f => f.event === "PlayerLocationEvent")
 				if (res.length > 0) {
 					res.forEach(r => {
-						if (Math.floor(r.time / 1000) >= _minTime && Math.floor(r.time / 1000) <= _maxTime) {
+						if (Math.floor(r.time / 1000) >= lowerTime && Math.floor(r.time / 1000) <= upperTime) {
 							if (r.player in data) {
 								data[r.player].pos.push(coord(r.x, r.z))
 							}
@@ -119,14 +95,10 @@
 				}
 			}
 
-			// return _data;
+			dataMin = lowerTime;
+			dataMax = upperTime;
 		}
 
-
-		// let jsondata = data
-
-
-		// console.log(jsondata)
 
 		var slider = createD3RangeSlider(_jsondata.time.min, _jsondata.time.max, "#slider-container", true);
 
@@ -208,6 +180,10 @@
 					// console.log(d.pos, d3.line()(d.pos))
 					return d3.line()(d.pos)
 				})
+				.each(function () {
+					createButton(this, function (d) { return d })
+				})
+				// .call(createButton, this, function (d) { return d })
 
 			path
 				.attr("visibility", "visible")
@@ -253,8 +229,10 @@
 		});
 
 		//<label for="quantity">Quantity:</label>
-		function createButton(selection, player, d) {
-			// console.log('create button', selection, d)
+		function createButton(_selection, d) {
+			selection = d3.select(_selection);
+			// selection = d
+			console.log('create button', selection, d)
 			// selection.append("g")
 			input.append("input")
 				.attr("type", "checkbox")
