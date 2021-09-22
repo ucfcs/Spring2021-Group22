@@ -3,6 +3,7 @@ main: ch.heap.bukkit.epilog.Epilog
 version: 0.1.3-dev
 author: stepmuel
 website: http://heapcraft.net/
+api-version: 1.16
 
 commands:
    el:

@@ -71,7 +71,7 @@ public class Epilog extends JavaPlugin {
 	
 	public String version = "unknown";
 
-	public String activeExperimentLabel = null;
+	public MazeEscapeGameData activeMazeEscapeGameData = null;
 	
 	public void versionCheck() {
 		String[] v = this.getDescription().getVersion().split("-");
@@ -153,13 +153,14 @@ public class Epilog extends JavaPlugin {
 
 					prevLocation.put(p.getUniqueId(), loc);
 
-					LogEvent event = new LogEvent("PlayerLocationEvent", System.currentTimeMillis(), activeExperimentLabel, p);
+					LogEvent event = new LogEvent("PlayerLocationEvent", System.currentTimeMillis(), activeMazeEscapeGameData != null ? activeMazeEscapeGameData.getTeamID() : null, p);
 					Map<String, Object> data = event.data;
 					data.put("x", loc.getX());
 					data.put("y", loc.getY());
 					data.put("z", loc.getZ());
 					data.put("pitch", loc.getPitch());
 					data.put("yaw", loc.getYaw());
+					data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 
 					plugin.postEvent(event);
 				}
@@ -192,7 +193,7 @@ public class Epilog extends JavaPlugin {
 	}
 	
 	public LogEvent epilogStateEvent(String trigger, boolean includeConfig) {
-		LogEvent event = new LogEvent("EpilogState", System.currentTimeMillis(), activeExperimentLabel, null);
+		LogEvent event = new LogEvent("EpilogState", System.currentTimeMillis(), activeMazeEscapeGameData != null ? activeMazeEscapeGameData.getTeamID() : null, null);
 		event.data.put("trigger", trigger);
 		event.data.put("onlinePlayers", this.dataCollector.getOnlinePlayers());
 		if (this.config!=null) {
@@ -253,7 +254,7 @@ public class Epilog extends JavaPlugin {
 		event.time = System.currentTimeMillis();
 		event.eventName = eventName;
 		event.player = player;
-		event.experimentLabel = activeExperimentLabel;
+		event.experimentLabel = activeMazeEscapeGameData != null ? activeMazeEscapeGameData.getTeamID() : null;
 		if (data!=null) for (Entry<String, Object> entry : data.entrySet()) {
 			event.data.put(entry.getKey(), entry.getValue());
 		}
@@ -307,6 +308,8 @@ public class Epilog extends JavaPlugin {
 					if (event.player != null && blacklist.contains(event.player.getUniqueId().toString())) {
 						continue;
 					}
+
+					System.out.println("Log " + event.eventName);
 
 					// let observers handle event
 					Iterator<Observer> it = observers.iterator();
