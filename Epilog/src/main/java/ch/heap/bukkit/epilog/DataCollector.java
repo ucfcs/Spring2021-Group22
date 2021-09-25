@@ -336,6 +336,7 @@ public class DataCollector {
 		} else if (event instanceof EntityPickupItemEvent) { 
 			EntityPickupItemEvent typedEvent = (EntityPickupItemEvent) event;
 			if (typedEvent.getEntity().getType() == EntityType.PLAYER) {
+				logEvent.eventName = "PlayerPickupItemEvent";
 				player = (Player) typedEvent.getEntity();
 				itemEntity = typedEvent.getItem();
 				itemStack = typedEvent.getItem().getItemStack();
