@@ -22,13 +22,24 @@ import com.mongodb.ConnectionString;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
+
+import ch.heap.bukkit.epilog.event.CollectTrophyListener;
+import ch.heap.bukkit.epilog.event.FarmListener;
+import ch.heap.bukkit.epilog.event.MansionListener;
+import ch.heap.bukkit.epilog.event.SpecialItemAttackListener;
+import ch.heap.bukkit.epilog.event.SpecialItemMarkerListener;
+import ch.heap.bukkit.epilog.event.SpecialItemPotionListener;
+import ch.heap.bukkit.epilog.event.SpecialItemUsageListener;
+import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
 
 public class Epilog extends JavaPlugin {
 	public RemoteAPI remote;
@@ -131,6 +142,13 @@ public class Epilog extends JavaPlugin {
 		listener.epilog = this;
 		getServer().getPluginManager().registerEvents(listener, this);
 		getServer().getPluginManager().registerEvents(new CustomActionListener(), this);
+		getServer().getPluginManager().registerEvents(new SpecialItemAttackListener(), this);
+		getServer().getPluginManager().registerEvents(new SpecialItemPotionListener(this), this);
+		getServer().getPluginManager().registerEvents(new SpecialItemUsageListener(this), this);
+		getServer().getPluginManager().registerEvents(new SpecialItemMarkerListener(), this);
+		getServer().getPluginManager().registerEvents(new FarmListener(), this);
+		getServer().getPluginManager().registerEvents(new MansionListener(), this);
+		getServer().getPluginManager().registerEvents(new CollectTrophyListener(), this);
 		exchangeItemListener = new ExchangeItemListener(this);
 		getServer().getPluginManager().registerEvents(exchangeItemListener, this);
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));
@@ -142,6 +160,35 @@ public class Epilog extends JavaPlugin {
 		final Epilog plugin = this;
 
 		(new BukkitRunnable(){
+			@Override
+			public void run() {
+				for (Player p : getServer().getOnlinePlayers()) {
+					for (ItemStack armorItem : p.getInventory().getArmorContents()) {
+						if (armorItem != null && armorItem.hasItemMeta()) {
+							String displayName = armorItem.getItemMeta().getDisplayName();
+							Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(p, p.getLocation(), displayName.toLowerCase().replace(" ", "_")));
+						}
+					}
+				}
+			}
+		}).runTaskTimer(this, 0L, 20L);
+
+		(new BukkitRunnable(){
+			@Override
+			public void run() {
+				for (Player p : getServer().getOnlinePlayers()) {
+					ItemStack item = p.getInventory().getItemInMainHand();
+					String displayName = item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty() ? item.getItemMeta().getDisplayName() : "";
+					if (displayName.startsWith("Hint ")) {
+						String hintID = "hint_" + displayName.substring("Hint #".length());
+						Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(p, p.getLocation(), hintID));
+					}
+				}
+			}
+		}).runTaskTimer(this, 0L, 20L);
+
+		(new BukkitRunnable(){
+
 			@Override
 			public void run() {
 				for (Player p : getServer().getOnlinePlayers()) {
@@ -309,7 +356,7 @@ public class Epilog extends JavaPlugin {
 						continue;
 					}
 
-					System.out.println("Log " + event.eventName);
+					System.out.println("Log " + event.eventName + " " + event.data);
 
 					// let observers handle event
 					Iterator<Observer> it = observers.iterator();

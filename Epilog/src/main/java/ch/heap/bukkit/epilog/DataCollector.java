@@ -65,6 +65,16 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
 
+import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
+import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
+import ch.heap.bukkit.epilog.event.CustomActionEvent;
+import ch.heap.bukkit.epilog.event.DoFarmEvent;
+import ch.heap.bukkit.epilog.event.DuneBreakEvent;
+import ch.heap.bukkit.epilog.event.OreBreakEvent;
+import ch.heap.bukkit.epilog.event.SolveMansionPuzzleEvent;
+import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
+import ch.heap.bukkit.epilog.event.VillagerTradeEvent;
+
 public class DataCollector {
 	Epilog epilog = null;
 
@@ -94,6 +104,16 @@ public class DataCollector {
 			addMovementData(logEvent, (PlayerMoveEvent) event);
 		} else if (event instanceof EntityDamageEvent || event instanceof EntityRegainHealthEvent) {
 			addDamageData(logEvent, (EntityEvent) event);
+		} else if (event instanceof UsingSpecialItemEvent) {
+			UsingSpecialItemEvent typedEvent = (UsingSpecialItemEvent) event;
+			logEvent.player = typedEvent.player;
+			Map<String, Object> data = logEvent.data;
+			Location loc = typedEvent.location;
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("special", typedEvent.action);
+			data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 		} else if (event instanceof AsyncPlayerChatEvent) {
 			AsyncPlayerChatEvent chatEvent = (AsyncPlayerChatEvent) event;
 			logEvent.player = chatEvent.getPlayer();
@@ -259,23 +279,9 @@ public class DataCollector {
 			//TODO I'm not 100% sure what the expression calculates
 			data.put("totalExperience", pexcEvent.getAmount() + pexcEvent.getPlayer().getTotalExperience());
 		} else if (event instanceof PlayerInteractEvent) {
-			PlayerInteractEvent typedEvent = (PlayerInteractEvent) event;
-			if (typedEvent.getClickedBlock() != null && typedEvent.getClickedBlock().getType() == Material.BARREL) {
-				logEvent.eventName = "BarrelOpenedEvent";
-				Location loc = typedEvent.getClickedBlock().getLocation();
-				data.put("x", loc.getBlockX());
-				data.put("y", loc.getBlockY());
-				data.put("z", loc.getBlockZ());
-				data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
-				data.put("first", epilog.activeMazeEscapeGameData != null ? epilog.activeMazeEscapeGameData.hasFoundBarrel(loc) : null);
-				if (epilog.activeMazeEscapeGameData != null) {
-					epilog.activeMazeEscapeGameData.addFoundBarrel(loc);
-				}
-			} else {
-				blockFace = ((PlayerInteractEvent) event).getBlockFace();
-				block = ((PlayerInteractEvent) event).getClickedBlock();
-				data.put("action", ((PlayerInteractEvent) event).getAction().name());
-			}
+			blockFace = ((PlayerInteractEvent) event).getBlockFace();
+			block = ((PlayerInteractEvent) event).getClickedBlock();
+			data.put("action", ((PlayerInteractEvent) event).getAction().name());
 		} else if (event instanceof FurnaceExtractEvent) {
 			material = ((FurnaceExtractEvent) event).getItemType();
 			block = ((FurnaceExtractEvent) event).getBlock();
@@ -291,21 +297,8 @@ public class DataCollector {
 			data.put("cmd", cmd.split(" ", 2)[0]);
 		} else if (event instanceof PlayerItemConsumeEvent) { 
 			PlayerItemConsumeEvent typedEvent = (PlayerItemConsumeEvent) event;
-			Bukkit.getServer().broadcastMessage("ItemConsume: " + typedEvent.getItem());
-			if (typedEvent.getItem().getType() == Material.POTION) {
-				logEvent.eventName = "SpecialItemUseEvent";
-				player = typedEvent.getPlayer();
-				Location loc = player.getLocation();
-				data.put("x", loc.getBlockX());
-				data.put("y", loc.getBlockY());
-				data.put("z", loc.getBlockZ());
-				Bukkit.getServer().broadcastMessage("ItemConsume (2): " + loc);
-				data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
-				data.put("potion", this.itemTypeString(typedEvent.getItem()));
-			} else {
-				player = typedEvent.getPlayer();
-				itemStack = typedEvent.getItem();
-			}
+			player = typedEvent.getPlayer();
+			itemStack = typedEvent.getItem();
 		} else if (event instanceof CraftItemEvent) {
 			itemStack = ((CraftItemEvent) event).getRecipe().getResult();
 			entity = ((CraftItemEvent) event).getWhoClicked();
@@ -323,19 +316,13 @@ public class DataCollector {
 			itemStack = typedEvent.getCursor();
 		} else if (event instanceof InventoryClickEvent) {
 			InventoryClickEvent typedEvent = (InventoryClickEvent) event;
-			if (typedEvent.getInventory().getType() == InventoryType.MERCHANT && typedEvent.getSlotType() == SlotType.RESULT) {
-				logEvent.eventName = "VillagerTradeEvent";
-				entity = typedEvent.getWhoClicked();
-				itemStack = typedEvent.getCurrentItem();
-			} else {
-				entity = typedEvent.getWhoClicked();
-				data.put("slot", typedEvent.getSlot());
-				data.put("slotType", typedEvent.getSlotType().toString());
-				data.put("currentItem", typedEvent.getCurrentItem() != null ? this.itemTypeString(typedEvent.getCurrentItem()) : null);
-				data.put("currentAmount", typedEvent.getCurrentItem() != null ? typedEvent.getCurrentItem().getAmount() : -1);
-				data.put("cursorItem", typedEvent.getCursor() != null ? this.itemTypeString(typedEvent.getCursor()) : null);
-				data.put("cursorAmount", typedEvent.getCursor() != null ? typedEvent.getCursor().getAmount() : -1);
-			}
+			entity = typedEvent.getWhoClicked();
+			data.put("slot", typedEvent.getSlot());
+			data.put("slotType", typedEvent.getSlotType().toString());
+			data.put("currentItem", typedEvent.getCurrentItem() != null ? this.itemTypeString(typedEvent.getCurrentItem()) : null);
+			data.put("currentAmount", typedEvent.getCurrentItem() != null ? typedEvent.getCurrentItem().getAmount() : -1);
+			data.put("cursorItem", typedEvent.getCursor() != null ? this.itemTypeString(typedEvent.getCursor()) : null);
+			data.put("cursorAmount", typedEvent.getCursor() != null ? typedEvent.getCursor().getAmount() : -1);
 		} else if (event instanceof PlayerDropItemEvent) { 
 			PlayerDropItemEvent typedEvent = (PlayerDropItemEvent) event;
 			player = (Player) typedEvent.getPlayer();
@@ -362,51 +349,86 @@ public class DataCollector {
 			}
 		} else if (event instanceof BlockBreakEvent) { 
 			BlockBreakEvent typedEvent = (BlockBreakEvent) event;
-			Material blockType = logEvent.material;
-			if (blockType == Material.SAND) {
-				logEvent.eventName = "DuneBreakEvent";
-				Location loc = typedEvent.getBlock().getLocation();
-				data.put("x", loc.getBlockX());
-				data.put("y", loc.getBlockY());
-				data.put("z", loc.getBlockZ());
-				data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
-			} else if (blockType == Material.COAL_ORE || blockType == Material.IRON_ORE || blockType == Material.GOLD_ORE || blockType == Material.DIAMOND_ORE) {
-				logEvent.eventName = "OreBreakEvent";
-				Location loc = typedEvent.getBlock().getLocation();
-				data.put("ore", blockType.toString());
-				data.put("x", loc.getBlockX());
-				data.put("y", loc.getBlockY());
-				data.put("z", loc.getBlockZ());
-				data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
-			} else if (blockType == Material.WHEAT) {
-				logEvent.eventName = "HarvestWheatEvent";
-				Location loc = typedEvent.getBlock().getLocation();
-				data.put("x", loc.getBlockX());
-				data.put("y", loc.getBlockY());
-				data.put("z", loc.getBlockZ());
-				data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
-			} else if (blockType == Material.NETHER_BRICKS || blockType == Material.CRACKED_NETHER_BRICKS) {
-				logEvent.eventName = "SpecialItemUseEvent";
-				Location loc = typedEvent.getBlock().getLocation();
-				data.put("x", loc.getBlockX());
-				data.put("y", loc.getBlockY());
-				data.put("z", loc.getBlockZ());
-				String wall = MazeEscapeZones.getWallZone(loc.toVector());
-				data.put("wall", wall);
-				data.put("first", epilog.activeMazeEscapeGameData != null ? epilog.activeMazeEscapeGameData.hasBrokenWall(wall) : null);
-				if (epilog.activeMazeEscapeGameData != null) {
-					epilog.activeMazeEscapeGameData.setHasBrokenWall(wall);
-				}
-			} else {
-				player = typedEvent.getPlayer();
-				block = typedEvent.getBlock();
-				itemStack = typedEvent.getPlayer().getItemOnCursor(); //TODO test
-			}
+			player = typedEvent.getPlayer();
+			block = typedEvent.getBlock();
+			itemStack = typedEvent.getPlayer().getInventory().getItemInMainHand();
 		} else if (event instanceof BlockPlaceEvent) { 
 			BlockPlaceEvent typedEvent = (BlockPlaceEvent) event;
 			player = typedEvent.getPlayer();
 			block = typedEvent.getBlockPlaced();
 			itemStack = typedEvent.getItemInHand();
+		} else if (event instanceof BarrelOpenedEvent) {
+			BarrelOpenedEvent typedEvent = (BarrelOpenedEvent) event;
+			player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+		} else if (event instanceof CollectTrophyEvent) {
+			CollectTrophyEvent typedEvent = (CollectTrophyEvent) event;
+			player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("trophy", typedEvent.getTrophyNumber());
+		} else if (event instanceof DoFarmEvent) {
+			DoFarmEvent typedEvent = (DoFarmEvent) event;
+			player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("action", typedEvent.getType().type);
+		} else if (event instanceof DuneBreakEvent) {
+			DuneBreakEvent typedEvent = (DuneBreakEvent) event;
+			player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+		} else if (event instanceof OreBreakEvent) {
+			OreBreakEvent typedEvent = (OreBreakEvent) event;
+			player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("ore", typedEvent.getMaterial().toString());
+		} else if (event instanceof SolveMansionPuzzleEvent) {
+			SolveMansionPuzzleEvent typedEvent = (SolveMansionPuzzleEvent) event;
+			player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("puzzle", typedEvent.getType().type);
+		} else if (event instanceof VillagerTradeEvent) {
+			VillagerTradeEvent typedEvent = (VillagerTradeEvent) event;
+			player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			String displayName = (typedEvent.getAcquiredItemStack().hasItemMeta() && !typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName().isEmpty())
+				? typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName() 
+				: typedEvent.getAcquiredItemStack().getType().toString()
+			;
+			data.put("itemstack", displayName);
 		} else {
 			doIntrospection = true;
 			for (Method method : event.getClass().getMethods()) {

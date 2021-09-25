@@ -82,6 +82,16 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
+import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
+import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
+import ch.heap.bukkit.epilog.event.CustomActionEvent;
+import ch.heap.bukkit.epilog.event.DoFarmEvent;
+import ch.heap.bukkit.epilog.event.DuneBreakEvent;
+import ch.heap.bukkit.epilog.event.OreBreakEvent;
+import ch.heap.bukkit.epilog.event.SolveMansionPuzzleEvent;
+import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
+import ch.heap.bukkit.epilog.event.VillagerTradeEvent;
+
 import org.bukkit.event.server.ServerCommandEvent;
 
 public class EventListener implements Listener {
@@ -517,6 +527,46 @@ public class EventListener implements Listener {
 	// custom events
 	@EventHandler
 	public void onCustomAction(CustomActionEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onSpecialItemUsage(UsingSpecialItemEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onBarrelOpened(BarrelOpenedEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onCollectTrophy(CollectTrophyEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onDoFarm(DoFarmEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onDuneBreak(DuneBreakEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onOreBreak(OreBreakEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onSolveMansionPuzzle(SolveMansionPuzzleEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onVillagerTrade(VillagerTradeEvent event) {
 		handleEvent(event);
 	}
 }

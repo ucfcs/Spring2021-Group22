@@ -1,4 +1,4 @@
-package ch.heap.bukkit.epilog;
+package ch.heap.bukkit.epilog.event;
  
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

@@ -10,6 +10,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
+import ch.heap.bukkit.epilog.event.CustomActionEvent;
+
 public class CustomActionListener implements Listener {
 
     @EventHandler
@@ -23,7 +25,6 @@ public class CustomActionListener implements Listener {
             }
             Player user = (Player) nearbyEntities.get(0);
             String action = event.getEntity().getCustomName();
-            Bukkit.broadcastMessage("Custom action triggered for user " + user.getName() + ": " + action);
             Bukkit.getPluginManager().callEvent(new CustomActionEvent(user, action));
         }
     }
