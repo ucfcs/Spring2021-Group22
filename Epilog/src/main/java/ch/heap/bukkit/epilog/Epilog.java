@@ -33,6 +33,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import ch.heap.bukkit.epilog.event.CollectTrophyListener;
+import ch.heap.bukkit.epilog.event.DunesListener;
 import ch.heap.bukkit.epilog.event.FarmListener;
 import ch.heap.bukkit.epilog.event.MansionListener;
 import ch.heap.bukkit.epilog.event.SpecialItemAttackListener;
@@ -40,6 +41,7 @@ import ch.heap.bukkit.epilog.event.SpecialItemMarkerListener;
 import ch.heap.bukkit.epilog.event.SpecialItemPotionListener;
 import ch.heap.bukkit.epilog.event.SpecialItemUsageListener;
 import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
+import net.md_5.bungee.api.ChatColor;
 
 public class Epilog extends JavaPlugin {
 	public RemoteAPI remote;
@@ -148,6 +150,7 @@ public class Epilog extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new SpecialItemMarkerListener(), this);
 		getServer().getPluginManager().registerEvents(new FarmListener(), this);
 		getServer().getPluginManager().registerEvents(new MansionListener(), this);
+		getServer().getPluginManager().registerEvents(new DunesListener(), this);
 		getServer().getPluginManager().registerEvents(new CollectTrophyListener(), this);
 		exchangeItemListener = new ExchangeItemListener(this);
 		getServer().getPluginManager().registerEvents(exchangeItemListener, this);
@@ -178,7 +181,7 @@ public class Epilog extends JavaPlugin {
 			public void run() {
 				for (Player p : getServer().getOnlinePlayers()) {
 					ItemStack item = p.getInventory().getItemInMainHand();
-					String displayName = item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty() ? item.getItemMeta().getDisplayName() : "";
+					String displayName = item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : "";
 					if (displayName.startsWith("Hint ")) {
 						String hintID = "hint_" + displayName.substring("Hint #".length());
 						Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(p, p.getLocation(), hintID));

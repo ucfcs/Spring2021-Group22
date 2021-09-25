@@ -18,10 +18,9 @@ public class SpecialItemAttackListener implements Listener {
         if (event.getDamager() instanceof Player) {
             Bukkit.broadcastMessage(((Player)event.getDamager()).getItemOnCursor() + "");
         }
-        Bukkit.broadcastMessage(event.getCause() + "");
         if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getDamager() instanceof Player) {
             Player attacker = (Player) event.getDamager();
-            ItemStack item = attacker.getItemOnCursor();
+            ItemStack item = attacker.getInventory().getItemInMainHand();
             Material material = item.getType();
             if (material == Material.DIAMOND_SWORD || material == Material.IRON_SWORD) {
                 Bukkit.getPluginManager().callEvent(
