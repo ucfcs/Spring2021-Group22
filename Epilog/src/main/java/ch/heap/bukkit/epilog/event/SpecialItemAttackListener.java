@@ -15,9 +15,6 @@ public class SpecialItemAttackListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         Bukkit.broadcastMessage(event.getCause() + "");
-        if (event.getDamager() instanceof Player) {
-            Bukkit.broadcastMessage(((Player)event.getDamager()).getItemOnCursor() + "");
-        }
         if (event.getCause() == DamageCause.ENTITY_ATTACK && event.getDamager() instanceof Player) {
             Player attacker = (Player) event.getDamager();
             ItemStack item = attacker.getInventory().getItemInMainHand();
