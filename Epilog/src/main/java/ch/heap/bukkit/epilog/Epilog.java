@@ -82,7 +82,7 @@ public class Epilog extends JavaPlugin {
 	
 	public String version = "unknown";
 
-	public MazeEscapeGameData activeMazeEscapeGameData = null;
+	public String activeExperimentLabel = null;
 	
 	public void versionCheck() {
 		String[] v = this.getDescription().getVersion().split("-");
@@ -200,7 +200,7 @@ public class Epilog extends JavaPlugin {
 
 					prevLocation.put(p.getUniqueId(), loc);
 
-					LogEvent event = new LogEvent("PlayerLocationEvent", System.currentTimeMillis(), activeMazeEscapeGameData != null ? activeMazeEscapeGameData.getTeamID() : null, p);
+					LogEvent event = new LogEvent("PlayerLocationEvent", System.currentTimeMillis(), activeExperimentLabel, p);
 					Map<String, Object> data = event.data;
 					data.put("x", loc.getX());
 					data.put("y", loc.getY());
@@ -240,7 +240,7 @@ public class Epilog extends JavaPlugin {
 	}
 	
 	public LogEvent epilogStateEvent(String trigger, boolean includeConfig) {
-		LogEvent event = new LogEvent("EpilogState", System.currentTimeMillis(), activeMazeEscapeGameData != null ? activeMazeEscapeGameData.getTeamID() : null, null);
+		LogEvent event = new LogEvent("EpilogState", System.currentTimeMillis(), activeExperimentLabel, null);
 		event.data.put("trigger", trigger);
 		event.data.put("onlinePlayers", this.dataCollector.getOnlinePlayers());
 		if (this.config!=null) {
@@ -301,7 +301,7 @@ public class Epilog extends JavaPlugin {
 		event.time = System.currentTimeMillis();
 		event.eventName = eventName;
 		event.player = player;
-		event.experimentLabel = activeMazeEscapeGameData != null ? activeMazeEscapeGameData.getTeamID() : null;
+		event.experimentLabel = activeExperimentLabel;
 		if (data!=null) for (Entry<String, Object> entry : data.entrySet()) {
 			event.data.put(entry.getKey(), entry.getValue());
 		}

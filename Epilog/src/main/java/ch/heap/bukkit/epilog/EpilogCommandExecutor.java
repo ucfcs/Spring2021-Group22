@@ -77,12 +77,11 @@ public class EpilogCommandExecutor implements CommandExecutor {
 				sender.sendMessage("removed ping functionality");
 			} else if (arg0.equalsIgnoreCase("experiment")) { 
 				if (arg1.isEmpty()) {
-					//TODO clear queue?
+					plugin.activeExperimentLabel = null;
 					sender.sendMessage("Ending experiment. Events will be logged with the team id null.");
-					plugin.activeMazeEscapeGameData = null;
 				} else {
-					sender.sendMessage("Begining experiment for team " + "\"" + plugin.activeMazeEscapeGameData.getTeamID() + "\". Events will be logged with this team id.");
-					plugin.activeMazeEscapeGameData = new MazeEscapeGameData(arg1);
+					plugin.activeExperimentLabel = arg1;
+					sender.sendMessage("Begining experiment for team " + "\"" + plugin.activeExperimentLabel + "\". Events will be logged with this team id.");
 				}
 			} else {
 				return false;

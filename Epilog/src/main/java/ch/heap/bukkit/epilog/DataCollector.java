@@ -348,7 +348,7 @@ public class DataCollector {
 				data.put("z", loc.getZ());
 				data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 			}
-		} else if (event instanceof BlockBreakEvent) { 
+		} else if (event instanceof BlockBreakEvent) {
 			BlockBreakEvent typedEvent = (BlockBreakEvent) event;
 			player = typedEvent.getPlayer();
 			block = typedEvent.getBlock();
