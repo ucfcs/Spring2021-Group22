@@ -32,6 +32,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
+import ch.heap.bukkit.epilog.event.BarrelOpenedListener;
 import ch.heap.bukkit.epilog.event.CollectTrophyListener;
 import ch.heap.bukkit.epilog.event.DunesListener;
 import ch.heap.bukkit.epilog.event.FarmListener;
@@ -154,6 +155,7 @@ public class Epilog extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new DunesListener(), this);
 		getServer().getPluginManager().registerEvents(new CollectTrophyListener(), this);
 		getServer().getPluginManager().registerEvents(new VillagerTradeListener(), this);
+		getServer().getPluginManager().registerEvents(new BarrelOpenedListener(), this);
 		exchangeItemListener = new ExchangeItemListener(this);
 		getServer().getPluginManager().registerEvents(exchangeItemListener, this);
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));
