@@ -41,6 +41,7 @@ import ch.heap.bukkit.epilog.event.SpecialItemMarkerListener;
 import ch.heap.bukkit.epilog.event.SpecialItemPotionListener;
 import ch.heap.bukkit.epilog.event.SpecialItemUsageListener;
 import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
+import ch.heap.bukkit.epilog.event.VillagerTradeListener;
 import net.md_5.bungee.api.ChatColor;
 
 public class Epilog extends JavaPlugin {
@@ -152,6 +153,7 @@ public class Epilog extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new MansionListener(), this);
 		getServer().getPluginManager().registerEvents(new DunesListener(), this);
 		getServer().getPluginManager().registerEvents(new CollectTrophyListener(), this);
+		getServer().getPluginManager().registerEvents(new VillagerTradeListener(), this);
 		exchangeItemListener = new ExchangeItemListener(this);
 		getServer().getPluginManager().registerEvents(exchangeItemListener, this);
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));
