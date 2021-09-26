@@ -365,8 +365,6 @@ public class Epilog extends JavaPlugin {
 						continue;
 					}
 
-					System.out.println("Log " + event.eventName + " " + event.data);
-
 					// let observers handle event
 					Iterator<Observer> it = observers.iterator();
 					while (it.hasNext()) {
