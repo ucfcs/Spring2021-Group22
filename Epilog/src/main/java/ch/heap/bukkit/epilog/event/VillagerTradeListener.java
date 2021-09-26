@@ -1,6 +1,7 @@
 package ch.heap.bukkit.epilog.event;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
@@ -13,6 +14,12 @@ public class VillagerTradeListener implements Listener {
     @EventHandler
     public void onVillagerTrade(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        if (event.getClickedInventory() == null) {
+            return;
+        }
+        if (event.getCurrentItem().getType() == Material.AIR) {
             return;
         }
         if (!(event.getClickedInventory().getHolder() instanceof Villager)) {

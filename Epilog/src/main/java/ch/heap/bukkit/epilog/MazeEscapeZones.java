@@ -3,7 +3,7 @@ package ch.heap.bukkit.epilog;
 import org.bukkit.util.Vector;
 
 public class MazeEscapeZones {
-    public static final MazeEscapeZone DUNES = new MazeEscapeZone("Dunes", new Vector(22, 52, -76), new Vector(76, 255, -11));
+    public static final MazeEscapeZone DUNES = new MazeEscapeZone("Dunes", new Vector(22, 0, -76), new Vector(76, 255, -11));
     public static final MazeEscapeZone FARMS = new MazeEscapeZone("Farms", new Vector(-76, 52, -76), new Vector(-2, 255, -12));
     public static final MazeEscapeZone CAVE = new MazeEscapeZone("Cave", new Vector(-76, 0, 6), new Vector(-5, 51, 76));
     public static final MazeEscapeZone FOREST = new MazeEscapeZone("Forest", new Vector(-76, 52, 6), new Vector(14, 255, 76));
@@ -15,11 +15,11 @@ public class MazeEscapeZones {
     public static final MazeEscapeZone WALL_2 = new MazeEscapeZone("Wall2", new Vector(-4, 59, 71), new Vector(4, 71, 77));
 
     public static String getPrimaryZone(Vector location) {
-        if (location.getY() <= CAVE.higher.getY()) return CAVE.name;
         if (location.isInAABB(DUNES.lower, DUNES.higher)) return DUNES.name;
         if (location.isInAABB(FARMS.lower, FARMS.higher)) return FARMS.name;
-        if (location.isInAABB(FOREST.lower, FOREST.higher)) return FOREST.name;
         if (location.isInAABB(MANSION.lower, MANSION.higher)) return MANSION.name;
+        if (location.isInAABB(FOREST.lower, FOREST.higher)) return FOREST.name;
+        if (location.isInAABB(CAVE.lower, CAVE.higher)) return CAVE.name;
         if (location.isInAABB(CENTER.lower, CENTER.higher)) return CENTER.name;
         return MAZE.name;
     }

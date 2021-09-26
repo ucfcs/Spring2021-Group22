@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import ch.heap.bukkit.epilog.MazeEscapeZones;
+
 public class MansionListener implements Listener {
 
     @EventHandler
@@ -25,8 +27,10 @@ public class MansionListener implements Listener {
 
     @EventHandler
     public void onFindBarrel(BarrelOpenedEvent event) {
-        Bukkit.getPluginManager().callEvent(
-            new SolveMansionPuzzleEvent(event.getPlayer(), event.getPlayer().getLocation(), MansionPuzzleType.HIDDEN_BARREL)
-        );
+        if (MazeEscapeZones.getPrimaryZone(event.getLocation().toVector()).contentEquals(MazeEscapeZones.DUNES.name)) {
+            Bukkit.getPluginManager().callEvent(
+                new SolveMansionPuzzleEvent(event.getPlayer(), event.getPlayer().getLocation(), MansionPuzzleType.HIDDEN_BARREL)
+            );
+        }
     }
 }

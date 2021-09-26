@@ -214,6 +214,8 @@ public class Epilog extends JavaPlugin {
 					data.put("z", loc.getZ());
 					data.put("pitch", loc.getPitch());
 					data.put("yaw", loc.getYaw());
+					data.put("isSpringing", p.isSprinting());
+					data.put("isSneaking", p.isSneaking());
 					data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 
 					plugin.postEvent(event);
@@ -392,6 +394,7 @@ public class Epilog extends JavaPlugin {
 					method.invoke(obj, event);
 				} catch (Exception e) {
 					System.out.println("failed to invoke event: " + e);
+					e.printStackTrace();
 				}
 			}
 		}
