@@ -1,1 +1,2 @@
+execute as @p[scores={pin=3549}] at @s run summon armor_stand ~ ~ ~ {NoGravity:1b,Invulnerable:1b,Small:1b,Marker:1b,Invisible:1b,Tags:["_custom_action"],CustomName:'{"text":"type_correct_pin"}'}
 fill 47 79 32 49 82 32 minecraft:air

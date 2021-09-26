@@ -4,7 +4,7 @@ function mazeescape:forest/set
 
 function mazeescape:trophy/summon
 
-# Windmill Trophy Access
+# trophy access
 fill -47 61 -58 -47 64 -58 minecraft:air
 execute as @e[tag=PreventPlace] run tp @s ~ -10 ~
 execute as @e[tag=PreventPlace] run data merge entity @s {Size:0}
@@ -14,10 +14,6 @@ summon slime -46.50 60.00 -58.60 {Silent:1b,Invulnerable:1b,Glowing:0b,CustomNam
 summon slime -46.50 61.00 -58.60 {Silent:1b,Invulnerable:1b,Glowing:0b,CustomNameVisible:0b,PersistenceRequired:1b,NoAI:1b,Size:1,Tags:["PreventPlace"]}
 summon slime -46.50 62.00 -58.60 {Silent:1b,Invulnerable:1b,Glowing:0b,CustomNameVisible:0b,PersistenceRequired:1b,NoAI:1b,Size:1,Tags:["PreventPlace"]}
 summon slime -46.50 63.00 -58.60 {Silent:1b,Invulnerable:1b,Glowing:0b,CustomNameVisible:0b,PersistenceRequired:1b,NoAI:1b,Size:1,Tags:["PreventPlace"]}
-
-# Fishing hut
-data merge block -27 55 4 {Items:[{Slot: 13b, id: "minecraft:fishing_rod", tag: {Damage: 0}, Count: 1b}]}
-summon cod -26.5 56 6.0 {NoGravity:1b,Silent:1b,Invulnerable:1b,NoAI:1b,CanPickUpLoot:0b,AbsorptionAmount:2147483647f,Health:2147483647f,Rotation:[180F,0F],Tags:["mazeescape","fish"],Attributes:[{Name:generic.max_health,Base:2147483647}]}
 
 # Floating Text
 # Farm
