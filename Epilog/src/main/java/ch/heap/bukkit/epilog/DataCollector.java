@@ -429,7 +429,7 @@ public class DataCollector {
 				? typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName() 
 				: typedEvent.getAcquiredItemStack().getType().toString()
 			;
-			data.put("itemstack", displayName);
+			data.put("item", displayName);
 		} else {
 			doIntrospection = true;
 			for (Method method : event.getClass().getMethods()) {

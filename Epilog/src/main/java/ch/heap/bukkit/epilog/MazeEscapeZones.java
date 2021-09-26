@@ -24,6 +24,8 @@ public class MazeEscapeZones {
         return MAZE.name;
     }
 
+    //@deprecated Not being logged rn
+    //TODO remove
     public static String getWallZone(Vector location) {
         if (location.isInAABB(WALL_1.lower, WALL_1.higher)) return WALL_1.name;
         if (location.isInAABB(WALL_2.lower, WALL_2.higher)) return WALL_2.name;
