@@ -33,7 +33,7 @@ args = parser.parse_args()
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
     collection = client.epilog.data2;
-    query = { "event": "EntityPickupItemEvent" }
+    query = { "event": "PlayerPickupItemEvent" }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
@@ -45,6 +45,7 @@ def precomputeJSON(experimentLabel):
     for event in cursor:
         if not isGoodData(event):
             continue
+
         if event['droppedBy'] == None:
             continue
         # if event['droppedBy'] == event['player']:
@@ -62,7 +63,7 @@ def precomputeJSON(experimentLabel):
     data = {
         'series': [{ 
                 'name': action, 
-                'data': [intermediary_data[action][player] for player in players] 
+                'data': [intermediary_data[action][player] if (player in intermediary_data[action]) else 0 for player in players] 
             } for action in actions],
         'categories': players,
     }
