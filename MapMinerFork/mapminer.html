@@ -3,6 +3,7 @@
 
 <body>
 	<script src="data.js"></script>
+	<script src="UUIDtoPlayer.js"></script>
 	<script src="https://d3js.org/d3.v7.js"></script>
 
 	<!-- Range slider code -->
@@ -26,6 +27,8 @@
 	<div id="slider-container"></div>
 	<div id="range-label"></div>
 
+	<input type="range" multiple value="10,80" />
+
 	<div id="map"></div>
 
 	<div id="input"></div>
@@ -35,8 +38,6 @@
 		const SCALE = 2
 		let width = 417 * SCALE, height = 417 * SCALE; // 417 is image size
 		const CENTER = { x: width / 2, y: height / 2 };
-		let colors = ["red", "green", "blue", "orange", "purple", "yellow", "cyan", "black"];
-
 
 		let inputdata = _jsondata;
 
@@ -47,30 +48,12 @@
 		let dataMin = _minTime;
 		let dataMax = _maxTime;
 
+		generateData(_minTime, _maxTime, true);
 
-
-
-		// prob not the best way to do this but it works
-		// duplicated? can prob be merged
-		for (const [key, value] of Object.entries(inputdata.timeline)) {
-			let res = value.filter(f => f.event === "PlayerLocationEvent")
-			if (res.length > 0) {
-				res.forEach(r => {
-					if (Math.floor(r.time / 1000) >= _minTime && Math.floor(r.time / 1000) <= _maxTime) {
-						if (r.player in data) {
-							data[r.player].pos.push(coord(r.x, r.z))
-						}
-						else {
-							data[r.player] = { player: r.player, color: colors.shift(), pos: [coord(r.x, r.z)] }
-						}
-					}
-				});
-			}
-		}
-
-
-		function generateData(lowerTime, upperTime) {
-			if (lowerTime == dataMin && upperTime == dataMax) {
+		// iterates over every event in input data and checks if its is the correct event (playerlocationevent) and if it is within timeframe
+		// if so, adds it to player object with array of coords which are turned into lines
+		function generateData(lowerTime, upperTime, force = false) {
+			if (!force && lowerTime == dataMin && upperTime == dataMax) {
 				return;
 			}
 
@@ -78,16 +61,17 @@
 			for (const player in data) {
 				data[player].pos.length = 0;
 			}
-			for (const [key, value] of Object.entries(inputdata.timeline)) {
-				let res = value.filter(f => f.event === "PlayerLocationEvent")
+			for (const key of Object.keys(inputdata.timeline).sort()) {
+				let res = inputdata.timeline[key].filter(f => f.event === "PlayerLocationEvent")
 				if (res.length > 0) {
 					res.forEach(r => {
+						player = UUIDtoPlayer(r.player);
 						if (Math.floor(r.time / 1000) >= lowerTime && Math.floor(r.time / 1000) <= upperTime) {
-							if (r.player in data) {
-								data[r.player].pos.push(coord(r.x, r.z))
+							if (player.name in data) {
+								data[player.name].pos.push(coord(r.x, r.z))
 							}
 							else {
-								data[r.player] = { player: r.player, color: colors.shift(), pos: [coord(r.x, r.z)] }
+								data[player.name] = { player: player.name, color: player.color, pos: [coord(r.x, r.z)] }
 							}
 						}
 
@@ -102,13 +86,11 @@
 
 		var slider = createD3RangeSlider(_jsondata.time.min, _jsondata.time.max, "#slider-container", true);
 
+		// Only redraw lines after selection is made, not on every change
 		slider.onChangeEnd(function (newRange) {
 
-			console.log(newRange);
-			// let data = 
 			generateData(newRange.begin, newRange.end)
 
-			console.log(data)
 
 			drawPlayers(data)
 
@@ -153,23 +135,11 @@
 		// draw path for each player with unique color
 		function drawPlayers(data) {
 
-			console.log('draw players', data, Object.values(data), Object.values(data))
+			console.log('draw players', data, Object.values(data))
 
 			let path = heatmap
 				.selectAll("path")
 				.data(Object.values(data))
-			// .enter()
-			// // .append("g")
-			// .append("path")
-			// .attr("id", function (d) { return d.player })
-			// .attr("d", function (d) { return d3.line()(d.pos) })
-			// // .attr("stroke", "black")
-			// .attr("fill", "none")
-			// .attr("stroke", function (d) { return d.color })
-			// .attr("visibility", "visible")
-			// .exit().attr("visibility", "hidden")
-
-			console.log(path)
 
 			path.enter().append("path")//.attr("id", function (d) { return d.player })
 				.attr("id", function (d) { return d.player })
@@ -180,83 +150,47 @@
 					// console.log(d.pos, d3.line()(d.pos))
 					return d3.line()(d.pos)
 				})
-				.each(function () {
-					createButton(this, function (d) { return d })
+				.each(function (d) {
+					createButton(this, d)
 				})
-				// .call(createButton, this, function (d) { return d })
 
 			path
 				.attr("visibility", "visible")
 				.attr("d", function (d) {
-					// console.log(d.pos, d3.line()(d.pos))
 					return d3.line()(d.pos)
 				})
 
 			path.exit().attr("visibility", "hidden")
 
-
 			return path
-
-
-
-			// x.enter()
-			// 	// .append("g")
-			// 	.append("path")
-			// 	.attr("id", function (d) { return d.player })
-			// 	.attr("d", function (d) { return d3.line()(d.pos) })
-			// 	// .attr("stroke", "black")
-			// 	.attr("fill", "none")
-			// 	.attr("stroke", function (d) { return d.color })
-			// 	.attr("visibility", "visible")
-
-			// x.update()
-			// 	.select("path")
-			// 	.attr("d", function (d) { return d3.line()(d.pos) })
-
-			// x.exit().remove()
 		}
+
 		let players = drawPlayers(data)
-		// .call(createButton, function (d) { return d }, null)
-		// .select("#input")
-		// .append("button")
-
-		// console.log(players)
-
-		players.each(function (player, i) {
-			console.log("p: " + player, "i: " + i);
-			// player.append("g")
-			d3.select(this).call(createButton, this, player, function (d) { return d })
-		});
-
-		//<label for="quantity">Quantity:</label>
-		function createButton(_selection, d) {
-			selection = d3.select(_selection);
-			// selection = d
-			console.log('create button', selection, d)
-			// selection.append("g")
-			input.append("input")
+		
+		function createButton(_selection, player) {
+			div = input.append("div")
+			button = div.append("input")
 				.attr("type", "checkbox")
-				.attr("name", d.player)
-				.attr("value", d.player)
+				.attr("name", function () { return player.player })
+				.attr("id", function () { return player.player })
 				.property("checked", true)
-				.on("click", function () {
+				.on("click", function (d) {
+					selection = d3.select(`path#${player.player}`);
 					let button = d3.select(this);
 					let state = button.property("checked");
-					selection.attr("visibility", state ? "visible" : "hidden")
+					selection.style("display", state ? "block" : "none")
 					if (state) {
 						// button.raise()	// need to move label and </br> as well
 						selection.raise()
 					}
 				})
-			input.append("label")
-				.attr("for", d.player)
-				.text(d.player)
-				.style("color", d.color)
-			input.append("br")
+			label = div.append("label")
+				.attr("for", player.player)
+				.text(player.player)
+				.style("color", player.color)
 		}
 
 		function initZoom() {
-			// d3.select('svg')
 			svg.call(zoom);
 		}
 
@@ -264,18 +198,7 @@
 			return [Math.floor(x * SCALE + CENTER.x), Math.floor(y * SCALE + CENTER.y)]
 		}
 
-
-
 		function handleZoom(e) {
-			// let transform = { k: Math.round(e.transform.k), x: Math.round(e.transform.x), y: Math.round(e.transform.y) }
-			// e.transform.k = Math.round(e.transform.k)
-			// e.transform.x = e.transform.x * e.transform.k
-			// e.transform.y = e.transform.y * e.transform.k
-
-			// console.log(e.transform)
-			// console.log(e.transform, transform)
-
-			// d3.select('svg g')
 			svg.attr('transform', e.transform);
 		}
 
