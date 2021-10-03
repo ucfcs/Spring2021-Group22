@@ -4,6 +4,7 @@ import argparse
 import os
 import json
 import math
+import ssl
 
 from pymongo.message import MAX_INT32, MIN_INT32
 from bson.json_util import dumps, loads
@@ -17,8 +18,8 @@ def main():
 
     print('Connecting to Mongo')
 
-    client = pymongo.MongoClient(os.getenv('MONGO_URI'))
-    collection = client.epilog.data2
+    client = pymongo.MongoClient(os.getenv('MONGO_URI'), ssl_cert_reqs=ssl.CERT_NONE)
+    collection = client.test.data3
 
     print('fetching metadata')
 
@@ -56,11 +57,11 @@ def main():
         
         if time_offset:
             time = str(math.floor(doc['time'] / 1000) - _time_offset)
-            doc['time'] -= _time_offset
+            doc['time'] = doc['time'] - (_time_offset * 1000)
         else:
             time = str(math.floor(doc['time'] / 1000))
 
-        if time in data:
+        if time in data['timeline']:
             data['timeline'][time].append(doc)
         else:
             data['timeline'][time] = [doc]
@@ -77,13 +78,11 @@ def main():
 def writeToFile(data, filename, extension='json'):
     i = 0
     istr = ''
-    while os.path.exists(f'../static_files/data/{filename}{istr}.{extension}'):
+    while os.path.exists(f'{filename}{istr}.{extension}'):
         i += 1
         istr = str(i)
 
-    print(data)
-
-    with open(f'../static_files/data/{filename}{istr}.{extension}', 'w') as outfile:
+    with open(f'{filename}{istr}.{extension}', 'w') as outfile:
         json.dump(data, outfile)
 
 
