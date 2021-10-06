@@ -34,6 +34,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import ch.heap.bukkit.epilog.event.BarrelOpenedListener;
 import ch.heap.bukkit.epilog.event.CollectTrophyListener;
+import ch.heap.bukkit.epilog.event.CrouchGreetingListener;
 import ch.heap.bukkit.epilog.event.DunesListener;
 import ch.heap.bukkit.epilog.event.FarmListener;
 import ch.heap.bukkit.epilog.event.MansionListener;
@@ -156,14 +157,13 @@ public class Epilog extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new CollectTrophyListener(), this);
 		getServer().getPluginManager().registerEvents(new VillagerTradeListener(), this);
 		getServer().getPluginManager().registerEvents(new BarrelOpenedListener(), this);
+		getServer().getPluginManager().registerEvents(new CrouchGreetingListener(), this);
 		exchangeItemListener = new ExchangeItemListener(this);
 		getServer().getPluginManager().registerEvents(exchangeItemListener, this);
 		this.getCommand("el").setExecutor(new EpilogCommandExecutor(this));
 		// send onEnable to sub modules
 		inventoryTracker.onEnable();
 
-		// Start tracking player locations
-		final Map<UUID, Location> prevLocation = new HashMap<>();
 		final Epilog plugin = this;
 
 		(new BukkitRunnable(){
@@ -198,14 +198,18 @@ public class Epilog extends JavaPlugin {
 
 			@Override
 			public void run() {
-				for (Player p : getServer().getOnlinePlayers()) {
+				Collection<? extends Player> players = getServer().getOnlinePlayers();
+				for (Player p : players) {
 					Location loc = p.getLocation();
-					Location prev = prevLocation.get(p.getUniqueId());
-					if (prev != null && prevLocation.get(p.getUniqueId()).equals(loc)) {
-						return;
-					}
 
-					prevLocation.put(p.getUniqueId(), loc);
+					Map<String, Double> distances = new HashMap<>();
+					double total = 0;
+					for (Player p2 : players) {
+						if (p == p2) continue;
+						double distance = loc.distance(p2.getLocation());
+						distances.put(p2.getUniqueId().toString(), distance);
+						total += distance;
+					}
 
 					LogEvent event = new LogEvent("PlayerLocationEvent", System.currentTimeMillis(), activeExperimentLabel, p);
 					Map<String, Object> data = event.data;
@@ -214,8 +218,12 @@ public class Epilog extends JavaPlugin {
 					data.put("z", loc.getZ());
 					data.put("pitch", loc.getPitch());
 					data.put("yaw", loc.getYaw());
-					data.put("isSpringing", p.isSprinting());
+					data.put("isSprinting", p.isSprinting());
 					data.put("isSneaking", p.isSneaking());
+					if (distances.size() > 0) {
+						data.put("distances", distances);
+					}
+					data.put("averageDistance", total / players.size());
 					data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 
 					plugin.postEvent(event);
@@ -357,6 +365,7 @@ public class Epilog extends JavaPlugin {
 
 				if (event!=null) {
 					// collect data (do work in event thread to avoid server lag)
+					//TODO don't collect data off the main thread... this is bukkit no-no
 					if (event.needsData) {
 						dataCollector.addData(event);
 					}

@@ -84,6 +84,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 
 import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
 import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
+import ch.heap.bukkit.epilog.event.CrouchGreetingEvent;
 import ch.heap.bukkit.epilog.event.CustomActionEvent;
 import ch.heap.bukkit.epilog.event.DoFarmEvent;
 import ch.heap.bukkit.epilog.event.DuneBreakEvent;
@@ -567,6 +568,11 @@ public class EventListener implements Listener {
 
 	@EventHandler
 	public void onVillagerTrade(VillagerTradeEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onCrouchGreeting(CrouchGreetingEvent event) {
 		handleEvent(event);
 	}
 }
