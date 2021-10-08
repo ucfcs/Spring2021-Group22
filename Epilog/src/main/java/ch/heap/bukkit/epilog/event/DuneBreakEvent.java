@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
  
-public class DuneBreakEvent extends Event  {
+public class DuneBreakEvent extends Event implements MazeEscapeEvent  {
 
     private static final HandlerList handlers = new HandlerList();
 

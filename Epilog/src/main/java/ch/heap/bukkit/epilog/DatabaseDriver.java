@@ -26,6 +26,7 @@ public class DatabaseDriver {
 
 	public void sendData(Document doc) {
 		try {
+			System.out.println(doc.toString());
 			collection.insertOne(doc);
 		} catch (Exception e) {
 			e.printStackTrace();

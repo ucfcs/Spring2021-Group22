@@ -26,7 +26,7 @@ public class SpecialItemPotionListener implements Listener {
             PotionMeta meta = (PotionMeta) item.getItemMeta();
             PotionData potion = meta.getBasePotionData();
             Player player = event.getPlayer();
-            String potionID = item.getType().toString().toLowerCase().replace(" ", "_");
+            String potionID = item.getType().toString().toLowerCase().replace(" ", "_") + ":" + potion.getType().toString();
 
             if (potion.getType() == PotionType.SPEED || potion.getType() == PotionType.INVISIBILITY) {
                 // Extracting the duration from a bukkit/spigot potion effect

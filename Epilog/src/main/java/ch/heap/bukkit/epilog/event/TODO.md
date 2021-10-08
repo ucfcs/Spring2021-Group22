@@ -1,0 +1,4 @@
+- merge this branch onto bukkit-no-no, then merge that onto dev
+- Test the rest of the events
+- debug why readable hints aren't logging when held
+- double logging white banner and torch placement events

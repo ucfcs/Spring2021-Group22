@@ -10,8 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
-import ch.heap.bukkit.epilog.event.CustomActionEvent;
-
 public class CustomActionListener implements Listener {
 
     @EventHandler

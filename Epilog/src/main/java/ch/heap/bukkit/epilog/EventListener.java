@@ -85,7 +85,6 @@ import org.bukkit.event.world.WorldLoadEvent;
 import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
 import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
 import ch.heap.bukkit.epilog.event.CrouchGreetingEvent;
-import ch.heap.bukkit.epilog.event.CustomActionEvent;
 import ch.heap.bukkit.epilog.event.DoFarmEvent;
 import ch.heap.bukkit.epilog.event.DuneBreakEvent;
 import ch.heap.bukkit.epilog.event.OreBreakEvent;

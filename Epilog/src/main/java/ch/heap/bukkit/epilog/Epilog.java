@@ -33,6 +33,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import ch.heap.bukkit.epilog.event.BarrelOpenedListener;
+import ch.heap.bukkit.epilog.event.CaveListener;
 import ch.heap.bukkit.epilog.event.CollectTrophyListener;
 import ch.heap.bukkit.epilog.event.CrouchGreetingListener;
 import ch.heap.bukkit.epilog.event.DunesListener;
@@ -150,6 +151,7 @@ public class Epilog extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new FarmListener(), this);
 		getServer().getPluginManager().registerEvents(new MansionListener(), this);
 		getServer().getPluginManager().registerEvents(new DunesListener(), this);
+		getServer().getPluginManager().registerEvents(new CaveListener(), this);
 		getServer().getPluginManager().registerEvents(new CollectTrophyListener(), this);
 		getServer().getPluginManager().registerEvents(new VillagerTradeListener(), this);
 		getServer().getPluginManager().registerEvents(new BarrelOpenedListener(), this);
@@ -182,6 +184,7 @@ public class Epilog extends JavaPlugin {
 				for (Player p : getServer().getOnlinePlayers()) {
 					ItemStack item = p.getInventory().getItemInMainHand();
 					String displayName = item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : "";
+					Bukkit.broadcastMessage(displayName);
 					if (displayName.startsWith("Hint ")) {
 						String hintID = "hint_" + displayName.substring("Hint #".length());
 						Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(p, p.getLocation(), hintID));
