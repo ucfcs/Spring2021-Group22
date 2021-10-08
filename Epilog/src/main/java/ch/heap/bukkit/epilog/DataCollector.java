@@ -67,6 +67,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
 import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
+import ch.heap.bukkit.epilog.event.CrouchGreetingEvent;
 import ch.heap.bukkit.epilog.event.CustomActionEvent;
 import ch.heap.bukkit.epilog.event.DoFarmEvent;
 import ch.heap.bukkit.epilog.event.DuneBreakEvent;
@@ -430,6 +431,16 @@ public class DataCollector {
 				: typedEvent.getAcquiredItemStack().getType().toString()
 			;
 			data.put("item", displayName);
+		} else if (event instanceof CrouchGreetingEvent) {
+			CrouchGreetingEvent typedEvent = (CrouchGreetingEvent) event;
+			player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("lookingAt", typedEvent.getLookingAt().getUniqueId().toString());
 		} else {
 			doIntrospection = true;
 			for (Method method : event.getClass().getMethods()) {

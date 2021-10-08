@@ -1,15 +1,17 @@
 package ch.heap.bukkit.epilog.event;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+
+import ch.heap.bukkit.epilog.event.util.Tracer;
 
 public class CrouchGreetingListener implements Listener {
 
@@ -31,12 +33,19 @@ public class CrouchGreetingListener implements Listener {
             long curTime = System.currentTimeMillis();
             final long ONE_SECOND = 1000;
             if (curTime - data.lastCrouchedTime <= ONE_SECOND) {
-                lastCrouched.put(event.getPlayer().getUniqueId(), new Data(curTime, data.streak+1));
                 if (data.streak+1 >= 3) {
-                    Bukkit.getPluginManager().callEvent(
-                        new CrouchGreetingEvent(event.getPlayer(), event.getPlayer().getLocation())
-                    );
-                }
+                    Player lookingAt = Tracer.trace(event.getPlayer(), event.getPlayer().getWorld().getPlayers());
+                    if (lookingAt != null) {
+                        Bukkit.getPluginManager().callEvent(
+                            new CrouchGreetingEvent(event.getPlayer(), event.getPlayer().getLocation(), lookingAt)
+                            );
+                        }
+                        // reset to 0
+                        lastCrouched.put(event.getPlayer().getUniqueId(), new Data(curTime, 0));
+                    } else {
+                        // increment
+                        lastCrouched.put(event.getPlayer().getUniqueId(), new Data(curTime, data.streak+1));
+                    }
             } else {
                 lastCrouched.put(event.getPlayer().getUniqueId(), new Data(curTime, 1));
             }

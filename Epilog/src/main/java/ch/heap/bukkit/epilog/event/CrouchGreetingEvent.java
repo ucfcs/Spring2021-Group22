@@ -11,10 +11,12 @@ public class CrouchGreetingEvent extends Event  {
 
     private Player player;
     private Location location;
+    private Player lookingAt;
 
-    public CrouchGreetingEvent(Player player, Location location) {
+    public CrouchGreetingEvent(Player player, Location location, Player lookingAt) {
         this.player = player;
         this.location = location;
+        this.lookingAt = lookingAt;
     }
 
     @Override
@@ -32,5 +34,9 @@ public class CrouchGreetingEvent extends Event  {
 
     public Location getLocation() {
         return location;
+    }
+
+    public Player getLookingAt() {
+        return lookingAt;
     }
 }
