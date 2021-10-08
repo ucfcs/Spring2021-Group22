@@ -103,10 +103,6 @@ public class EventListener implements Listener {
 		logEvent.event = event;
 		logEvent.time = System.currentTimeMillis();
 		logEvent.experimentLabel = epilog.activeExperimentLabel;
-		if (event instanceof BlockBreakEvent) {
-			BlockBreakEvent bbe = (BlockBreakEvent) event;
-			logEvent.material = bbe.getBlock().getType();
-		}
 		logEvent.needsData = true;
 		epilog.postEvent(logEvent);
 	}
