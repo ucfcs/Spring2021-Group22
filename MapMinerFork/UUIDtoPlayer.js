@@ -18,7 +18,7 @@ const UUIDtoPlayer = (uuid) => {
 		case "6dc38184-c3e7-49ab-a99b-799b01274d01":
 			return {
 				name: "LeapingPage211",
-				color: "green"
+				color: "cyan"
 			}
 		default:
 			return {

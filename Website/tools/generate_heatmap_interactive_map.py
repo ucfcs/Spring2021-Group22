@@ -53,6 +53,9 @@ def main():
                          suffix='Complete', length=50)
         index = index + 1
         
+        if doc['event'] != "PlayerLocationEvent":
+            continue
+        
         doc['_id'] = str(doc['_id'])
         
         if time_offset:
