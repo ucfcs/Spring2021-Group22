@@ -9,6 +9,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoClient;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 
 public class DatabaseDriver {
 	private MongoClient mongoClient;
@@ -25,14 +26,11 @@ public class DatabaseDriver {
 
 	public void sendData(Document doc) {
 		try {
+			System.out.println(doc.toString());
 			collection.insertOne(doc);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println(doc.toString());
 		}
-	}
-
-	public void sendData(LogEvent event) {
-		collection.insertOne(event.toDocument());
 	}
 }

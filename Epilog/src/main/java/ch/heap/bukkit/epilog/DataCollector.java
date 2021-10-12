@@ -68,9 +68,9 @@ import org.bukkit.projectiles.ProjectileSource;
 import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
 import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
 import ch.heap.bukkit.epilog.event.CrouchGreetingEvent;
-import ch.heap.bukkit.epilog.event.CustomActionEvent;
 import ch.heap.bukkit.epilog.event.DoFarmEvent;
 import ch.heap.bukkit.epilog.event.DuneBreakEvent;
+import ch.heap.bukkit.epilog.event.MazeEscapeEvent;
 import ch.heap.bukkit.epilog.event.OreBreakEvent;
 import ch.heap.bukkit.epilog.event.SolveMansionPuzzleEvent;
 import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
@@ -100,21 +100,8 @@ public class DataCollector {
 				return;
 			}
 		}
-		// add data
-		if (event instanceof PlayerMoveEvent) {
-			addMovementData(logEvent, (PlayerMoveEvent) event);
-		} else if (event instanceof EntityDamageEvent || event instanceof EntityRegainHealthEvent) {
+		if (event instanceof EntityDamageEvent || event instanceof EntityRegainHealthEvent) {
 			addDamageData(logEvent, (EntityEvent) event);
-		} else if (event instanceof UsingSpecialItemEvent) {
-			UsingSpecialItemEvent typedEvent = (UsingSpecialItemEvent) event;
-			logEvent.player = typedEvent.player;
-			Map<String, Object> data = logEvent.data;
-			Location loc = typedEvent.location;
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("special", typedEvent.action);
-			data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 		} else if (event instanceof AsyncPlayerChatEvent) {
 			AsyncPlayerChatEvent chatEvent = (AsyncPlayerChatEvent) event;
 			logEvent.player = chatEvent.getPlayer();
@@ -127,16 +114,8 @@ public class DataCollector {
 			data.put("y", loc.getY());
 			data.put("z", loc.getZ());
 			data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
-		} else if (event instanceof CustomActionEvent) {
-			CustomActionEvent typedEvent = (CustomActionEvent) event;
-			logEvent.player = typedEvent.getPlayer();
-			Location loc = typedEvent.getPlayer().getLocation();
-			Map<String, Object> data = logEvent.data;
-			data.put("action", typedEvent.getAction());
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
+		} else if (event instanceof MazeEscapeEvent) {
+			addMazeEscapeData(logEvent, event);
 		} else {
 			// add data by introspection
 			addGenericData(logEvent, event);
@@ -159,22 +138,10 @@ public class DataCollector {
 				return ans;
 		}
 		ans = item.getType().toString();
-		if (item.hasItemMeta()) {
+		if (item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty()) {
 			ans += ":" + item.getItemMeta().getDisplayName();
 		}
 		return ans;
-	}
-
-	private static void addMovementData(LogEvent logEvent, PlayerMoveEvent event) {
-		logEvent.player = event.getPlayer();
-		Map<String, Object> data = logEvent.data;
-		Location loc = event.getTo();
-		data.put("x", loc.getX());
-		data.put("y", loc.getY());
-		data.put("z", loc.getZ());
-		data.put("pitch", loc.getPitch());
-		data.put("yaw", loc.getYaw());
-		data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 	}
 
 	private static void addDamageData(LogEvent logEvent, EntityEvent event) {
@@ -252,6 +219,102 @@ public class DataCollector {
 			data.put("blockY", block.getY());
 			data.put("blockZ", block.getZ());
 		}
+	}
+
+	private void addMazeEscapeData(LogEvent logEvent, Event event) {
+		Map<String, Object> data = logEvent.data;
+		if (event instanceof BarrelOpenedEvent) {
+			BarrelOpenedEvent typedEvent = (BarrelOpenedEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+		} else if (event instanceof CollectTrophyEvent) {
+			CollectTrophyEvent typedEvent = (CollectTrophyEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("trophy", typedEvent.getTrophyNumber());
+		} else if (event instanceof DoFarmEvent) {
+			DoFarmEvent typedEvent = (DoFarmEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("action", typedEvent.getType().type);
+		} else if (event instanceof DuneBreakEvent) {
+			DuneBreakEvent typedEvent = (DuneBreakEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+		} else if (event instanceof OreBreakEvent) {
+			OreBreakEvent typedEvent = (OreBreakEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("ore", typedEvent.getMaterial().toString());
+		} else if (event instanceof SolveMansionPuzzleEvent) {
+			SolveMansionPuzzleEvent typedEvent = (SolveMansionPuzzleEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("puzzle", typedEvent.getType().type);
+		} else if (event instanceof VillagerTradeEvent) {
+			VillagerTradeEvent typedEvent = (VillagerTradeEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			String displayName = (typedEvent.getAcquiredItemStack().hasItemMeta() && !typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName().isEmpty())
+				? typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName() 
+				: typedEvent.getAcquiredItemStack().getType().toString()
+			;
+			data.put("item", displayName);
+		} else if (event instanceof CrouchGreetingEvent) {
+			CrouchGreetingEvent typedEvent = (CrouchGreetingEvent) event;
+			logEvent.player = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("zone", zone);
+			data.put("lookingAt", typedEvent.getLookingAt().getUniqueId().toString());
+		} else if (event instanceof UsingSpecialItemEvent) {
+			UsingSpecialItemEvent typedEvent = (UsingSpecialItemEvent) event;
+			logEvent.player = typedEvent.player;
+			Location loc = typedEvent.location;
+			data.put("x", loc.getX());
+			data.put("y", loc.getY());
+			data.put("z", loc.getZ());
+			data.put("special", typedEvent.action);
+			data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
+		} 
 	}
 
 	private void addGenericData(LogEvent logEvent, Event event) {
@@ -359,88 +422,15 @@ public class DataCollector {
 			player = typedEvent.getPlayer();
 			block = typedEvent.getBlockPlaced();
 			itemStack = typedEvent.getItemInHand();
-		} else if (event instanceof BarrelOpenedEvent) {
-			BarrelOpenedEvent typedEvent = (BarrelOpenedEvent) event;
+		} else if (event instanceof CustomActionEvent) { 
+			CustomActionEvent typedEvent = (CustomActionEvent) event;
 			player = typedEvent.getPlayer();
-			Location loc = typedEvent.getLocation();
-			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
+			Location loc = player.getLocation();
+			data.put("action", typedEvent.getAction());
 			data.put("x", loc.getX());
 			data.put("y", loc.getY());
 			data.put("z", loc.getZ());
-			data.put("zone", zone);
-		} else if (event instanceof CollectTrophyEvent) {
-			CollectTrophyEvent typedEvent = (CollectTrophyEvent) event;
-			player = typedEvent.getPlayer();
-			Location loc = typedEvent.getLocation();
-			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("zone", zone);
-			data.put("trophy", typedEvent.getTrophyNumber());
-		} else if (event instanceof DoFarmEvent) {
-			DoFarmEvent typedEvent = (DoFarmEvent) event;
-			player = typedEvent.getPlayer();
-			Location loc = typedEvent.getLocation();
-			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("zone", zone);
-			data.put("action", typedEvent.getType().type);
-		} else if (event instanceof DuneBreakEvent) {
-			DuneBreakEvent typedEvent = (DuneBreakEvent) event;
-			player = typedEvent.getPlayer();
-			Location loc = typedEvent.getLocation();
-			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("zone", zone);
-		} else if (event instanceof OreBreakEvent) {
-			OreBreakEvent typedEvent = (OreBreakEvent) event;
-			player = typedEvent.getPlayer();
-			Location loc = typedEvent.getLocation();
-			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("zone", zone);
-			data.put("ore", typedEvent.getMaterial().toString());
-		} else if (event instanceof SolveMansionPuzzleEvent) {
-			SolveMansionPuzzleEvent typedEvent = (SolveMansionPuzzleEvent) event;
-			player = typedEvent.getPlayer();
-			Location loc = typedEvent.getLocation();
-			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("zone", zone);
-			data.put("puzzle", typedEvent.getType().type);
-		} else if (event instanceof VillagerTradeEvent) {
-			VillagerTradeEvent typedEvent = (VillagerTradeEvent) event;
-			player = typedEvent.getPlayer();
-			Location loc = typedEvent.getLocation();
-			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("zone", zone);
-			String displayName = (typedEvent.getAcquiredItemStack().hasItemMeta() && !typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName().isEmpty())
-				? typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName() 
-				: typedEvent.getAcquiredItemStack().getType().toString()
-			;
-			data.put("item", displayName);
-		} else if (event instanceof CrouchGreetingEvent) {
-			CrouchGreetingEvent typedEvent = (CrouchGreetingEvent) event;
-			player = typedEvent.getPlayer();
-			Location loc = typedEvent.getLocation();
-			String zone = MazeEscapeZones.getPrimaryZone(loc.toVector());
-			data.put("x", loc.getX());
-			data.put("y", loc.getY());
-			data.put("z", loc.getZ());
-			data.put("zone", zone);
-			data.put("lookingAt", typedEvent.getLookingAt().getUniqueId().toString());
+			data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 		} else {
 			doIntrospection = true;
 			for (Method method : event.getClass().getMethods()) {

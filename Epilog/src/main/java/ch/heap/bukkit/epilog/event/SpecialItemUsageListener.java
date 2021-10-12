@@ -16,6 +16,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import ch.heap.bukkit.epilog.CustomActionEvent;
+
 public class SpecialItemUsageListener implements Listener {
 
     private JavaPlugin plugin;
@@ -34,27 +36,17 @@ public class SpecialItemUsageListener implements Listener {
                 60, 
                 plugin
             );
-            return;
-        }
-
-        if (event.getAction().contentEquals(SpecialItemActions.USE_ESCAPE_ROPE.action)) {
-            SpecialItemEventGenerator.scheduleRepeatingEventGenerator(
-                () -> new UsingSpecialItemEvent(player, player.getLocation(), action), 
-                // Escape rope is worth 30 seconds of time
-                30, 
-                plugin
-            );
-            return;
-        }
-
-        if (event.getAction().contentEquals(SpecialItemActions.USE_REVEAL_PLAYERS.action)) {
+        } else if (event.getAction().contentEquals(SpecialItemActions.USE_ESCAPE_ROPE.action)) {
+            Bukkit.getPluginManager().callEvent(
+                new UsingSpecialItemEvent(player, player.getLocation(), action)
+           );
+        } else if (event.getAction().contentEquals(SpecialItemActions.USE_REVEAL_PLAYERS.action)) {
             SpecialItemEventGenerator.scheduleRepeatingEventGenerator(
                 () -> new UsingSpecialItemEvent(player, player.getLocation(), action), 
                 20, 
                 // Effect lasts 20 seconds
                 plugin
             );
-            return;
         }
     }
 

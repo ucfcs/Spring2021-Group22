@@ -85,7 +85,6 @@ import org.bukkit.event.world.WorldLoadEvent;
 import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
 import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
 import ch.heap.bukkit.epilog.event.CrouchGreetingEvent;
-import ch.heap.bukkit.epilog.event.CustomActionEvent;
 import ch.heap.bukkit.epilog.event.DoFarmEvent;
 import ch.heap.bukkit.epilog.event.DuneBreakEvent;
 import ch.heap.bukkit.epilog.event.OreBreakEvent;
@@ -103,10 +102,6 @@ public class EventListener implements Listener {
 		logEvent.event = event;
 		logEvent.time = System.currentTimeMillis();
 		logEvent.experimentLabel = epilog.activeExperimentLabel;
-		if (event instanceof BlockBreakEvent) {
-			BlockBreakEvent bbe = (BlockBreakEvent) event;
-			logEvent.material = bbe.getBlock().getType();
-		}
 		logEvent.needsData = true;
 		epilog.postEvent(logEvent);
 	}

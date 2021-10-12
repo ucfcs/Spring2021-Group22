@@ -6,7 +6,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
  
-public class VillagerTradeEvent extends Event  {
+public class VillagerTradeEvent extends Event implements MazeEscapeEvent  {
 
     private static final HandlerList handlers = new HandlerList();
 

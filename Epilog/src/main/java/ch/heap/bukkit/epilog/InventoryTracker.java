@@ -111,7 +111,7 @@ public class InventoryTracker {
 			InventoryOpenEvent ioe = (InventoryOpenEvent)event.event;
 			checkChest(ioe.getInventory().getHolder(), null, event.time);
 		} else if (event.event instanceof BlockBreakEvent) {
-			Material material = event.material;
+			Material material = ((BlockBreakEvent)event.event).getBlock().getType();
 			if (material==Material.CHEST) {
 				Block block = ((BlockBreakEvent)event.event).getBlock();
 				Location location = block.getLocation();

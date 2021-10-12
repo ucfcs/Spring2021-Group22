@@ -33,6 +33,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import ch.heap.bukkit.epilog.event.BarrelOpenedListener;
+import ch.heap.bukkit.epilog.event.CaveListener;
 import ch.heap.bukkit.epilog.event.CollectTrophyListener;
 import ch.heap.bukkit.epilog.event.CrouchGreetingListener;
 import ch.heap.bukkit.epilog.event.DunesListener;
@@ -51,7 +52,6 @@ public class Epilog extends JavaPlugin {
 	public PlayerNotifications informant;
 	public DataCollector dataCollector;
 	private EventListener listener;
-	private EventNotifier eventNotifier;
 	private List<Observer> observers;
 	private InventoryTracker inventoryTracker;
 	public ExchangeItemListener exchangeItemListener;
@@ -109,7 +109,6 @@ public class Epilog extends JavaPlugin {
 		this.versionCheck();
 		this.version = this.getDescription().getVersion();
 		// this.loadState();
-		eventNotifier = new EventNotifier();
 		remote = new RemoteAPI(this, db);
 		// remote.skippedLogs = this.state.optInt("skippedLogs", 0);
 		dataCollector = new DataCollector(this);
@@ -140,8 +139,6 @@ public class Epilog extends JavaPlugin {
 	public void onEnable() {
 		// start communication with logging server
 		remote.start();
-		// start event notification thread
-		eventNotifier.start();
 		// register event listener
 		listener = new EventListener();
 		listener.epilog = this;
@@ -154,6 +151,7 @@ public class Epilog extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new FarmListener(), this);
 		getServer().getPluginManager().registerEvents(new MansionListener(), this);
 		getServer().getPluginManager().registerEvents(new DunesListener(), this);
+		getServer().getPluginManager().registerEvents(new CaveListener(), this);
 		getServer().getPluginManager().registerEvents(new CollectTrophyListener(), this);
 		getServer().getPluginManager().registerEvents(new VillagerTradeListener(), this);
 		getServer().getPluginManager().registerEvents(new BarrelOpenedListener(), this);
@@ -186,6 +184,7 @@ public class Epilog extends JavaPlugin {
 				for (Player p : getServer().getOnlinePlayers()) {
 					ItemStack item = p.getInventory().getItemInMainHand();
 					String displayName = item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : "";
+					Bukkit.broadcastMessage(displayName);
 					if (displayName.startsWith("Hint ")) {
 						String hintID = "hint_" + displayName.substring("Hint #".length());
 						Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(p, p.getLocation(), hintID));
@@ -242,14 +241,6 @@ public class Epilog extends JavaPlugin {
 		remote.stop(); 
 		// this.state.put("skippedLogs", remote.skippedLogs);
 		remote = null;
-		// stop event notification thread
-		if (eventNotifier!=null) {
-			eventNotifier.interrupt();
-			try {
-				eventNotifier.join();
-			} catch (InterruptedException e) {}
-			eventNotifier = null;
-		}
 		observers = null;
 		inventoryTracker = null;
 		informant = null;
@@ -327,9 +318,25 @@ public class Epilog extends JavaPlugin {
 		postEvent(event);
 	}
 	
-	public boolean postEvent(LogEvent event) {
-		if (eventNotifier==null) return false;
-		return eventNotifier.queue.offer(event);
+	public void postEvent(LogEvent event) {
+		if (event.needsData) {
+			dataCollector.addData(event);
+		}
+
+		if (event.player != null && blacklist.contains(event.player.getUniqueId().toString())) {
+			return;
+		}
+
+		// let observers handle event
+		Iterator<Observer> it = observers.iterator();
+		while (it.hasNext()) {
+			it.next().post(event);
+		}
+		// send event to log server
+		if (!event.ignore) {
+			// needs to count skipped  events
+			remote.addLogEvent(event);
+		}
 	}
 	
 	public Class<LogEvent> addEventObserver(Object obj, Method method, Collection<String> eventNames) {
@@ -348,44 +355,6 @@ public class Epilog extends JavaPlugin {
 			if (it.next().obj==obj) {
 				it.remove();
 		    }
-		}
-	}
-	
-	private class EventNotifier extends Thread
-	{
-		public BlockingQueue<LogEvent> queue = new LinkedBlockingQueue <LogEvent>();
-	    public void run() {
-			while (!Thread.currentThread().isInterrupted()) {
-				LogEvent event = null;
-				try {
-					event = queue.take();
-				} catch (InterruptedException e) {
-					return;
-				}
-
-				if (event!=null) {
-					// collect data (do work in event thread to avoid server lag)
-					//TODO don't collect data off the main thread... this is bukkit no-no
-					if (event.needsData) {
-						dataCollector.addData(event);
-					}
-
-					if (event.player != null && blacklist.contains(event.player.getUniqueId().toString())) {
-						continue;
-					}
-
-					// let observers handle event
-					Iterator<Observer> it = observers.iterator();
-					while (it.hasNext()) {
-						it.next().post(event);
-					}
-					// send event to log server
-					if (!event.ignore) {
-						// needs to count skipped  events
-						remote.addLogEvent(event);
-					}
-				}
-			}
 		}
 	}
 	
