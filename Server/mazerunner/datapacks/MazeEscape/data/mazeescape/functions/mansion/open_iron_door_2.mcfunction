@@ -1,2 +1,2 @@
-execute as @p at @p run summon armor_stand ~ ~ ~ {NoGravity:1b,Invulnerable:1b,Small:1b,Marker:1b,Invisible:1b,Tags:["_custom_action"],CustomName:'{"text":"open_iron_door_2"}'}
+execute as @p at @p run summon armor_stand ~ ~ ~ {NoGravity:1b,Invulnerable:1b,Small:1b,Marker:1b,Invisible:1b,Tags:["_custom_action"],CustomName:'{"text":"open_shared_iron_door"}'}
 setblock 51 65 57 minecraft:redstone_wall_torch[facing=east]

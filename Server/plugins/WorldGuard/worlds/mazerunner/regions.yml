@@ -26,14 +26,6 @@ regions:
         owners: {}
         type: cuboid
         priority: 9
-    crop3gm:
-        min: {x: -27, y: 53, z: -28}
-        max: {x: -11, y: 63, z: -12}
-        members: {}
-        flags: {block-break: deny}
-        owners: {}
-        type: cuboid
-        priority: 9
     crop1:
         min: {x: -12, y: 56, z: -44}
         max: {x: -2, y: 56, z: -32}
@@ -58,22 +50,6 @@ regions:
         owners: {}
         type: cuboid
         priority: 10
-    crop3:
-        min: {x: -24, y: 56, z: -25}
-        max: {x: -14, y: 56, z: -15}
-        members: {}
-        flags: {game-mode: survival, block-break: allow, block-place: allow}
-        owners: {}
-        type: cuboid
-        priority: 10
-    desertcopy:
-        min: {x: 17, y: 20, z: -71}
-        max: {x: 71, y: 45, z: -9}
-        members: {}
-        flags: {mob-spawning: deny}
-        owners: {}
-        type: cuboid
-        priority: 3
     maze:
         min: {x: -207, y: 0, z: -207}
         max: {x: 207, y: 75, z: 207}
@@ -82,6 +58,14 @@ regions:
         owners: {}
         type: cuboid
         priority: 1
+    desertcopy:
+        min: {x: 17, y: 20, z: -71}
+        max: {x: 71, y: 45, z: -9}
+        members: {}
+        flags: {mob-spawning: deny}
+        owners: {}
+        type: cuboid
+        priority: 3
     tutorial:
         min: {x: -8, y: 39, z: -36}
         max: {x: 7, y: 46, z: 6}
@@ -89,7 +73,10 @@ regions:
         flags:
             command-on-exit: ['/function mazeescape:tutorial/leave']
             soil-dry: deny
+            invincible: allow
             command-on-entry: ['/function mazeescape:tutorial/join']
+            pvp: deny
+            mob-spawning: deny
             natural-hunger-drain: deny
         owners: {}
         type: cuboid
@@ -110,11 +97,11 @@ regions:
             respawn-location: {world: mazerunner, x: 4.5, y: 56.0, z: 0.5, pitch: 0.0,
                 yaw: 0.0}
             use: allow
+            vehicle-destroy: allow
             lighter: allow
             interact: allow
-            vehicle-destroy: allow
-            pvp: allow
             chest-access: allow
+            pvp: allow
             deny-spawn: ['minecraft:pillager', 'minecraft:blaze', 'minecraft:skeleton',
                 'minecraft:elder_guardian', 'minecraft:zoglin', 'minecraft:ravager',
                 'minecraft:ghast', 'minecraft:hoglin', 'minecraft:guardian', 'minecraft:vindicator',
@@ -128,15 +115,15 @@ regions:
             sleep: allow
             vehicle-place: allow
             game-mode: adventure
-            potion-splash: allow
             block-break: deny
+            potion-splash: allow
             damage-animals: allow
         owners: {}
         type: cuboid
         priority: 2
     wallbreak1:
-        min: {x: -2, y: 55, z: -71}
-        max: {x: 2, y: 60, z: -71}
+        min: {x: -2, y: 55, z: -75}
+        max: {x: 2, y: 61, z: -71}
         members: {}
         flags: {block-break: allow}
         owners: {}
@@ -146,56 +133,64 @@ regions:
         members: {}
         flags:
             other-explosion: deny
-            frosted-ice-form: deny
             lava-fire: deny
+            use: allow
+            leaf-decay: deny
+            snow-fall: deny
+            firework-damage: deny
+            mob-damage: allow
+            ravager-grief: deny
+            use-anvil: deny
+            respawn-anchors: deny
+            mushroom-growth: deny
+            lightning: deny
+            wither-damage: deny
+            ice-form: deny
+            enderman-grief: deny
+            pvp: allow
+            mob-spawning: deny
+            crop-growth: allow
+            natural-hunger-drain: deny
+            creeper-explosion: allow
+            vine-growth: deny
+            item-durability: deny
+            damage-animals: allow
+            snow-melt: deny
+            tnt: deny
+            ghast-fireball: deny
+            entity-item-frame-destroy: deny
+            frosted-ice-form: deny
             respawn-location: {world: mazerunner, x: 4.5, y: 49.0, z: 0.5, pitch: 0.0,
                 yaw: 0.0}
-            use: allow
-            ice-melt: deny
+            mycelium-spread: deny
             block-trampling: deny
-            snow-fall: deny
-            vehicle-destroy: allow
+            ice-melt: deny
             interact: allow
+            vehicle-destroy: allow
             chest-access: allow
             ride: allow
-            firework-damage: deny
             fire-spread: deny
             enderdragon-block-damage: deny
             sleep: allow
             vehicle-place: allow
             snowman-trails: deny
-            mob-damage: allow
             block-break: deny
             entity-painting-destroy: deny
-            ravager-grief: deny
-            lightning: deny
-            wither-damage: deny
-            ice-form: deny
             lighter: allow
-            enderman-grief: deny
-            pvp: allow
-            mob-spawning: deny
             block-place: allow
-            crop-growth: allow
-            natural-hunger-drain: deny
             soil-dry: deny
-            creeper-explosion: allow
             exp-drops: deny
             game-mode: adventure
             item-frame-rotation: deny
-            item-durability: deny
             potion-splash: allow
-            damage-animals: allow
             frosted-ice-melt: deny
-            snow-melt: deny
-            entity-item-frame-destroy: deny
-            ghast-fireball: deny
+            grass-growth: deny
         owners: {}
         type: global
         priority: 0
     wallbreak2:
         min: {x: -2, y: 61, z: 71}
-        max: {x: 3, y: 65, z: 71}
+        max: {x: 4, y: 65, z: 75}
         members: {}
         flags: {block-break: allow}
         owners: {}
