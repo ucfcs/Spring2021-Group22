@@ -61,20 +61,6 @@ public class SpecialItemUsageListener implements Listener {
     }
 
     @EventHandler
-    public void onUseTorch(BlockPlaceEvent event) {
-        if (event.getBlock().getType() == Material.WHITE_BANNER) {
-            Bukkit.getPluginManager().callEvent(
-                new UsingSpecialItemEvent(event.getPlayer(), event.getPlayer().getLocation(), "white_banner")
-            );   
-        } else if (event.getBlock().getType() == Material.TORCH) {
-            Bukkit.getPluginManager().callEvent(
-                new UsingSpecialItemEvent(event.getPlayer(), event.getPlayer().getLocation(), "torch")
-            );
-        }
-    }
-
-    @EventHandler
-    //TODO TEST THIS AND OTHERS
     public void onUseFireworks(EntitySpawnEvent event) {
         if (event.getEntityType() == EntityType.FIREWORK) {
             Firework firework = (Firework) event.getEntity();

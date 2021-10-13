@@ -21,7 +21,7 @@ public class SpecialItemMarkerListener implements Listener {
         ItemStack item = event.getItemInHand();
         String displayName = item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty() ? item.getItemMeta().getDisplayName() : item.getType().toString();
         if (specialItems.contains(displayName)) {
-            Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(event.getPlayer(), event.getPlayer().getLocation(), displayName));
+            Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(event.getPlayer(), event.getPlayer().getLocation(), displayName.toLowerCase().replace(" ", "_")));
         }
     } 
 }

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -139,7 +140,7 @@ public class DataCollector {
 		}
 		ans = item.getType().toString();
 		if (item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty()) {
-			ans += ":" + item.getItemMeta().getDisplayName();
+			ans += ":" + ChatColor.stripColor(item.getItemMeta().getDisplayName());
 		}
 		return ans;
 	}
