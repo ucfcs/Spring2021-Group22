@@ -43,8 +43,6 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -66,16 +64,17 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
 
-import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
-import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
-import ch.heap.bukkit.epilog.event.CrouchGreetingEvent;
-import ch.heap.bukkit.epilog.event.DoFarmEvent;
-import ch.heap.bukkit.epilog.event.DuneBreakEvent;
-import ch.heap.bukkit.epilog.event.MazeEscapeEvent;
-import ch.heap.bukkit.epilog.event.OreBreakEvent;
-import ch.heap.bukkit.epilog.event.SolveMansionPuzzleEvent;
-import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
-import ch.heap.bukkit.epilog.event.VillagerTradeEvent;
+import ch.heap.bukkit.epilog.PlayerLocationEvent;
+import ch.heap.bukkit.epilog.meevent.BarrelOpenedEvent;
+import ch.heap.bukkit.epilog.meevent.CollectTrophyEvent;
+import ch.heap.bukkit.epilog.meevent.CrouchGreetingEvent;
+import ch.heap.bukkit.epilog.meevent.DoFarmEvent;
+import ch.heap.bukkit.epilog.meevent.DuneBreakEvent;
+import ch.heap.bukkit.epilog.meevent.MazeEscapeEvent;
+import ch.heap.bukkit.epilog.meevent.OreBreakEvent;
+import ch.heap.bukkit.epilog.meevent.SolveMansionPuzzleEvent;
+import ch.heap.bukkit.epilog.meevent.UsingSpecialItemEvent;
+import ch.heap.bukkit.epilog.meevent.VillagerTradeEvent;
 
 public class DataCollector {
 	Epilog epilog = null;
@@ -101,7 +100,35 @@ public class DataCollector {
 				return;
 			}
 		}
-		if (event instanceof EntityDamageEvent || event instanceof EntityRegainHealthEvent) {
+		if (event instanceof PlayerLocationEvent) {
+			PlayerLocationEvent typedEvent = (PlayerLocationEvent) event;
+			Player p = typedEvent.getPlayer();
+			Location loc = typedEvent.getLocation();
+			Collection<? extends Player> players = typedEvent.getPlayer().getWorld().getPlayers();
+			Map<String, Double> distances = new HashMap<>();
+            double total = 0;
+            for (Player other : players) {
+                if (p == other) continue;
+                double distance = loc.distance(other.getLocation());
+                distances.put(other.getUniqueId().toString(), distance);
+                total += distance;
+            }
+
+			logEvent.player = p;
+            Map<String, Object> data = logEvent.data;
+            data.put("x", loc.getX());
+            data.put("y", loc.getY());
+            data.put("z", loc.getZ());
+            data.put("pitch", loc.getPitch());
+            data.put("yaw", loc.getYaw());
+            data.put("isSprinting", p.isSprinting());
+            data.put("isSneaking", p.isSneaking());
+            if (distances.size() > 0) {
+                data.put("distances", distances);
+            }
+            data.put("averageDistance", total / players.size());
+            data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
+		} else if (event instanceof EntityDamageEvent || event instanceof EntityRegainHealthEvent) {
 			addDamageData(logEvent, (EntityEvent) event);
 		} else if (event instanceof AsyncPlayerChatEvent) {
 			AsyncPlayerChatEvent chatEvent = (AsyncPlayerChatEvent) event;
@@ -124,6 +151,9 @@ public class DataCollector {
 		if (logEvent.player == null) {
 			logEvent.ignore = true;
 			return;
+		}
+		if (logEvent.player != null) {
+			logEvent.data.put("worldTime", logEvent.player.getWorld().getTime());
 		}
 	}
 
@@ -291,11 +321,7 @@ public class DataCollector {
 			data.put("y", loc.getY());
 			data.put("z", loc.getZ());
 			data.put("zone", zone);
-			String displayName = (typedEvent.getAcquiredItemStack().hasItemMeta() && !typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName().isEmpty())
-				? typedEvent.getAcquiredItemStack().getItemMeta().getDisplayName() 
-				: typedEvent.getAcquiredItemStack().getType().toString()
-			;
-			data.put("item", displayName);
+			data.put("tradedFor", this.itemTypeString(typedEvent.getAcquiredItemStack()));
 		} else if (event instanceof CrouchGreetingEvent) {
 			CrouchGreetingEvent typedEvent = (CrouchGreetingEvent) event;
 			logEvent.player = typedEvent.getPlayer();
@@ -418,11 +444,13 @@ public class DataCollector {
 			player = typedEvent.getPlayer();
 			block = typedEvent.getBlock();
 			itemStack = typedEvent.getPlayer().getInventory().getItemInMainHand();
+			material = typedEvent.getBlock().getType();
 		} else if (event instanceof BlockPlaceEvent) { 
 			BlockPlaceEvent typedEvent = (BlockPlaceEvent) event;
 			player = typedEvent.getPlayer();
 			block = typedEvent.getBlockPlaced();
 			itemStack = typedEvent.getItemInHand();
+			material = typedEvent.getBlock().getType();
 		} else if (event instanceof CustomActionEvent) { 
 			CustomActionEvent typedEvent = (CustomActionEvent) event;
 			player = typedEvent.getPlayer();
@@ -483,9 +511,6 @@ public class DataCollector {
 			if (material == null) {
 				material = block.getType();
 			}
-		}
-		if (logEvent.material != null) {
-			material = logEvent.material;
 		}
 		if (material != null) {
 			data.put("material", material.name());

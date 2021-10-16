@@ -18,7 +18,6 @@ import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityCombustByBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
-import org.bukkit.event.entity.EntityCreatePortalEvent;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -49,7 +48,6 @@ import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
@@ -82,15 +80,16 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
-import ch.heap.bukkit.epilog.event.BarrelOpenedEvent;
-import ch.heap.bukkit.epilog.event.CollectTrophyEvent;
-import ch.heap.bukkit.epilog.event.CrouchGreetingEvent;
-import ch.heap.bukkit.epilog.event.DoFarmEvent;
-import ch.heap.bukkit.epilog.event.DuneBreakEvent;
-import ch.heap.bukkit.epilog.event.OreBreakEvent;
-import ch.heap.bukkit.epilog.event.SolveMansionPuzzleEvent;
-import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
-import ch.heap.bukkit.epilog.event.VillagerTradeEvent;
+import ch.heap.bukkit.epilog.PlayerLocationEvent;
+import ch.heap.bukkit.epilog.meevent.BarrelOpenedEvent;
+import ch.heap.bukkit.epilog.meevent.CollectTrophyEvent;
+import ch.heap.bukkit.epilog.meevent.CrouchGreetingEvent;
+import ch.heap.bukkit.epilog.meevent.DoFarmEvent;
+import ch.heap.bukkit.epilog.meevent.DuneBreakEvent;
+import ch.heap.bukkit.epilog.meevent.OreBreakEvent;
+import ch.heap.bukkit.epilog.meevent.SolveMansionPuzzleEvent;
+import ch.heap.bukkit.epilog.meevent.UsingSpecialItemEvent;
+import ch.heap.bukkit.epilog.meevent.VillagerTradeEvent;
 
 import org.bukkit.event.server.ServerCommandEvent;
 
@@ -193,11 +192,6 @@ public class EventListener implements Listener {
 	}
 
 	@EventHandler
-	public void onEntityCreatePortal(EntityCreatePortalEvent event) {
-		handleEvent(event);
-	}
-
-	@EventHandler
 	public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
 		handleEvent(event);
 	}
@@ -246,6 +240,11 @@ public class EventListener implements Listener {
 
 	@EventHandler
 	public void onEntityShootBow(EntityShootBowEvent event) {
+		handleEvent(event);
+	}
+
+	@EventHandler
+	public void onPlayerLocation(PlayerLocationEvent event) {
 		handleEvent(event);
 	}
 
@@ -329,9 +328,6 @@ public class EventListener implements Listener {
 		handleEvent(event);
 	}
 
-	// @EventHandler
-	// public void onPlayerAnimation(PlayerAnimationEvent event)
-	// {handleEvent(event);}
 	@EventHandler
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
 		handleEvent(event);
@@ -354,11 +350,6 @@ public class EventListener implements Listener {
 
 	@EventHandler
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-		handleEvent(event);
-	}
-
-	@EventHandler
-	public void onPlayerChatTabComplete(PlayerChatTabCompleteEvent event) {
 		handleEvent(event);
 	}
 

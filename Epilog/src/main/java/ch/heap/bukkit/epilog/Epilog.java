@@ -1,10 +1,5 @@
 package ch.heap.bukkit.epilog;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,41 +7,30 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.HashMap;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import com.mongodb.ConnectionString;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
-import ch.heap.bukkit.epilog.event.BarrelOpenedListener;
-import ch.heap.bukkit.epilog.event.CaveListener;
-import ch.heap.bukkit.epilog.event.CollectTrophyListener;
-import ch.heap.bukkit.epilog.event.CrouchGreetingListener;
-import ch.heap.bukkit.epilog.event.DunesListener;
-import ch.heap.bukkit.epilog.event.FarmListener;
-import ch.heap.bukkit.epilog.event.MansionListener;
-import ch.heap.bukkit.epilog.event.SpecialItemAttackListener;
-import ch.heap.bukkit.epilog.event.SpecialItemMarkerListener;
-import ch.heap.bukkit.epilog.event.SpecialItemPotionListener;
-import ch.heap.bukkit.epilog.event.SpecialItemUsageListener;
-import ch.heap.bukkit.epilog.event.UsingSpecialItemEvent;
-import ch.heap.bukkit.epilog.event.VillagerTradeListener;
-import net.md_5.bungee.api.ChatColor;
+import ch.heap.bukkit.epilog.meevent.BarrelOpenedListener;
+import ch.heap.bukkit.epilog.meevent.CaveListener;
+import ch.heap.bukkit.epilog.meevent.CollectTrophyListener;
+import ch.heap.bukkit.epilog.meevent.CrouchGreetingListener;
+import ch.heap.bukkit.epilog.meevent.DunesListener;
+import ch.heap.bukkit.epilog.meevent.FarmListener;
+import ch.heap.bukkit.epilog.meevent.MansionListener;
+import ch.heap.bukkit.epilog.meevent.SpecialItemAttackListener;
+import ch.heap.bukkit.epilog.meevent.SpecialItemMarkerListener;
+import ch.heap.bukkit.epilog.meevent.SpecialItemPotionListener;
+import ch.heap.bukkit.epilog.meevent.SpecialItemUsageListener;
+import ch.heap.bukkit.epilog.meevent.VillagerTradeListener;
 
 public class Epilog extends JavaPlugin {
 	public RemoteAPI remote;
@@ -163,77 +147,9 @@ public class Epilog extends JavaPlugin {
 		// send onEnable to sub modules
 		inventoryTracker.onEnable();
 
-		final Epilog plugin = this;
-
-		(new BukkitRunnable(){
-			@Override
-			public void run() {
-				for (Player p : getServer().getOnlinePlayers()) {
-					for (ItemStack armorItem : p.getInventory().getArmorContents()) {
-						if (armorItem != null && armorItem.hasItemMeta()) {
-							String displayName = armorItem.getItemMeta().getDisplayName();
-							Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(p, p.getLocation(), displayName.toLowerCase().replace(" ", "_")));
-						}
-					}
-				}
-			}
-		}).runTaskTimer(this, 0L, 20L);
-
-		(new BukkitRunnable(){
-			@Override
-			public void run() {
-				for (Player p : getServer().getOnlinePlayers()) {
-					ItemStack item = p.getInventory().getItemInMainHand();
-					String displayName = null;
-					if (item.getType() == Material.WRITTEN_BOOK) {
-						displayName = item.hasItemMeta() ? ((BookMeta)item.getItemMeta()).getTitle() : "";
-					} else {
-						displayName = item.hasItemMeta() && !item.getItemMeta().getDisplayName().isEmpty() ? ChatColor.stripColor(item.getItemMeta().getDisplayName()) : "";
-					}
-					if (displayName.startsWith("Hint ")) {
-						String hintID = "hint_" + displayName.substring("Hint #".length());
-						Bukkit.getPluginManager().callEvent(new UsingSpecialItemEvent(p, p.getLocation(), hintID));
-					}
-				}
-			}
-		}).runTaskTimer(this, 0L, 20L);
-
-		(new BukkitRunnable(){
-
-			@Override
-			public void run() {
-				Collection<? extends Player> players = getServer().getOnlinePlayers();
-				for (Player p : players) {
-					Location loc = p.getLocation();
-
-					Map<String, Double> distances = new HashMap<>();
-					double total = 0;
-					for (Player p2 : players) {
-						if (p == p2) continue;
-						double distance = loc.distance(p2.getLocation());
-						distances.put(p2.getUniqueId().toString(), distance);
-						total += distance;
-					}
-
-					LogEvent event = new LogEvent("PlayerLocationEvent", System.currentTimeMillis(), activeExperimentLabel, p);
-					Map<String, Object> data = event.data;
-					data.put("x", loc.getX());
-					data.put("y", loc.getY());
-					data.put("z", loc.getZ());
-					data.put("pitch", loc.getPitch());
-					data.put("yaw", loc.getYaw());
-					data.put("isSprinting", p.isSprinting());
-					data.put("isSneaking", p.isSneaking());
-					if (distances.size() > 0) {
-						data.put("distances", distances);
-					}
-					data.put("averageDistance", total / players.size());
-					data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
-
-					plugin.postEvent(event);
-				}
-			}
-		}).runTaskTimer(this, 0L, 20L);
+		new ArmorWatchRunnable(this).runTaskTimer(this, 0L, 20L);
+		new HintWatchRunnable(this).runTaskTimer(this, 0L, 20L);
+		new PlayerLocationRunnable(this).runTaskTimer(this, 0L, 20L);
 	}
 	
 	@Override
