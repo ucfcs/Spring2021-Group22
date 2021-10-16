@@ -151,6 +151,13 @@ public class DataCollector {
 			logEvent.ignore = true;
 			return;
 		}
+		// Add worldTime to most events.
+		// TODO This is a weird place to add the world time to events. It adds
+		//      the attribute to any event that was logged with needsData = true,
+		//      but not to others. This sorta makes sense but feels wrong. This,
+		//      perhaps along with some other properties, could be added in a more
+		//      streamlined way elsewhere in the code. e.g. Hoist worldTime to the 
+		//      logEvent object itself and treat it like time.
 		if (logEvent.player != null) {
 			logEvent.data.put("worldTime", logEvent.player.getWorld().getTime());
 		}

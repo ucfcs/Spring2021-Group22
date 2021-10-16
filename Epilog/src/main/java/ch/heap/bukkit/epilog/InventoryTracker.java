@@ -87,7 +87,7 @@ public class InventoryTracker {
 		if (p==null) return;
 
 		// Delay the check for inventory differences. Otherwise, in 1.16.5 spigot, the inventories
-		// will be the same until (I believe) the event completes, which is after the current tick.
+		// will be the same until the event completes, which is after the current tick.
 		// I don't know how nicely this integrates into Epilog threading or whatnot, but this works 
 		// for now.
 		new BukkitRunnable(){
@@ -165,7 +165,7 @@ public class InventoryTracker {
 				contentSize += item.getAmount();
 			}
 		}
-		logEvent.data.put("totalUniqueSize", contentUniqueSize);
+		logEvent.data.put("totalSpaceSize", contentUniqueSize);
 		logEvent.data.put("totalSize", contentSize);
 		epilog.postEvent(logEvent);
 		state.put(uid, current);
