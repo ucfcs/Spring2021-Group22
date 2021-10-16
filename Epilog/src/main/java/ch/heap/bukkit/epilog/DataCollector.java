@@ -126,7 +126,6 @@ public class DataCollector {
             if (distances.size() > 0) {
                 data.put("distances", distances);
             }
-            data.put("averageDistance", total / (players.size()-1));
             data.put("zone", MazeEscapeZones.getPrimaryZone(loc.toVector()));
 		} else if (event instanceof EntityDamageEvent || event instanceof EntityRegainHealthEvent) {
 			addDamageData(logEvent, (EntityEvent) event);
