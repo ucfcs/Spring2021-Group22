@@ -1,1 +1,1 @@
-give @s book{display:{Name:'[{"text":"Hint #8","color":"light_purple"}]',Lore:['[{"text":"Hold this item to reveal a path.","italic":false}]','[{"text":"The path starts at the center of the map.","italic":false}]']}}
+give @s book{display:{Name:'[{"text":"Hint #8","color":"light_purple"}]',Lore:['[{"text":"Hold this item to reveal a path.","italic":false}]','[{"text":"The path starts at the center","italic":false}]', '[{"text":"of the map.","italic":false}]']}}
