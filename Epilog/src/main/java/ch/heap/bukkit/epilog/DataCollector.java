@@ -537,9 +537,6 @@ public class DataCollector {
 		} else if (entity instanceof Player) {
 			logEvent.player = (Player) entity;
 		}
-		// if (material!=null) {
-		// System.out.println(event.getEventName() + ": " + material.name());
-		// }
 	}
 
 	public List<String> getOnlinePlayers() {

@@ -137,7 +137,6 @@ public class InventoryTracker {
 			LogEvent logEvent = new LogEvent("PlayerItemInHandEvent", time, epilog.activeExperimentLabel, p);
 			logEvent.data.put("material", itemType);
 			epilog.postEvent(logEvent);
-			// System.out.println("PlayerItemInHandEvent: "+itemType);
 		}
 	}
 	

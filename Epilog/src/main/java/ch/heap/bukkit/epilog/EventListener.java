@@ -433,12 +433,6 @@ public class EventListener implements Listener {
 		handleEvent(event);
 	}
 
-	@EventHandler
-	public void onPlayerMove(PlayerMoveEvent event) {
-		// handleEvent(event);
-		// System.out.println("movement event");
-	}
-
 	//TODO move this to entity section
 	@EventHandler
 	public void onEntityPickupItem(EntityPickupItemEvent event) {

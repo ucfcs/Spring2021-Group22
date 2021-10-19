@@ -290,7 +290,6 @@ public class Epilog extends JavaPlugin {
 				try {
 					method.invoke(obj, event);
 				} catch (Exception e) {
-					System.out.println("failed to invoke event: " + e);
 					e.printStackTrace();
 				}
 			}
