@@ -8,4 +8,9 @@ ingame-commands: true
 world-download: true
 offline-mode: false
 logging-server-url: http://localhost:2345
-mongo-uri: mongodb+srv://epilog:0BZpFnbqzSDbbs0a@cluster0.wvs6a.mongodb.net
+mongo-uri: mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000
+blacklist:
+- 6eceb300-a4de-4638-a1c2-6d91d34b5ab4
+- 8204dfef-ae45-4c4a-ac97-164042ab9557
+- f31d4b91-9b84-4209-9018-7f2526cb71a0
+- 7ddc493a-f0e5-45a3-9b28-c5533c6291ec

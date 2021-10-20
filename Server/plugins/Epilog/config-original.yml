@@ -1,9 +1,0 @@
-auto-update: true
-logging-enabled: true
-log-chats: true
-use-evaluation-server: false
-player-notifications: true
-logging-info: true
-ingame-commands: true
-world-download: true
-offline-mode: false
