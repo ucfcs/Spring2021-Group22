@@ -1,5 +1,3 @@
-kill @e[tag=mazeescape,tag=tutorial]
-
-# Farm
-fill 2 41 -10 6 41 -6 air
-data merge block 6 41 -10 {Items:[]}
+summon item_frame 01 43 2 {Facing:2b,Invulnerable:1b,Invisible:1b,Fixed:1b,Tags:["mazeescape","tutorial"],Item:{id:"minecraft:filled_map",Count:1b,tag:{map:0}}}
+summon item_frame 00 43 2 {Facing:2b,Invulnerable:1b,Invisible:1b,Fixed:1b,Tags:["mazeescape","tutorial"],Item:{id:"minecraft:filled_map",Count:1b,tag:{map:1}}}
+summon item_frame -1 43 2 {Facing:2b,Invulnerable:1b,Invisible:1b,Fixed:1b,Tags:["mazeescape","tutorial"],Item:{id:"minecraft:filled_map",Count:1b,tag:{map:2}}}

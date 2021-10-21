@@ -1,8 +1,17 @@
-function mazeescape:villagers/setup
+function mazeescape:reset
+
+# Fill barrels
 function mazeescape:desert/set
 function mazeescape:forest/set
+function mazeescape:mansion/set
 
 function mazeescape:trophy/summon
+
+function mazeescape:villagers/setup
+
+function mazeescape:scheduler
+
+tp @a 4.5 56 0.5
 
 # trophy access
 fill -47 61 -58 -47 64 -58 minecraft:air
