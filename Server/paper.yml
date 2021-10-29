@@ -150,7 +150,7 @@ world-settings:
     max-auto-save-chunks-per-tick: 24
     optimize-explosions: false
     baby-zombie-movement-modifier: 0.5
-    use-vanilla-world-scoreboard-name-coloring: false
+    use-vanilla-world-scoreboard-name-coloring: true
     seed-based-feature-search: true
     water-over-lava-flow-speed: 5
     grass-spread-tick-rate: 1

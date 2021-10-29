@@ -1,0 +1,2 @@
+execute if score num trophy_collected matches 1 run tellraw @a [{"text":"[@] "}, {"text":"You have collected "},{"score":{"name":"num","objective":"trophy_collected"}},{"text":" trophy"}]
+execute unless score num trophy_collected matches 1 run tellraw @a [{"text":"[@] "}, {"text":"You have collected "},{"score":{"name":"num","objective":"trophy_collected"}},{"text":" trophies"}]
