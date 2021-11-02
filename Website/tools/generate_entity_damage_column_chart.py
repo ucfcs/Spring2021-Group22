@@ -17,34 +17,29 @@ if (MONGO_URI not in os.environ.keys()):
 
 mongo_connection_uri = os.environ.get(MONGO_URI);
 
-# I've changed the schema so without this the script crashes. This check will
-# eventually be unnecessary
-def isGoodData(event):
-    return 'msg' in event;
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--out', help='where to write the data to');
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
 args = parser.parse_args()
 
-# Precompute the data structure needed for the sharing column chart. This would be
+# Precompute the data structure needed for the trophy column chart. This would be
 # the "tools" part of the process. This would be run once for each team we have run
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    query = { "event": 'AsyncPlayerChatEvent' }
+    query = { "event": 'EntityDamageByPlayerEvent' }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
-        { '$project' : { '_id' : 0, 'player': 1, 'msg': 1 } },
-        { '$group': { '_id' : '$player', 'total': { '$sum': { '$strLenCP': '$msg' } } } },
+        { '$project' : { '_id' : 0, 'player': 1, 'damage': 1 } },
+        { '$group': { '_id' : '$player', 'total': { '$sum': '$damage' } } },
     ]))
 
     data = {
         'series': [
             { 
-                'name': 'Messages Length', 
+                'name': 'Entity Damage', 
                 'data': [data['total'] for data in intermediary_data] 
             }
         ],
@@ -59,4 +54,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/chat_content_column_chart.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/entity_damage_column_chart.json')

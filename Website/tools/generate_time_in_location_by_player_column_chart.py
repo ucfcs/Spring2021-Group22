@@ -33,34 +33,41 @@ args = parser.parse_args()
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    collection = client.epilog.data2;
-    query = { "event": "PlayerLocationEvent" }
+    query = { "event": 'PlayerLocationEvent' }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
-    cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
-    intermediary_data = {}
-    zone_names = [zone['name'] for zone in ALL_ZONES]
-    for zone in zone_names:
-        intermediary_data[zone] = {}
-    intermediary_player_set = set()
-    for event in cursor:
-        if not isGoodData(event):
-            continue
-        
-        intermediary_player_set.add(event['player'])
-        event_zone = getZone(event['x'], event['y'], event['z'])
-        if event['player'] not in intermediary_data[event_zone]:
-            intermediary_data[event_zone][event['player']] = 0
-        intermediary_data[event_zone][event['player']]+=1;
+    intermediary_data = list(client.epilog.data2.aggregate([
+        { '$match' : query },
+        { '$project' : { '_id' : 0, 'player': 1, 'zone': 1 } },
+        { '$group': { '_id' : { 'zone': '$zone', 'player': '$player'}, 'total': { '$sum': 1 } } },
+        { '$group' : { 
+            '_id' :  "$_id.zone",
+            'totals': { '$push': { 'player': '$_id.player', 'total': '$total'} }
+            } 
+        },
+        { '$limit': 4 }
+    ]))
 
-    players = list(intermediary_player_set)
+    players = set()
+    for player in intermediary_data:
+        for total in player['totals']:
+            players.add(total['player'])
+    players = list(players)
+    zones = set()
+    for zone in intermediary_data:
+        zones.add(zone['_id'])
+    zones = list(zones)
     data = {
         'series': [{ 
-                'name': event_zone, 
+                'name': zone_data['_id'], 
                 'data': [
-                    (intermediary_data[event_zone][player] if player in intermediary_data[event_zone] else 0) 
+                    (
+                        [player_data['total'] for player_data in zone_data['totals'] if player_data['player'] == player][0]
+                        if (len([player_data['total'] for player_data in zone_data['totals'] if player_data['player'] == player]) > 0) 
+                        else 0
+                    ) 
                 for player in players] 
-            } for event_zone in zone_names],
+            } for zone_data in intermediary_data],
         'categories': players,
     }
     return data

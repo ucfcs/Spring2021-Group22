@@ -32,20 +32,16 @@ args = parser.parse_args()
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    collection = client.epilog.data2;
     query = { "event": "InventoryContent" }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
-    cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
-    data = {};
-    for event in cursor:
-        if not isGoodData(event):
-            continue
-        if event['player'] not in data:
-            data[event['player']] = {'x': [], 'y': []}
-        data[event['player']]['x'].append(event['time'] // 1000);
-        data[event['player']]['y'].append(event['totalSize']);
-    return data
+    intermediary_data = list(client.epilog.data2.aggregate([
+        { '$match' : query },
+        { '$project' : { '_id' : 0, 'player': 1, 'totalSize': 1, 'time': 1 } },
+        { '$group': { '_id' : '$player', 'events': { '$push': { 'totalSize': '$totalSize', 'time': { '$floor': { '$divide': ['$time', 1000] } } } } } },
+    ]))
+
+    return intermediary_data
 
 # Write the results to a precomputed file. This file will likely be in the static_files 
 # directory.

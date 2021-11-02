@@ -1,12 +1,12 @@
-## Simple tool for querying the database for common events
+## DEPRECATED - DO NOT REFERENCE/USE
 
 import pymongo
 import argparse
 from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
 import json
-from utils import groupBy
 
 load_dotenv();
 
@@ -20,37 +20,28 @@ mongo_connection_uri = os.environ.get(MONGO_URI);
 # I've changed the schema so without this the script crashes. This check will
 # eventually be unnecessary
 def isGoodData(event):
-    return 'msg' in event;
+    return 'totalSize' in event;
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--out', help='where to write the data to');
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
 args = parser.parse_args()
 
-# Precompute the data structure needed for the sharing column chart. This would be
+# Precompute the data structure needed for the inventory size time series. This would be
 # the "tools" part of the process. This would be run once for each team we have run
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    query = { "event": 'AsyncPlayerChatEvent' }
+    query = { "event": "UsingSpecialItemEvent" }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
-        { '$project' : { '_id' : 0, 'player': 1, 'msg': 1 } },
-        { '$group': { '_id' : '$player', 'total': { '$sum': { '$strLenCP': '$msg' } } } },
+        { '$project' : { '_id' : 0, 'player': 1, 'special': 1, 'time': 1 } },
+        { '$group': { '_id' : '$player', 'events': { '$push': { 'special': '$special', 'time': { '$floor': { '$divide': ['$time', 1000] } } } } } },
     ]))
 
-    data = {
-        'series': [
-            { 
-                'name': 'Messages Length', 
-                'data': [data['total'] for data in intermediary_data] 
-            }
-        ],
-        'categories': [data['_id'] for data in intermediary_data],
-    }
-    return data
+    return intermediary_data
 
 # Write the results to a precomputed file. This file will likely be in the static_files 
 # directory.
@@ -59,4 +50,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/chat_content_column_chart.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/special_items_over_time.json')

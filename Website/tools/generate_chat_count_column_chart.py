@@ -7,6 +7,8 @@ import os
 from datetime import datetime, timedelta
 import json
 
+from utils import groupBy
+
 load_dotenv();
 
 MONGO_URI = 'MONGO_URI';
@@ -31,29 +33,23 @@ args = parser.parse_args()
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    collection = client.epilog.data2;
-    query = { "event": "AsyncPlayerChatEvent" }
+    query = { "event": 'AsyncPlayerChatEvent' }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
-    cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
-    intermediary_data = {}
-    for event in cursor:
-        if not isGoodData(event):
-            continue
-        
-        if event['player'] not in intermediary_data:
-            intermediary_data[event['player']] = 0
-        intermediary_data[event['player']]+=1;
+    intermediary_data = list(client.epilog.data2.aggregate([
+        { '$match' : { 'event' : 'AsyncPlayerChatEvent' } },
+        { '$project' : { '_id' : 0, 'player': 1, 'msg': 1 } },
+        { '$group': { '_id' : '$player', 'total': { '$sum': 1 } } },
+    ]))
 
-    players = list(intermediary_data.keys())
     data = {
         'series': [
             { 
                 'name': 'Messages Count', 
-                'data': [intermediary_data[player] for player in players] 
+                'data': [data['total'] for data in intermediary_data] 
             }
         ],
-        'categories': players,
+        'categories': [data['_id'] for data in intermediary_data],
     }
     return data
 
