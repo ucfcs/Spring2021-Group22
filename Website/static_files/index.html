@@ -1,17 +1,89 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <title>Hello World</title>
-    <link rel="stylesheet" href="css/styles.css" />
+    <link type="text/css" rel="stylesheet" href="/styles.css">
+    <link href="http://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
   </head>
   <body>
-    <ul>
-      <li><a href="mapminer.html">/mapminer</a></li>
-      <li><a href="sharing_column_chart.html">/sharing_column_chart</a></li>
-      <li><a href="time_in_location_by_player_column_chart.html">/time_in_location_by_player_column_chart</a></li>
-      <li><a href="time_of_player_by_location_column_chart.html">/time_of_player_by_location_column_chart</a></li>
-      <li><a href="chat_count_column_chart.html">/chat_count_column_chart</a></li>
-      <li><a href="chat_content_column_chart.html">/chat_content_column_chart</a></li>
-    </ul>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <!-- <div class="navbar-brand" id="title-style" href="#">Measuring Collaboration in Minecraft&nbsp;&nbsp;&nbsp;&nbsp;</div> -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" id="selected-link" aria-current="page" href="/index.html"><b>Home</b></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/collection.html">Data Collection</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/visualization.html">Data Visualization</a>
+            </li>
+          </ul>
+          <!-- <form class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form> -->
+        </div>
+      </div>
+    </nav>
+    <br><br>
+    <h1 id="title-style" class="col text-center">Measuring Collaboration in Minecraft</h1>
+    <br>
+    <div class="card center" style="width: 70%;">
+      <img src="/img/cover.png" class="card-img-top center" alt="minecraft" style="width: 80%;">
+      <div class="card-body">
+        <h4 class="card-title">Abstract</h4>
+        <p class="card-text">Research into collaborative artificial intelligence is showing promise. Minecraft, an open world sandbox game, is being used as a medium to explore advances in collaborative intelligence. A Minecraft virtual world will be built where players will collaborate to collect resources and discover trophies in a maze. After IRB confirmation, subjects will be recruited for the experiment from the internet and/or the university for participation. HeapCraft is an extension to the game that collects and visualizes data. The HeapCraft toolset will be extended and tailored so that we may collect data for collaborative AI analysis. Analysis will be performed on the collected data.</p>
+        <br>
+        <h4 class="card-title">Broader Impacts</h4>
+        <p class="card-text">The impact of this project will be observed in related virtual world social experiments. Our methodologies for collecting data and the collected data itself can be referenced for other studies, just as we will be building upon the results published before us. For example, our plan for metric design will be influenced by the conclusions drawn from previous HeapCraft research. The master’s thesis by Stephan Muller identified that collaborating players tend to stay within 10 blocks of each other. Knowing this, we can design metrics that more accurately identify location patterns.
+          <br><br>If we decide to extend the HeapCraft platform, then other groups using it in the future will benefit from the wider array of metrics. If we decide to build our own toolchain, it will be publicly available and share similar benefits. In any case, the analysis of the data collected will be useful for related studies. The success of the use of Minecraft as a virtual world medium will also be useful for inspiring future studies or directing them to other virtual world platforms.</p>
+        <br>
+        <h4 class="card-title">Implementation</h4>
+        <div class="col text-center">
+          <img src="/img/block.png" alt="block diagram" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 70%;"><br><br>
+          <i>Tap the image to zoom in</i>
+        </div><br>
+        <p class="card-text">Many players would be on one server that is exchanging data with its own internal database and multiple plugins would interact with the server augmenting how the server operates. HeapCraft, or any other plugins we make, would use that fact to write any data it collects into a separate database with just the information we want on player interactions. We can then separately analyze the data to produce our results. This is how our team has analyzed the project requirements and aims to implement the research.</p>
+      </div>
+      <!-- <ul class="list-group list-group-flush">
+        <li class="list-group-item">An item</li>
+        <li class="list-group-item">A second item</li>
+        <li class="list-group-item">A third item</li>
+      </ul>
+      <div class="card-body">
+        <a href="#" class="card-link">Card link</a>
+        <a href="#" class="card-link">Another link</a>
+      </div> -->
+    </div>
+    <br><br>
+    <div class="modal modal-xl fade modal-fullscreen" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Larger View</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="col text-center"><img src="/img/block.png" alt="block diagram" style="width: 70rem;"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </body>
 </html>
