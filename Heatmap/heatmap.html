@@ -14,8 +14,8 @@
 
 	// set the dimensions and margins of the graph
 	const margin = { top: 80, right: 25, bottom: 30, left: 40 },
-		width = 450 - margin.left - margin.right,
-		height = 450 - margin.top - margin.bottom;
+		width = 1000 - margin.left - margin.right,
+		height = 1000 - margin.top - margin.bottom;
 
 	// append the svg object to the body of the page
 	const svg = d3.select("#my_dataviz")
@@ -27,7 +27,7 @@
 
 	//Read the data
 	// d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/heatmap_data.csv").then(function (data) {
-	d3.csv('./rawdata_timestamp.csv').then(function (data) {
+	d3.csv('https://raw.githubusercontent.com/ucfcs/Spring2021-Group22/2bae3421e6ab31b52b760536a4ada1b63bb42a91/Heatmap/rawdata_timestamp.csv').then(function (data) {
 
 		// Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
 		const myGroups = Array.from(new Set(data.map(d => d.x)))
@@ -80,7 +80,7 @@
 		}
 		const mousemove = function (event, d) {
 			tooltip
-				.html("The exact value of<br>this cell is: " + d.value)
+				.html("The exact value of<br>this cell is: " + d.count)
 				.style("left", (event.x) / 2 + "px")
 				.style("top", (event.y) / 2 + "px")
 		}
@@ -94,15 +94,15 @@
 
 		// add the squares
 		svg.selectAll()
-			.data(data, function (d) { return d.group + ':' + d.variable; })
+			.data(data, function (d) { return d.x + ':' + d.y; })
 			.join("rect")
-			.attr("x", function (d) { return x(d.group) })
-			.attr("y", function (d) { return y(d.variable) })
+			.attr("x", function (d) { return x(d.x) })
+			.attr("y", function (d) { return y(d.y) })
 			.attr("rx", 4)
 			.attr("ry", 4)
 			.attr("width", x.bandwidth())
 			.attr("height", y.bandwidth())
-			.style("fill", function (d) { return myColor(d.value) })
+			.style("fill", function (d) { return myColor(d.count) })
 			.style("stroke-width", 4)
 			.style("stroke", "none")
 			.style("opacity", 0.8)
