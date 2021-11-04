@@ -5,9 +5,8 @@ import argparse
 from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
 import json
-
-from utils import groupBy
 
 load_dotenv();
 
@@ -21,7 +20,7 @@ mongo_connection_uri = os.environ.get(MONGO_URI);
 # I've changed the schema so without this the script crashes. This check will
 # eventually be unnecessary
 def isGoodData(event):
-    return 'msg' in event;
+    return 'droppedBy' in event;
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--out', help='where to write the data to');
@@ -33,23 +32,32 @@ args = parser.parse_args()
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    query = { "event": 'AsyncPlayerChatEvent' }
+    collection = client.epilog.data2;
+    query = { "event": "PlayerPickupItemEvent" }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
-    intermediary_data = list(client.epilog.data2.aggregate([
-        { '$match' : query },
-        { '$project' : { '_id' : 0, 'player': 1, 'msg': 1 } },
-        { '$group': { '_id' : '$player', 'total': { '$sum': 1 } } },
-    ]))
+    cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
+    actions = ['greeted_to', 'greeted_by']
+    intermediary_data = {};
+    for action in actions:
+        intermediary_data[action] = {}
+    intermediary_player_set = set()
+    for event in cursor:
+        intermediary_player_set.add(event['player'])
+        if event['player'] not in intermediary_data['greeted_to']:
+            intermediary_data['greeted_to'][event['player']] = 0
+        intermediary_data['greeted_to'][event['player']]+=1;
+        if event['target'] not in intermediary_data['greeted_by']:
+            intermediary_data['greeted_by'][event['target']] = 0
+        intermediary_data['greeted_by'][event['target']]+=1;
 
+    players = list(intermediary_player_set)
     data = {
-        'series': [
-            { 
-                'name': 'Messages Count', 
-                'data': [data['total'] for data in intermediary_data] 
-            }
-        ],
-        'categories': [data['_id'] for data in intermediary_data],
+        'series': [{ 
+                'name': action, 
+                'data': [intermediary_data[action][player] if (player in intermediary_data[action]) else 0 for player in players] 
+            } for action in actions],
+        'categories': players,
     }
     return data
 
@@ -60,4 +68,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/chat_count_column_chart.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/sharing_column_chart.json')
