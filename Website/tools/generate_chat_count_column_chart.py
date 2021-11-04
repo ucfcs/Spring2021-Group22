@@ -7,8 +7,6 @@ import os
 from datetime import datetime, timedelta
 import json
 
-from utils import groupBy
-
 load_dotenv();
 
 MONGO_URI = 'MONGO_URI';

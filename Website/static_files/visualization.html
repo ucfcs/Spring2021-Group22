@@ -10,14 +10,26 @@
     <link type="text/css" rel="stylesheet" href="/styles.css">
     <!-- <link href="/squigglemap.html" rel="import" /> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="js/core.js"></script>
+    <script src="js/show_chat_content_column_chart.js"></script>
+    <script src="js/show_chat_count_column_chart.js"></script>
+    <script src="js/show_diversity_of_labor_by_player_chart.js"></script>
+    <script src="js/show_diversity_of_labor_chart.js"></script>
+    <script src="js/show_sharing_column_chart.js"></script>
+    <script src="js/show_time_in_location_by_player_column_chart.js"></script>
+    <script src="js/show_time_of_player_by_location_column_chart.js"></script>
+    <script src="js/show_trophies_collected_column_chart.js"></script>
     <script> 
         $(function(){
-            $("#includedContent").load("squigglemap.html"); 
-            $("#includedContent1").load("sharing_column_chart.html"); 
-            $("#includedContent2").load("time_in_location_by_player_column_chart.html");
-            $("#includedContent3").load("chat_content_column_chart.html"); 
-            $("#includedContent4").load("chat_count_column_chartt.html"); 
-            $("#includedContent5").load("time_of_player_by_location_column_chart.html"); 
+            renderChatContentColumnChart(document.querySelector('#chart1'));
+            renderChatCountColumnChart(document.querySelector('#chart2'));
+            renderDiversityOfLaborByPlayerColumnChart(document.querySelector('#chart3'));
+            renderDiversityOfLaborColumnChart(document.querySelector('#chart4'));
+            renderSharingColumnChart(document.querySelector('#chart5'));
+            renderTimeInLocationByPlayerColumnChart(document.querySelector('#chart6'));
+            renderTimeOfPlayerByLocationColumnChart(document.querySelector('#chart7'));
+            renderTrophiesCollectedColumnChart(document.querySelector('#chart8'));
         });
     </script> 
     <!-- <script> 
@@ -62,14 +74,18 @@
     <div class="card center" style="width: 70%;">
       <!-- <img src="..." class="card-img-top" alt="..."> -->
       <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <div id="includedContent"></div><br>
-        <div id="includedContent1"></div><br>
-        <div id="includedContent2"></div><br>
-        <div id="includedContent3"></div><br>
-        <div id="includedContent4"></div><br>
-        <div id="includedContent5"></div><br>
+        <h5 class="card-title">Team 3 Experimental Charts and Visualizations</h5>
+        <div id="chart1"></div><br>
+        <div id="chart2"></div><br>
+        <div id="chart3"></div><br>
+        <div id="chart4"></div><br>
+        <div id="chart5"></div><br>
+        <div id="chart6"></div><br>
+        <div id="chart7"></div><br>
+        <div id="chart8"></div><br>
+        <iframe src="/squigglemap.html"/>
       </div>
+      <br>
       <ul class="list-group list-group-flush">
         <li class="list-group-item">An item</li>
         <li class="list-group-item">A second item</li>

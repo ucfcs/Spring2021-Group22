@@ -19,7 +19,7 @@ def main():
     print('Connecting to Mongo')
 
     client = pymongo.MongoClient(os.getenv('MONGO_URI'), ssl_cert_reqs=ssl.CERT_NONE)
-    collection = client.test.data3
+    collection = client.epilog.data2
 
     print('fetching metadata')
 
