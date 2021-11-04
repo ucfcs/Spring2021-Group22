@@ -58,26 +58,15 @@ regions:
         owners: {}
         type: cuboid
         priority: 1
-    desertcopy:
-        min: {x: 17, y: 20, z: -71}
-        max: {x: 71, y: 45, z: -9}
-        members: {}
-        flags: {mob-spawning: deny}
-        owners: {}
-        type: cuboid
-        priority: 3
     tutorial:
-        min: {x: -8, y: 39, z: -36}
-        max: {x: 7, y: 46, z: 6}
+        min: {x: -6, y: 39, z: -6}
+        max: {x: 6, y: 46, z: 6}
         members: {}
         flags:
-            command-on-exit: ['/function mazeescape:tutorial/leave']
-            soil-dry: deny
+            respawn-location: {world: mazerunner, x: 0.5, y: 41.0, z: 0.5, pitch: 0.0,
+                yaw: 0.0}
             invincible: allow
-            command-on-entry: ['/function mazeescape:tutorial/join']
-            pvp: deny
             mob-spawning: deny
-            natural-hunger-drain: deny
         owners: {}
         type: cuboid
         priority: 2
@@ -140,12 +129,12 @@ regions:
             firework-damage: deny
             mob-damage: allow
             ravager-grief: deny
-            use-anvil: deny
-            respawn-anchors: deny
             mushroom-growth: deny
+            respawn-anchors: deny
+            use-anvil: deny
             lightning: deny
-            wither-damage: deny
             ice-form: deny
+            wither-damage: deny
             enderman-grief: deny
             pvp: allow
             mob-spawning: deny
@@ -165,8 +154,8 @@ regions:
             mycelium-spread: deny
             block-trampling: deny
             ice-melt: deny
-            interact: allow
             vehicle-destroy: allow
+            interact: allow
             chest-access: allow
             ride: allow
             fire-spread: deny

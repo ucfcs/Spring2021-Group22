@@ -1,1 +1,0 @@
-/rg flag -w "mazerunner" -h 3 mazecenter deny-spawn spider,enderman,piglin,evoker,vindicator,pillager,ravager,cave_spider,endermite,guardian,elder_guardian,shulker,husk,stray,phantom,blaze,creeper,ghast,magma_cube,silverfish,skeleton,zombie,zombie_villager,drowned,wither_skeleton,witch,hoglin,zoglin,piglin_brute,bat,enderman
