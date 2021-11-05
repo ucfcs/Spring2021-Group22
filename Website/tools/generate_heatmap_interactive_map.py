@@ -48,7 +48,7 @@ def main():
     data['timeline'] = dict()
 
     index = 0
-    for doc in collection.find().sort('time', pymongo.ASCENDING):
+    for doc in collection.find({ 'experimentLabel': "Team3" }).sort('time', pymongo.ASCENDING):
         printProgressBar(index, doc_count, prefix='Progress:',
                          suffix='Complete', length=50)
         index = index + 1
