@@ -26,7 +26,7 @@ async function squigglemap() {
 		for (const player in data) {
 			data[player].pos.length = 0;
 		}
-		for (const key of Object.keys(inputdata.timeline).sort()) {
+		for (const key of Object.keys(inputdata.timeline).sort((a,b) => parseFloat(a) - parseFloat(b))) {
 			let res = inputdata.timeline[key].filter(f => f.event === "PlayerLocationEvent")
 			if (res.length > 0) {
 				res.forEach(r => {
