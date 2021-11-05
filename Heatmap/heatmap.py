@@ -17,6 +17,7 @@ load_dotenv()
 
 time_offset = True
 
+
 def def_value():
     return 0
 
@@ -24,7 +25,8 @@ def main():
 
     print('Connecting to Mongo')
 
-    client = pymongo.MongoClient(os.getenv('MONGO_URI'), ssl_cert_reqs=ssl.CERT_NONE)
+    client = pymongo.MongoClient(
+        os.getenv('MONGO_URI'), ssl_cert_reqs=ssl.CERT_NONE)
     collection = client.test.data3
 
     print('fetching metadata')
@@ -58,28 +60,29 @@ def main():
         printProgressBar(index, doc_count, prefix='Progress:',
                          suffix='Complete', length=50)
         index = index + 1
-        
+
         if doc['event'] != "PlayerLocationEvent":
             continue
-        
+
         # doc['_id'] = str(doc['_id'])
-        
+
         # print(doc)
         x = int(doc['x'])
         y = int(doc['z'])
-        
+
         # print(x)
         # print(y)
         # print(data[x,y])
-        
+
         data[x, y] += 1
-        
-        
+
+    data = sorted(data.items(), key=lambda key: key[0])
+
     print('')
 
     print('Writing data to file')
     writeToFile(data, 'rawdata_timestamp', 'csv')
-    
+
     # print(data)
 
     return 0
@@ -96,12 +99,12 @@ def writeToFile(data, filename, extension='json'):
 
     # with open(f'{filename}{istr}.{extension}', 'w') as outfile:
     #     json.dump(data, outfile)
-    
-    with open(f'{filename}{istr}.{extension}', 'w', newline="") as csv_file:  
+
+    with open(f'{filename}{istr}.{extension}', 'w', newline="") as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(['x', 'y', 'count'])
-        for key, value in data.items():
-            writer.writerow([key[0], key[1], value])
+        for tuple in data:
+            writer.writerow([tuple[0][0], tuple[0][1], tuple[1]])
 
 
 # Print iterations progress
