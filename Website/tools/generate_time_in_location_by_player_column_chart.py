@@ -46,7 +46,6 @@ def precomputeJSON(experimentLabel):
             'totals': { '$push': { 'player': '$_id.player', 'total': '$total'} }
             } 
         },
-        { '$limit': 4 }
     ]))
 
     players = set()
