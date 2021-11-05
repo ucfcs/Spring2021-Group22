@@ -11,6 +11,7 @@ async function renderTimeOfPlayerByLocationColumnChart(element) {
       height: 350,
     },
     series: data.series,
+    colors: data.colors,
     xaxis: {
       categories: data.categories,
     },

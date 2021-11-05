@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import json
 
+from uuid_to_playerdata import UUID_MAP
+
 load_dotenv();
 
 MONGO_URI = 'MONGO_URI';
@@ -65,7 +67,7 @@ def precomputeJSON(experimentLabel):
                 'name': action, 
                 'data': [intermediary_data[action][player] if (player in intermediary_data[action]) else 0 for player in players] 
             } for action in actions],
-        'categories': players,
+        'categories': [UUID_MAP[player]['name'] for player in players],
     }
     return data
 

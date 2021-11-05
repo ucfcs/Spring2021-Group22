@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import json
 from zoning_util import ALL_ZONES, getZone
+from uuid_to_playerdata import UUID_MAP
 
 load_dotenv();
 
@@ -68,7 +69,8 @@ def precomputeJSON(experimentLabel):
                     ) 
                 for player in players] 
             } for zone_data in intermediary_data],
-        'categories': players,
+        'colors': [UUID_MAP[player]['color'] for player in players],
+        'categories': [UUID_MAP[player]['name'] for player in players],
     }
     return data
 
