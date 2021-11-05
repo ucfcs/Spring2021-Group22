@@ -23,14 +23,14 @@ def main():
 
     print('fetching metadata')
 
-    for time in collection.find().sort('time', pymongo.ASCENDING).limit(1):
+    for time in collection.find({'event': 'PlayerLocationEvent'}).sort('time', pymongo.ASCENDING).limit(1):
         _time = math.floor(time['time'] / 1000)
         if time_offset:
             _time_offset = _time
             min_time = 0
         else:
             min_time = _time
-    for time in collection.find().sort('time', pymongo.DESCENDING).limit(1):
+    for time in collection.find({'event': 'PlayerLocationEvent'}).sort('time', pymongo.DESCENDING).limit(1):
         if time_offset:
             max_time = math.floor(time['time'] / 1000) - _time_offset
         else:
@@ -48,7 +48,7 @@ def main():
     data['timeline'] = dict()
 
     index = 0
-    for doc in collection.find({ 'experimentLabel': "Team3" }).sort('time', pymongo.ASCENDING):
+    for doc in collection.find({ 'experimentLabel': "Team3", 'event': 'PlayerLocationEvent' }).sort('time', pymongo.ASCENDING):
         printProgressBar(index, doc_count, prefix='Progress:',
                          suffix='Complete', length=50)
         index = index + 1
