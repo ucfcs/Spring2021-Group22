@@ -7,6 +7,8 @@ import os
 from datetime import datetime, timedelta
 import json
 
+from uuid_to_playerdata import UUID_MAP
+
 load_dotenv();
 
 MONGO_URI = 'MONGO_URI';
@@ -35,6 +37,8 @@ def precomputeJSON(experimentLabel):
         { '$group': { '_id' : '$player', 'total': { '$sum': 1 } } },
     ]));
 
+    intermediary_data = sorted(intermediary_data, key=lambda x: x['_id'])
+
     data = {
         'series': [
             { 
@@ -42,7 +46,7 @@ def precomputeJSON(experimentLabel):
                 'data': [data['total'] for data in intermediary_data]
             }
         ],
-        'categories': [data['_id'] for data in intermediary_data],
+        'categories': [UUID_MAP[data['_id']]['name'] for data in intermediary_data],
     }
     return data
 

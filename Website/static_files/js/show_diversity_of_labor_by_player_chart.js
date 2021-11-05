@@ -15,7 +15,7 @@ async function renderDiversityOfLaborByPlayerColumnChart(element) {
     },
     yaxis: {
       title: {
-        text: 'Points',
+        text: 'Percentage',
       },
       decimalsInFloat: 2,
     },

@@ -7,6 +7,7 @@ import os
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import json
+from uuid_to_playerdata import UUID_MAP
 
 load_dotenv();
 
@@ -46,6 +47,7 @@ def precomputeJSON(experimentLabel):
         query['experimentLabel'] = experimentLabel
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
+        { '$sort': { 'time': 1 } },
         { '$project' : { '_id' : 0, 'player': 1, 'special': 1, 'time': 1 } },
         { '$group': { '_id' : '$player', 'events': { '$push': { 'special': '$special', 'time': { '$floor': { '$divide': ['$time', 1000] } } } } } },
     ]))
@@ -91,11 +93,27 @@ def precomputeJSON(experimentLabel):
         'trophy': 0, # investigate this? Hypothesis, we had someone wearing the skulls and it triggered the event...
     }
 
-    for player in intermediary_data:
-        for event in player['events']:
-            event['specialValue'] = items_to_value[event['special']]
+    start_time = list(client.epilog.data2.find(query).sort('time', 1).limit(1))[0]['time']
+    processed_data = {}
+    for player_data in intermediary_data:
+        buckets = []
+        for i in range(60*60//60):
+            buckets.append(i)
+        for event in player_data['events']:
+            local_event_time = (int(event['time']) - start_time // 1000) // 60
+            if local_event_time < 60*60//60:
+                buckets[local_event_time] += 1
+                # buckets[local_event_time] += items_to_value[event['special']]
+        processed_data[player_data['_id']] = buckets
 
-    return intermediary_data
+
+    return {
+        'series': [{
+            'name': UUID_MAP[player]['name'],
+            'data': processed_data[player]
+        } for player in processed_data],
+        'categories': [idx for idx, _ in enumerate(buckets)]
+    }
 
 # Write the results to a precomputed file. This file will likely be in the static_files 
 # directory.

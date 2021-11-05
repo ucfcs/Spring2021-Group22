@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
 import json
+from uuid_to_playerdata import UUID_MAP
 
 load_dotenv();
 
@@ -49,20 +50,20 @@ def precomputeJSON(experimentLabel):
     for event_data in intermediary_data:
         for player_data in event_data['totals']:
             players.add(player_data['player'])
-    players = list(players)
+    players = sorted(list(players))
     events = set()
     for event_data in intermediary_data:
         events.add(event_data['_id'])
-    events = list(events)
+    events = sorted(list(events))
 
     # normalize event totals
-    event_totals = [0 for _ in events]
     for event_data in intermediary_data:
         total = 0
         for player_data in event_data['totals']:
             total += player_data['total']
         for player_data in event_data['totals']:
             player_data['total'] /= total
+            player_data['total'] *= 100.0
 
     data = {
         'series': [{ 
@@ -75,7 +76,7 @@ def precomputeJSON(experimentLabel):
                     ) 
                 for player in players] 
             } for event_data in intermediary_data],
-        'categories': players,
+        'categories': [UUID_MAP[player]['name'] for player in players],
     }
 
     return data

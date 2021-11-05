@@ -3,7 +3,7 @@ async function renderTrophiesCollectedColumnChart(element) {
   
   const options = {
     title: {
-      text: 'Trophies Collected',
+      text: 'Trophies Collected by Player',
     },
     chart: {
       type: 'bar',
@@ -15,7 +15,7 @@ async function renderTrophiesCollectedColumnChart(element) {
     },
     yaxis: {
       title: {
-        text: 'Count',
+        text: 'Trophies',
       },
     },
   }

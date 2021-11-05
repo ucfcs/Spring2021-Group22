@@ -53,11 +53,11 @@ def precomputeJSON(experimentLabel):
     for player in intermediary_data:
         for total in player['totals']:
             players.add(total['player'])
-    players = list(players)
+    players = sorted(list(players))
     zones = set()
     for zone in intermediary_data:
         zones.add(zone['_id'])
-    zones = list(zones)
+    zones = sorted(list(zones))
     data = {
         'series': [{ 
                 'name': zone_data['_id'], 

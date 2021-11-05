@@ -3,7 +3,7 @@ async function renderDiversityOfLaborColumnChart(element) {
 
   const options = {
     title: {
-      text: 'Diversity of Labor by Players',
+      text: 'Diversity of Labor by Activity',
     },
     chart: {
       type: 'bar',
@@ -15,7 +15,7 @@ async function renderDiversityOfLaborColumnChart(element) {
     },
     yaxis: {
       title: {
-        text: 'Points',
+        text: 'Percentage',
       },
       decimalsInFloat: 2,
     },

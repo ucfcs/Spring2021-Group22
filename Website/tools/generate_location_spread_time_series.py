@@ -37,26 +37,26 @@ def precomputeJSON(experimentLabel):
     ]))
 
     game_start = None
-    timeCursor = None
+    time_cursor = None
     buckets = []
     total_events = 0
     total_distances = 0
     for event in intermediary_data:
         event_time = event['time']
         # counter += 1
-        if timeCursor == None:
+        if time_cursor == None:
             game_start = event_time
-            timeCursor = event_time
+            time_cursor = event_time
 
         if event_time - game_start > 60 * 60 * 1000:
             break
 
-        if event_time - timeCursor > 60*1000:
-            # print(datetime.fromtimestamp(event_time//1000).strftime('%c'), datetime.fromtimestamp(timeCursor//1000).strftime('%c'))
+        if event_time - time_cursor > 60*1000:
+            # print(datetime.fromtimestamp(event_time//1000).strftime('%c'), datetime.fromtimestamp(time_cursor//1000).strftime('%c'))
             buckets.append(total_distances / total_events)
             total_distances = 0
             total_events = 0
-            timeCursor = event_time
+            time_cursor = event_time
 
         total_distances += sum([event['distances'][uid] for uid in event['distances']]) / len(event['distances'])
         total_events += 1

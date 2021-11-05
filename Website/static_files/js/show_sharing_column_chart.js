@@ -3,7 +3,7 @@ async function renderSharingColumnChart(element) {
   
   const options = {
     title: {
-      text: 'Items Shared Among Us',
+      text: 'Items Shared By Player',
     },
     chart: {
       type: 'bar',

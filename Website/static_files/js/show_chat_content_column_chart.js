@@ -3,7 +3,7 @@ async function renderChatContentColumnChart(element) {
   
   const options = {
     title: {
-      text: 'Chat Content Usage',
+      text: 'Total Chat Content By Player',
     },
     chart: {
       type: 'bar',
@@ -15,7 +15,7 @@ async function renderChatContentColumnChart(element) {
     },
     yaxis: {
       title: {
-        text: 'Count',
+        text: 'Content Length',
       },
     },
   }

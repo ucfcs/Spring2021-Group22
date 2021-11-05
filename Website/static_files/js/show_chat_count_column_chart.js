@@ -3,7 +3,7 @@ async function renderChatCountColumnChart(element) {
   
   const options = {
     title: {
-      text: 'Chat Messages Usage',
+      text: 'Total Chat Messages Sent By Player',
     },
     chart: {
       type: 'bar',
@@ -15,7 +15,7 @@ async function renderChatCountColumnChart(element) {
     },
     yaxis: {
       title: {
-        text: 'Count',
+        text: 'Message Count',
       },
     },
   }

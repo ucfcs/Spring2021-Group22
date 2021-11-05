@@ -3,7 +3,7 @@ async function renderTimeInLocationByPlayerColumnChart(element) {
 
   const options = {
     title: {
-      text: 'Time in Location by Each Player',
+      text: 'Time Spent in Location by Player',
     },
     chart: {
       type: 'bar',
@@ -15,7 +15,7 @@ async function renderTimeInLocationByPlayerColumnChart(element) {
     },
     yaxis: {
       title: {
-        text: 'Seconds',
+        text: 'Time Spent (s)',
       },
     },
   }
