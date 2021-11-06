@@ -1,4 +1,4 @@
-## Simple tool for querying the database for common events
+# Simple tool for querying the database for common events
 
 import pymongo
 import argparse
@@ -8,53 +8,47 @@ from datetime import datetime, timedelta
 import json
 from uuid_to_playerdata import UUID_MAP
 
-load_dotenv();
+load_dotenv()
 
-MONGO_URI = 'MONGO_URI';
+MONGO_URI = 'MONGO_URI'
 if (MONGO_URI not in os.environ.keys()):
-    print('Please add MONGO_URI to your environment variables before using this utility');
-    exit(0);
+    print('Please add MONGO_URI to your environment variables before using this utility')
+    exit(0)
 
-mongo_connection_uri = os.environ.get(MONGO_URI);
+mongo_connection_uri = os.environ.get(MONGO_URI)
 
-# I've changed the schema so without this the script crashes. This check will
-# eventually be unnecessary
-def isGoodData(event):
-    return 'msg' in event;
+PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
+           '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
+EVENTS = ['BarrelOpenedEvent', 'CollectTrophyEvent', 'DoFarmEvent',
+          'DuneBreakEvent', 'OreBreakEvent', 'SolveMansionPuzzleEvent', 'VillagerTradeEvent']
+
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--out', help='where to write the data to');
-parser.add_argument('--experiment', help='the experiment label to limit the data to');
+parser.add_argument('--out', help='where to write the data to')
+parser.add_argument(
+    '--experiment', help='the experiment label to limit the data to')
 args = parser.parse_args()
 
 # Precompute the data structure needed for the sharing column chart. This would be
 # the "tools" part of the process. This would be run once for each team we have run
 # through the map
 def precomputeJSON(experimentLabel):
-    client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    query = { "event": { '$in' : [ 'DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent', 'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent' ] } }
+    client = pymongo.MongoClient(
+        mongo_connection_uri, serverSelectionTimeoutMS=5000)
+    query = {"event": {'$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
+                               'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']}}
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     intermediary_data = list(client.epilog.data2.aggregate([
-        { '$match' : query },
-        { '$project' : { '_id' : 0, 'event': '$event', 'player': 1, 'zone': 1 } },
-        { '$group': { '_id' : { 'event': '$event', 'player': '$player'}, 'total': { '$sum': 1 } } },
-        { '$group' : { 
-            '_id' :  "$_id.event",
-            'totals': { '$push': { 'player': '$_id.player', 'total': '$total'} }
-            } 
+        {'$match': query},
+        {'$project': {'_id': 0, 'event': '$event', 'player': 1, 'zone': 1}},
+        {'$group': {'_id': {'event': '$event', 'player': '$player'}, 'total': {'$sum': 1}}},
+        {'$group': {
+            '_id':  "$_id.event",
+            'totals': {'$push': {'player': '$_id.player', 'total': '$total'}}
+        }
         },
     ]))
-
-    players = set()
-    for event_data in intermediary_data:
-        for player_data in event_data['totals']:
-            players.add(player_data['player'])
-    players = sorted(list(players))
-    events = set()
-    for event_data in intermediary_data:
-        events.add(event_data['_id'])
-    events = sorted(list(events))
 
     # normalize event totals
     for event_data in intermediary_data:
@@ -66,26 +60,29 @@ def precomputeJSON(experimentLabel):
             player_data['total'] *= 100.0
 
     data = {
-        'series': [{ 
-                'name': event_data['_id'], 
-                'data': [
-                    (
-                        [player_data['total'] for player_data in event_data['totals'] if player_data['player'] == player][0]
-                        if (len([player_data['total'] for player_data in event_data['totals'] if player_data['player'] == player]) > 0) 
-                        else 0
-                    ) 
-                for player in players] 
-            } for event_data in intermediary_data],
-        'categories': [UUID_MAP[player]['name'] for player in players],
+        'series': [{
+            'name': event,
+            'data': [
+                next((player_data['total'] for player_data in next(
+                    (event_data['totals'] for event_data in intermediary_data if event_data['_id'] == event), [])
+                    if player_data['player'] == player), 0)
+                for player in PLAYERS
+            ],
+        } for event in EVENTS],
+        'categories': [UUID_MAP[player]['name'] for player in PLAYERS],
     }
 
     return data
 
-# Write the results to a precomputed file. This file will likely be in the static_files 
+# Write the results to a precomputed file. This file will likely be in the static_files
 # directory.
+
+
 def writeToFile(data, file):
     with open(file, 'w+') as out:
         json.dump(data, out)
 
+
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/diversity_of_labor_by_player_column_chart.json')
+writeToFile(data, args.out if args.out !=
+            None else '../static_files/data/diversity_of_labor_by_player_column_chart.json')

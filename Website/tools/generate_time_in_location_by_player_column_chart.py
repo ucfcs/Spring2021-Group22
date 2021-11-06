@@ -19,6 +19,10 @@ if (MONGO_URI not in os.environ.keys()):
 
 mongo_connection_uri = os.environ.get(MONGO_URI);
 
+PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
+           '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
+ZONES = ['Cave', 'Center', 'Dunes', 'Farms', 'Forest', 'Mansion', 'Maze']
+
 # I've changed the schema so without this the script crashes. This check will
 # eventually be unnecessary
 def isGoodData(event):
@@ -48,28 +52,17 @@ def precomputeJSON(experimentLabel):
         },
     ]))
 
-    players = set()
-    for player in intermediary_data:
-        for total in player['totals']:
-            players.add(total['player'])
-    players = sorted(list(players))
-    zones = set()
-    for zone in intermediary_data:
-        zones.add(zone['_id'])
-    zones = sorted(list(zones))
     data = {
         'series': [{ 
-                'name': zone_data['_id'], 
+                'name': zone, 
                 'data': [
-                    (
-                        [player_data['total'] for player_data in zone_data['totals'] if player_data['player'] == player][0]
-                        if (len([player_data['total'] for player_data in zone_data['totals'] if player_data['player'] == player]) > 0) 
-                        else 0
-                    ) 
-                for player in players] 
-            } for zone_data in intermediary_data],
-        'colors': [UUID_MAP[player]['color'] for player in players],
-        'categories': [UUID_MAP[player]['name'] for player in players],
+                    next((player_data['total'] for player_data in next(
+                        (zone_data['totals'] for zone_data in intermediary_data if zone_data['_id'] == zone), []
+                    ) if player_data['player'] == player), 0)
+                for player in PLAYERS],
+            } for zone in ZONES],
+        'colors': [UUID_MAP[player]['color'] for player in PLAYERS],
+        'categories': [UUID_MAP[player]['name'] for player in PLAYERS],
     }
     return data
 

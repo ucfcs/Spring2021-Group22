@@ -19,10 +19,9 @@ if (MONGO_URI not in os.environ.keys()):
 
 mongo_connection_uri = os.environ.get(MONGO_URI);
 
-# I've changed the schema so without this the script crashes. This check will
-# eventually be unnecessary
-def isGoodData(event):
-    return True;
+PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
+           '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
+ZONES = ['Cave', 'Center', 'Dunes', 'Farms', 'Forest', 'Mansion', 'Maze']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--out', help='where to write the data to');
@@ -40,37 +39,28 @@ def precomputeJSON(experimentLabel):
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$project' : { '_id' : 0, 'player': 1, 'zone': 1 } },
+        { '$sort': { 'zone': 1 } },
         { '$group': { '_id' : { 'zone': '$zone', 'player': '$player'}, 'total': { '$sum': 1 } } },
         { '$group' : { 
             '_id' :  "$_id.player",
             'totals': { '$push': { 'zone': '$_id.zone', 'total': '$total'} }
             } 
         },
+        { '$sort': { '_id': 1 } },
         { '$limit': 4 }
     ]))
 
-    zones = set()
-    for player in intermediary_data:
-        for total in player['totals']:
-            zones.add(total['zone'])
-    zones = sorted(list(zones))
-    players = set()
-    for player in intermediary_data:
-        players.add(player['_id'])
-    players = sorted(list(players))
     data = {
         'series': [{ 
-                'name': UUID_MAP[player_data['_id']]['name'], 
+                'name': UUID_MAP[player]['name'], 
                 'data': [
-                    (
-                        [zone_data['total'] for zone_data in player_data['totals'] if zone_data['zone'] == zone][0]
-                        if (len([zone_data['total'] for zone_data in player_data['totals'] if zone_data['zone'] == zone]) > 0) 
-                        else 0
-                    ) 
-                for zone in zones] 
-            } for player_data in intermediary_data],
-        'colors': [UUID_MAP[player_data['_id']]['color'] for player_data in intermediary_data],
-        'categories': zones,
+                    next((player_data['total'] for player_data in next(
+                        (zone_data['totals'] for zone_data in intermediary_data if zone_data['_id'] == player), []) 
+                    if player_data['zone'] == zone), 0)
+                for zone in ZONES],
+            } for player in PLAYERS],
+        'colors': [UUID_MAP[player]['color'] for player in PLAYERS],
+        'categories': ZONES,
     }
     return data
 
