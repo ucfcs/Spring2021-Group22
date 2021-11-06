@@ -12,7 +12,7 @@ const svg = d3.select("#my_dataviz")
 	.attr("transform", `translate(${margin.left},${margin.top})`);
 
 // read data
-d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_for_density2d.csv").then(function (data) {
+d3.csv("https://raw.githubusercontent.com/ucfcs/Spring2021-Group22/0e9b8c2982c27f3dd56762a320472cf4de18a080/Heatmap/rawdata_timestamp.csv").then(function (data) {
 
 	// Add X axis
 	const x = d3.scaleLinear()
