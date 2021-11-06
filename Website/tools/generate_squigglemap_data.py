@@ -71,7 +71,7 @@ def main():
     print('')
 
     print('Writing data to file')
-    writeToFile(data, 'rawdata_timestamp', 'json')
+    writeToFile(data, 'squigglemap', 'json')
 
     return 0
 

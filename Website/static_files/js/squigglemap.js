@@ -4,7 +4,7 @@ async function squigglemap() {
 	let width = 417 * SCALE, height = 417 * SCALE; // 417 is image size
 	const CENTER = { x: width / 2, y: height / 2 };
 
-	const inputdata = await getData('rawdata_timestamp.json')
+	const inputdata = await getData('squigglemap.json')
 
 	const _minTime = inputdata.time.min;
 	const _maxTime = inputdata.time.max;
@@ -49,7 +49,7 @@ async function squigglemap() {
 	}
 
 
-	var slider = createD3RangeSlider(_jsondata.time.min, _jsondata.time.max, "#slider-container", true);
+	var slider = createD3RangeSlider(inputdata.time.min, inputdata.time.max, "#slider-container", true);
 
 	// Only redraw lines after selection is made, not on every change
 	slider.onChangeEnd(function (newRange) {
