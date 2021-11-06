@@ -21,6 +21,7 @@ time_offset = True
 def def_value():
     return 0
 
+
 def main():
 
     print('Connecting to Mongo')
@@ -56,23 +57,13 @@ def main():
     # data['timeline'] = dict()
 
     index = 0
-    for doc in collection.find().sort('time', pymongo.ASCENDING):
+    for doc in collection.find({'x': {'$exists': True}, 'y': {'$exists': True}, 'z': {'$exists': True}}).sort('time', pymongo.ASCENDING):
         printProgressBar(index, doc_count, prefix='Progress:',
                          suffix='Complete', length=50)
         index = index + 1
 
-        if doc['event'] != "PlayerLocationEvent":
-            continue
-
-        # doc['_id'] = str(doc['_id'])
-
-        # print(doc)
         x = int(doc['x'])
         y = int(doc['z'])
-
-        # print(x)
-        # print(y)
-        # print(data[x,y])
 
         data[x, y] += 1
 
@@ -81,7 +72,7 @@ def main():
     print('')
 
     print('Writing data to file')
-    writeToFile(data, 'rawdata_timestamp', 'csv')
+    writeToFile(data, 'heatmap', 'csv')
 
     # print(data)
 
