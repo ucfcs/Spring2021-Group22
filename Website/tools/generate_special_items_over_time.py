@@ -18,10 +18,8 @@ if (MONGO_URI not in os.environ.keys()):
 
 mongo_connection_uri = os.environ.get(MONGO_URI);
 
-# I've changed the schema so without this the script crashes. This check will
-# eventually be unnecessary
-def isGoodData(event):
-    return 'totalSize' in event;
+PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
+           '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--out', help='where to write the data to');
@@ -36,6 +34,23 @@ def expected_seconds(x):
 
 def expected_minutes(x):
     return x*60
+
+def interpolate_missing_values(buckets):
+    run = { 'location': len(buckets)-1, 'value': 0 }
+    forwardLookup = [{ 'location': len(buckets)-1, 'value': 0 }]*(len(buckets))
+    for i in range(len(buckets)):
+        j = len(buckets)-1 - i
+        if buckets[j] != None:
+            run = { 'location': j, 'value': buckets[j]}
+        forwardLookup[j] = run
+    run_forward = { 'location': 0, 'value': 0 }
+    interpolated_values = [0]*len(buckets)
+    for i in range(len(buckets)-1):
+        if buckets[i] != None:
+            run_forward = { 'location': i, 'value': buckets[i] }
+        interpolated_values[i] = (forwardLookup[i+1]['value'] - run_forward['value'])/(forwardLookup[i+1]['location'] - run_forward['location'])*(i-run_forward['location'])+run_forward['value']
+    interpolated_values[len(buckets)-1] = buckets[len(buckets)-1] if buckets[len(buckets)-1] != None else 0
+    return interpolated_values
 
 # Precompute the data structure needed for the inventory size time series. This would be
 # the "tools" part of the process. This would be run once for each team we have run
@@ -52,7 +67,7 @@ def precomputeJSON(experimentLabel):
         { '$group': { '_id' : '$player', 'events': { '$push': { 'special': '$special', 'time': { '$floor': { '$divide': ['$time', 1000] } } } } } },
     ]))
 
-      # Normalize the values by their frequency. Wearing a helmet for 10 minutes
+    # Normalize the values by their frequency. Wearing a helmet for 10 minutes
     # should be weighed the same as using the escape rope for 1 second
     items_to_value = {
         'hint_0': max_seconds() / expected_seconds(60),
@@ -97,21 +112,19 @@ def precomputeJSON(experimentLabel):
     processed_data = {}
     for player_data in intermediary_data:
         buckets = []
-        for i in range(60*60//60):
-            buckets.append(i)
+        for _ in range(60):
+            buckets.append(None)
         for event in player_data['events']:
             local_event_time = (int(event['time']) - start_time // 1000) // 60
-            if local_event_time < 60*60//60:
-                buckets[local_event_time] += 1
-                # buckets[local_event_time] += items_to_value[event['special']]
-        processed_data[player_data['_id']] = buckets
-
+            if local_event_time < 60:
+                buckets[local_event_time] = (0 if buckets[local_event_time] == None else buckets[local_event_time]) + items_to_value[event['special']]
+        processed_data[player_data['_id']] = interpolate_missing_values(buckets)
 
     return {
         'series': [{
             'name': UUID_MAP[player]['name'],
             'data': processed_data[player]
-        } for player in processed_data],
+        } for player in PLAYERS],
         'categories': [idx for idx, _ in enumerate(buckets)]
     }
 

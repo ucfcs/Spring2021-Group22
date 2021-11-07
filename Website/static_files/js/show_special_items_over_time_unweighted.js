@@ -1,5 +1,5 @@
-async function renderLocationSpreadTimeSeries(element) {
-  const data = await getData('location_spread_time_series.json')
+async function renderSpecialItemsOverTimeUnweighted(element) {
+  const data = await getData('special_items_over_time_unweighted.json')
 
   const options = {
     series: data.series,
@@ -7,17 +7,16 @@ async function renderLocationSpreadTimeSeries(element) {
       height: 350,
       type: 'line',
       zoom: {
-        enabled: false,
+        type: 'x',
+        enabled: true,
+        autoScaleYaxis: true
       },
     },
     dataLabels: {
       enabled: false,
     },
-    stroke: {
-      curve: 'straight',
-    },
     title: {
-      text: 'Average Distance of All Players Over Time',
+      text: 'Special Item Usage Over Time',
       align: 'left',
     },
     grid: {

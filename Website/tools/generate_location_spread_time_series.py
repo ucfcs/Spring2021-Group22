@@ -1,4 +1,4 @@
-## DEPRECATED - DO NOT REFERENCE/USE
+## TODO this one might be slightly inaccurate?
 
 import pymongo
 import argparse
@@ -7,6 +7,7 @@ import os
 from datetime import datetime, time, timedelta
 import matplotlib.pyplot as plt
 import json
+from uuid_to_playerdata import UUID_MAP
 
 load_dotenv();
 
@@ -33,14 +34,16 @@ def precomputeJSON(experimentLabel):
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort': { 'time': 1 } },
-        { '$project' : { '_id' : 0, 'distances': 1, 'time': 1 } },
+        { '$project' : { '_id' : 0, 'player': 1, 'distances': 1, 'time': 1 } },
     ]))
 
     game_start = None
     time_cursor = None
     buckets = []
+    # events = []
     total_events = 0
     total_distances = 0
+
     for event in intermediary_data:
         event_time = event['time']
         # counter += 1
@@ -49,15 +52,19 @@ def precomputeJSON(experimentLabel):
             time_cursor = event_time
 
         if event_time - game_start > 60 * 60 * 1000:
+            buckets.append(total_distances / total_events)
             break
 
         if event_time - time_cursor > 60*1000:
-            # print(datetime.fromtimestamp(event_time//1000).strftime('%c'), datetime.fromtimestamp(time_cursor//1000).strftime('%c'))
+            # print(event_time - time_cursor)
+            # print(events)
             buckets.append(total_distances / total_events)
             total_distances = 0
             total_events = 0
             time_cursor = event_time
+            # events = []
 
+        events.append(UUID_MAP[event['player']]['name'])
         total_distances += sum([event['distances'][uid] for uid in event['distances']]) / len(event['distances'])
         total_events += 1
 

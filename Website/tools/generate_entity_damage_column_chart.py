@@ -7,6 +7,8 @@ import os
 from datetime import datetime, timedelta
 import json
 
+from uuid_to_playerdata import UUID_MAP
+
 load_dotenv();
 
 MONGO_URI = 'MONGO_URI';
@@ -15,6 +17,9 @@ if (MONGO_URI not in os.environ.keys()):
     exit(0);
 
 mongo_connection_uri = os.environ.get(MONGO_URI);
+
+PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
+           '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--out', help='where to write the data to');
@@ -39,10 +44,10 @@ def precomputeJSON(experimentLabel):
         'series': [
             { 
                 'name': 'Entity Damage', 
-                'data': [data['total'] for data in intermediary_data] 
+                'data': [next((player_data['total'] for player_data in intermediary_data if player_data['_id'] == player), 0) for player in PLAYERS] 
             }
         ],
-        'categories': [data['_id'] for data in intermediary_data],
+        'categories': [UUID_MAP[player]['name'] for player in PLAYERS],
     }
     return data
 

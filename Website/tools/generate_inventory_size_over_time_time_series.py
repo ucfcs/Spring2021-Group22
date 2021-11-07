@@ -17,11 +17,6 @@ if (MONGO_URI not in os.environ.keys()):
 
 mongo_connection_uri = os.environ.get(MONGO_URI);
 
-# I've changed the schema so without this the script crashes. This check will
-# eventually be unnecessary
-def isGoodData(event):
-    return 'totalSize' in event;
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--out', help='where to write the data to');
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
