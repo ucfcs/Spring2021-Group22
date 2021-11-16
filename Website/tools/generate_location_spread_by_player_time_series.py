@@ -40,7 +40,10 @@ def precomputeJSON(experimentLabel):
         { '$project' : { '_id' : 0, 'player': 1, 'distances': 1, 'time': 1 } },
     ]))
 
-    start_time = list(client.epilog.data2.find(query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
+    start_query = {}
+    if experimentLabel != None:
+        start_query['experimentLabel'] = experimentLabel 
+    start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
     proccessed_data = { player: [{ 'total': 0, 'count': 0 }]*(60) for player in PLAYERS }
     for event in intermediary_data:
         event_time = event['time'] // (60*1000)

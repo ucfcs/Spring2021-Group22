@@ -1,4 +1,5 @@
 ## TODO this one might be slightly inaccurate?
+## DEPRECATED
 
 import pymongo
 import argparse
@@ -8,6 +9,7 @@ from datetime import datetime, time, timedelta
 import matplotlib.pyplot as plt
 import json
 from uuid_to_playerdata import UUID_MAP
+from scipy.spatial import ConvexHull
 
 load_dotenv();
 
@@ -26,6 +28,30 @@ parser.add_argument('--out', help='where to write the data to');
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
 args = parser.parse_args()
 
+
+def areaOfConvexShell(processed_time):
+    # If not all points can be grabbed
+    if len([data for data in processed_time.values() if data['count'] == 0]) > 0:
+        return 0
+
+    points = [[
+        processed_time[player]['totalX'] / processed_time[player]['count'], 
+        processed_time[player]['totalY'] / processed_time[player]['count'], 
+        processed_time[player]['totalZ'] / processed_time[player]['count']
+    ] for player in PLAYERS];
+    return ConvexHull(points).volume
+
+def areaOfConvexHull(processed_time):
+    # If not all points can be grabbed
+    if len([data for data in processed_time.values() if data['count'] == 0]) > 0:
+        return 0
+
+    points = [[
+        processed_time[player]['totalX'] / processed_time[player]['count'], 
+        processed_time[player]['totalZ'] / processed_time[player]['count']
+    ] for player in PLAYERS];
+    return ConvexHull(points).area
+
 # Precompute the data structure needed for the inventory size time series. This would be
 # the "tools" part of the process. This would be run once for each team we have run
 # through the map
@@ -37,28 +63,40 @@ def precomputeJSON(experimentLabel):
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort': { 'time': 1 } },
-        { '$project' : { '_id' : 0, 'player': 1, 'distances': 1, 'time': 1 } },
+        { '$project' : { '_id' : 0, 'player': 1, 'x': 1, 'y': 1, 'z': 1, 'time': 1 } },
     ]))
 
     start_query = {}
     if experimentLabel != None:
         start_query['experimentLabel'] = experimentLabel 
     start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
-    proccessed_data = [{ player: { 'count': 0, 'total': 0 } for player in PLAYERS } for _ in range(60)]
+    proccessed_data = [{ player: { 'count': 0, 'totalX': 0, 'totalY': 0, 'totalZ': 0 } for player in PLAYERS } for _ in range(60)]
     for event in intermediary_data:
         event_time = event['time'] // (60*1000)
 
         if (event_time - start_time) < 60:
             data = proccessed_data[(event_time - start_time)][event['player']]
+            # TODO debug early only one player recorded?
+            # print(event_time - start_time, UUID_MAP[event['player']]['name'], data['count'])
             proccessed_data[(event_time - start_time)][event['player']] = {
-                'total': data['total'] + sum(event['distances'].values()) / len(event['distances']),
+                'totalX': data['totalX'] + event['x'],
+                'totalY': data['totalY'] + event['y'],
+                'totalZ': data['totalZ'] + event['z'],
                 'count': data['count'] + 1
             }
+    
+    # Sorting needs to be done
+    # for processed_time in proccessed_data:
+    #     for value in processed_time.values():
+    #         print(value)
+
+    final_processed_data = [areaOfConvexHull(processed_time)
+        for processed_time in proccessed_data]
 
     return {
         'series': [{
-            'title': 'Average Distance Between All Members Over Time',
-            'data': [sum([data[player]['total'] / data[player]['count'] for player in PLAYERS]) / len(PLAYERS) for data in proccessed_data]
+            'title': 'Area of Convex Shell Between Average Player Positions Over Time',
+            'data': final_processed_data
         }],
         'categories': [i for i in range(60)]
     }
@@ -70,4 +108,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/location_spread_time_series.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/location_convex_shell_spread_time_series.json')

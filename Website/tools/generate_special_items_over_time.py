@@ -26,14 +26,14 @@ parser.add_argument('--out', help='where to write the data to');
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
 args = parser.parse_args()
 
-def max_seconds():
-    return 60*60
+def repeating():
+    return 1
 
-def expected_seconds(x):
-    return x
+def sparse_use():
+    return 10
 
-def expected_minutes(x):
-    return x*60
+def one_use():
+    return 60
 
 def interpolate_missing_values(buckets):
     run = { 'location': len(buckets)-1, 'value': 0 }
@@ -57,6 +57,44 @@ def interpolate_missing_values(buckets):
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
+
+    query = { "event": "UsingSpecialItemEvent" }
+    if experimentLabel != None:
+        query['experimentLabel'] = experimentLabel
+    # intermediary_data = list(client.epilog.data2.aggregate([
+    #     { '$match' : query },
+    #     { '$sort': { 'time': 1 } },
+    #     { '$project' : { '_id' : 0, 'player': 1, 'special': 1, 'time': 1 } },
+    #     { '$group': { '_id' : '$special', 'events': { '$sum': 1 } } },
+    # ]))
+    # print(intermediary_data)
+    # exit(0)
+
+    #TODO extract this
+    query = { "event": "UsingSpecialItemEvent" }
+    if experimentLabel != None:
+        query['experimentLabel'] = experimentLabel
+    intermediary_data = list(client.epilog.data2.aggregate([
+        {'$match': query},
+        {'$project': {'_id': 0, 'special': 1, 'player': 1, 'time': 1 }},
+        {'$group': {'_id': {'player': '$player', 'special': '$special'}, 'total': {'$sum': 1}, 'events': { '$push': { 'time': '$time' } } }},
+        {'$group': {
+            '_id':  "$_id.player",
+            'totals': {'$push': {'special': '$_id.special', 'total': '$total', 'events': '$events' }}
+        }
+        },
+    ]))
+    start_query = {}
+    if experimentLabel != None:
+        start_query['experimentLabel'] = experimentLabel 
+    start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
+    for entry in intermediary_data:
+        print('--------------------------------')
+        print(UUID_MAP[entry['_id']]['name'])
+        for total in entry['totals']:
+            times = sorted([a['time'] // (60*1000) - start_time for a in total['events']])
+            print(total['special'], total['total'], times)
+
     query = { "event": "UsingSpecialItemEvent" }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
@@ -70,41 +108,41 @@ def precomputeJSON(experimentLabel):
     # Normalize the values by their frequency. Wearing a helmet for 10 minutes
     # should be weighed the same as using the escape rope for 1 second
     items_to_value = {
-        'hint_0': max_seconds() / expected_seconds(60),
-        'hint_1': max_seconds() / expected_seconds(60),
-        'hint_2': max_seconds() / expected_seconds(60),
-        'hint_3': max_seconds() / expected_seconds(60),
-        'hint_4': max_seconds() / expected_seconds(60),
-        'hint_5': max_seconds() / expected_seconds(60),
-        'hint_6': max_seconds() / expected_seconds(60),
-        'hint_7': max_seconds() / expected_seconds(60),
-        'hint_8': max_seconds() / expected_seconds(60),
-        'hint_9': max_seconds() / expected_seconds(60),
-        'hint_10': max_seconds() / expected_seconds(60),
-        'hint_11': max_seconds() / expected_seconds(60),
-        'hint_12': max_seconds() / expected_seconds(60),
-        'bow': max_seconds() / expected_seconds(2),
-        'boots': max_seconds() / expected_minutes(10),
-        'chestplate': max_seconds() / expected_minutes(10),
-        'leggings': max_seconds() / expected_minutes(10),
-        'helmet': max_seconds() / expected_minutes(10),
-        'sword': max_seconds() / expected_minutes(5),
-        'strong_boots': max_seconds() / expected_minutes(10),
-        'strong_chestplate': max_seconds() / expected_minutes(10),
-        'strong_leggings': max_seconds() / expected_minutes(10),
-        'strong_helmet': max_seconds() / expected_minutes(10),
-        'strong_sword': max_seconds() / expected_minutes(5),
-        'nether_brick_pickaxe': max_seconds() / expected_seconds(2),
-        'use_reveal_players': max_seconds() / expected_seconds(20),
-        'use_escape_rope': max_seconds() / expected_seconds(1),
-        'cave_torch': max_seconds() / expected_seconds(1),
-        'torch': max_seconds() / expected_seconds(1),
-        'fireworks': max_seconds() / expected_seconds(4),
-        'white_banner': max_seconds() / expected_seconds(1),
-        'use_glow_path': max_seconds() / expected_seconds(60),
-        'instant_heal_potion': max_seconds() / expected_seconds(1),
-        'speed_potion': max_seconds() / expected_minutes(8),
-        'invisibility_potion': max_seconds() / expected_minutes(8),
+        'hint_0': repeating(),
+        'hint_1': repeating(),
+        'hint_2': repeating(),
+        'hint_3': repeating(),
+        'hint_4': repeating(),
+        'hint_5': repeating(),
+        'hint_6': repeating(),
+        'hint_7': repeating(),
+        'hint_8': repeating(),
+        'hint_9': repeating(),
+        'hint_10': repeating(),
+        'hint_11': repeating(),
+        'hint_12': repeating(),
+        'bow': sparse_use(),
+        'boots': repeating(),
+        'chestplate': repeating(),
+        'leggings': repeating(),
+        'helmet': repeating(),
+        'sword': sparse_use(),
+        'strong_boots': repeating(),
+        'strong_chestplate': repeating(),
+        'strong_leggings': repeating(),
+        'strong_helmet': repeating(),
+        'strong_sword': sparse_use(),
+        'nether_brick_pickaxe': sparse_use(),
+        'use_reveal_players': repeating(),
+        'use_escape_rope': one_use(),
+        'cave_torch': sparse_use(),
+        'torch': sparse_use(),
+        'fireworks': sparse_use(),
+        'white_banner': sparse_use(),
+        'use_glow_path': repeating(),
+        'instant_heal_potion': one_use(),
+        'speed_potion': repeating(),
+        'invisibility_potion': repeating(),
         'trophy': 0, # investigate this? Hypothesis, we had someone wearing the skulls and it triggered the event...
     }
 

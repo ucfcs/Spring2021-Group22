@@ -1,5 +1,3 @@
-## TODO this one might be slightly inaccurate?
-
 import pymongo
 import argparse
 from dotenv import load_dotenv
@@ -40,26 +38,25 @@ def precomputeJSON(experimentLabel):
         { '$project' : { '_id' : 0, 'player': 1, 'distances': 1, 'time': 1 } },
     ]))
 
-    start_query = {}
-    if experimentLabel != None:
-        start_query['experimentLabel'] = experimentLabel 
-    start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
-    proccessed_data = [{ player: { 'count': 0, 'total': 0 } for player in PLAYERS } for _ in range(60)]
+    start_time = list(client.epilog.data2.find(query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
+    proccessed_data = { player: [{ 'total': 0, 'count': 0 }]*(60) for player in PLAYERS }
     for event in intermediary_data:
         event_time = event['time'] // (60*1000)
 
         if (event_time - start_time) < 60:
-            data = proccessed_data[(event_time - start_time)][event['player']]
-            proccessed_data[(event_time - start_time)][event['player']] = {
-                'total': data['total'] + sum(event['distances'].values()) / len(event['distances']),
+            data = proccessed_data[event['player']][(event_time - start_time)]
+            dx = event['x'] - 4;
+            dz = event['z'] - 0;
+            proccessed_data[event['player']][(event_time - start_time)] = {
+                'total': data['total'] + (dx*dx + dz*dz)**0.5,
                 'count': data['count'] + 1
             }
 
     return {
         'series': [{
-            'title': 'Average Distance Between All Members Over Time',
-            'data': [sum([data[player]['total'] / data[player]['count'] for player in PLAYERS]) / len(PLAYERS) for data in proccessed_data]
-        }],
+            'name': UUID_MAP[player]['name'],
+            'data': [data['total'] / data['count'] for data in proccessed_data[player]]
+        } for player in PLAYERS],
         'categories': [i for i in range(60)]
     }
 
@@ -70,4 +67,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/location_spread_time_series.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/location_spread_by_players_time_series.json')

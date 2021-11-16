@@ -67,7 +67,10 @@ def precomputeJSON(experimentLabel):
         { '$group': { '_id' : '$player', 'events': { '$push': { 'special': '$special', 'time': { '$floor': { '$divide': ['$time', 1000] } } } } } },
     ]))
 
-    start_time = list(client.epilog.data2.find(query).sort('time', 1).limit(1))[0]['time']
+    start_query = {}
+    if experimentLabel != None:
+        start_query['experimentLabel'] = experimentLabel 
+    start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time']
     processed_data = {}
     for player_data in intermediary_data:
         buckets = []
