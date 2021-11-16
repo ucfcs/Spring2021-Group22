@@ -28,6 +28,14 @@ parser.add_argument('--out', help='where to write the data to');
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
 args = parser.parse_args()
 
+def build_pie_chart(player, intermediary_data):
+    player_data = next((data['totals'] for data in intermediary_data if data['_id'] == player), [])
+    return {
+        'title': 'Time Spent in Zones for ' + UUID_MAP[player]['name'],
+        'series': [next((data['total'] for data in player_data if data['zone'] == zone), 0) for zone in ZONES],
+        'labels': ZONES,
+    };
+
 # Precompute the data structure needed for the sharing column chart. This would be
 # the "tools" part of the process. This would be run once for each team we have run
 # through the map
@@ -49,18 +57,22 @@ def precomputeJSON(experimentLabel):
         { '$sort': { '_id': 1 } },
     ]))
 
+    # normalize event totals
+    for event_data in intermediary_data:
+        total = 0
+        for player_data in event_data['totals']:
+            total += player_data['total']
+        for player_data in event_data['totals']:
+            player_data['total'] /= total
+            player_data['total'] *= 100.0
+
     data = {
-        'series': [{ 
-                'name': UUID_MAP[player]['name'], 
-                'data': [
-                    next((player_data['total'] for player_data in next(
-                        (zone_data['totals'] for zone_data in intermediary_data if zone_data['_id'] == player), []) 
-                    if player_data['zone'] == zone), 0)
-                for zone in ZONES],
-            } for player in PLAYERS],
-        'colors': [UUID_MAP[player]['color'] for player in PLAYERS],
-        'categories': ZONES,
+        'charts': [
+            build_pie_chart(player, intermediary_data)
+            for player in PLAYERS
+        ]
     }
+
     return data
 
 # Write the results to a precomputed file. This file will likely be in the static_files 
@@ -70,4 +82,4 @@ def writeToFile(data, file):
         json.dump(data, out)
 
 data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/time_of_player_by_location_column_chart.json')
+writeToFile(data, args.out if args.out != None else '../static_files/data/time_in_location_pie_chart.json')

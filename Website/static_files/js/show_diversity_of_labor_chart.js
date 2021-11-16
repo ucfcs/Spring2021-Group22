@@ -1,28 +1,23 @@
-async function renderDiversityOfLaborColumnChart(element) {
-  const data = await getData('diversity_of_labor_column_chart.json')
+async function renderDiversityOfLaborColumnChart(elements) {
+  const data = (await getData('diversity_of_labor_by_player_pie_charts.json')).charts
 
-  const options = {
-    title: {
-      text: 'Diversity of Labor by Activity',
-    },
-    chart: {
-      type: 'bar',
-      height: 350,
-    },
-    series: data.series,
-    xaxis: {
-      categories: data.categories,
-    },
-    yaxis: {
+  for (let i = 0; i < data.length; i++) {
+    const element = elements[i];
+    const chart = data[i];
+    const options = {
       title: {
-        text: 'Percentage',
+        text: chart.title,
       },
-      decimalsInFloat: 2,
-    },
-    dataLabels: {
-      enabled: false
-    },
+      chart: {
+        type: 'pie',
+      },
+      series: chart.series,
+      labels: chart.labels,
+      dataLabels: {
+        enabled: false,
+      },
+    }
+    
+    new ApexCharts(element, options).render();
   }
-  
-  new ApexCharts(element, options).render();
 }

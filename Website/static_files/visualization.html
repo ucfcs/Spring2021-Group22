@@ -26,23 +26,43 @@
     <script src="js/show_special_items_over_time_unweighted.js"></script>
     <script src="js/show_special_items_over_time_unweighted.js"></script>
     <script src="js/show_location_spread_time_series.js"></script>
+    <script src="js/show_location_convex_shell_spread_time_series.js"></script>
     <script src="js/show_location_spread_by_players_time_series.js"></script>
+    <script src="js/show_total_distance_travelled_column_chart.js"></script>
+    <script src="js/show_percent_duplicate_location_column_chart.js"></script>
+    <script src="js/show_zone_timeline_chart.js"></script>
     <script> 
         $(function(){
             renderChatContentColumnChart(document.querySelector('#chart1'));
             renderChatCountColumnChart(document.querySelector('#chart2'));
             renderDiversityOfLaborByPlayerColumnChart(document.querySelector('#chart3'));
-            renderDiversityOfLaborColumnChart(document.querySelector('#chart4'));
+            renderDiversityOfLaborColumnChart([
+              document.querySelector('#chart4_1'),
+              document.querySelector('#chart4_2'),
+              document.querySelector('#chart4_3'),
+              document.querySelector('#chart4_4'),
+              document.querySelector('#chart4_5'),
+              document.querySelector('#chart4_6'),
+              document.querySelector('#chart4_7'),
+            ]);
             renderSharingColumnChart(document.querySelector('#chart5'));
             renderTimeInLocationByPlayerColumnChart(document.querySelector('#chart6'));
-            renderTimeOfPlayerByLocationColumnChart(document.querySelector('#chart7'));
+            renderTimeOfPlayerByLocationColumnChart([
+              document.querySelector('#chart7_1'),
+              document.querySelector('#chart7_2'),
+              document.querySelector('#chart7_3'),
+              document.querySelector('#chart7_4'),
+            ]);
             renderTrophiesCollectedColumnChart(document.querySelector('#chart8'));
             renderEntityDamageColumnChart(document.querySelector('#chart9'));
             renderEntityDamagedColumnChart(document.querySelector('#chart10'));
             renderSpecialItemsOverTime(document.querySelector('#chart11'));
             renderSpecialItemsOverTimeUnweighted(document.querySelector('#chart12'));
             renderLocationSpreadTimeSeries(document.querySelector('#chart13'));
-            renderLocationSpreadByPlayersTimeSeries(document.querySelector('#chart14'));
+            renderLocationSpreadByPlayersTimeSeries(document.querySelector('#chart15'));
+            renderTotalDistanceTravelledColumnChart(document.querySelector('#chart17'));
+            renderPercentDuplicateLocationColumnChart(document.querySelector('#chart18'));
+            renderZoneTimelineChart(document.querySelector('#chart19'));
         });
     </script> 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -84,17 +104,33 @@
         <div id="chart1"></div><br>
         <div id="chart2"></div><br>
         <div id="chart3"></div><br>
-        <div id="chart4"></div><br>
+        <div id="chart4" style="display: grid; grid-template-columns: 1fr 1fr">
+          <div id="chart4_1"></div>
+          <div id="chart4_2"></div>
+          <div id="chart4_3"></div>
+          <div id="chart4_4"></div>
+          <div id="chart4_5"></div>
+          <div id="chart4_6"></div>
+          <div id="chart4_7"></div>
+        </div><br>
         <div id="chart5"></div><br>
         <div id="chart6"></div><br>
-        <div id="chart7"></div><br>
+        <div id="chart7" style="display: grid; grid-template-columns: 1fr 1fr">
+          <div id="chart7_1"></div>
+          <div id="chart7_2"></div>
+          <div id="chart7_3"></div>
+          <div id="chart7_4"></div>
+        </div><br>
         <div id="chart8"></div><br>
         <div id="chart9"></div><br>
         <div id="chart10"></div><br>
         <div id="chart11"></div><br>
         <div id="chart12"></div><br>
         <div id="chart13"></div><br>
-        <div id="chart14"></div><br>
+        <div id="chart15"></div><br>
+        <div id="chart17"></div><br>
+        <div id="chart18"></div><br>
+        <div id="chart19"></div><br>
       </div>
       <br>
       <ul class="list-group list-group-flush">

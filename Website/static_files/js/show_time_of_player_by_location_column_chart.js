@@ -1,26 +1,24 @@
 
-async function renderTimeOfPlayerByLocationColumnChart(element) {
-  const data = await getData('time_of_player_by_location_column_chart.json')
+async function renderTimeOfPlayerByLocationColumnChart(elements) {
+  const data = (await getData('time_in_location_pie_chart.json')).charts
 
-  const options = {
-    title: {
-      text: 'Time Spent in Location by Location',
-    },
-    chart: {
-      type: 'bar',
-      height: 350,
-    },
-    series: data.series,
-    colors: data.colors,
-    xaxis: {
-      categories: data.categories,
-    },
-    yaxis: {
+  for (let i = 0; i < data.length; i++) {
+    const element = elements[i];
+    const chart = data[i];
+    const options = {
       title: {
-        text: 'Time Spent (s)',
+        text: chart.title,
       },
-    },
+      chart: {
+        type: 'pie',
+      },
+      series: chart.series,
+      labels: chart.labels,
+      dataLabels: {
+        enabled: false,
+      },
+    }
+    
+    new ApexCharts(element, options).render();
   }
-  
-  new ApexCharts(element, options).render();
 }
