@@ -36,7 +36,7 @@ def generate_location_spread_time_series(client, experimentLabel):
     return {
         'series': [{
             'title': 'Average Distance Between All Members Over Time',
-            'data': [sum([data[player]['total'] / data[player]['count'] for player in PLAYERS]) / len(PLAYERS) for data in proccessed_data]
+            'data': [sum([data[player]['total'] / data[player]['count'] if data[player]['count'] > 0 else 0 for player in PLAYERS]) / len(PLAYERS) for data in proccessed_data]
         }],
         'categories': [i for i in range(60)]
     }

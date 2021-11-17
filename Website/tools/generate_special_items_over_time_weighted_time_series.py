@@ -43,39 +43,6 @@ def generate_special_items_over_time_weighted_time_series(client, experimentLabe
     query = { "event": "UsingSpecialItemEvent" }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
-    # intermediary_data = list(client.epilog.data2.aggregate([
-    #     { '$match' : query },
-    #     { '$sort': { 'time': 1 } },
-    #     { '$project' : { '_id' : 0, 'player': 1, 'special': 1, 'time': 1 } },
-    #     { '$group': { '_id' : '$special', 'events': { '$sum': 1 } } },
-    # ]))
-    # print(intermediary_data)
-    # exit(0)
-
-    #TODO extract this
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": "UsingSpecialItemEvent" }
-    intermediary_data = list(client.epilog.data2.aggregate([
-        {'$match': query},
-        {'$project': {'_id': 0, 'special': 1, 'player': 1, 'time': 1 }},
-        {'$group': {'_id': {'player': '$player', 'special': '$special'}, 'total': {'$sum': 1}, 'events': { '$push': { 'time': '$time' } } }},
-        {'$group': {
-            '_id':  "$_id.player",
-            'totals': {'$push': {'special': '$_id.special', 'total': '$total', 'events': '$events' }}
-        }
-        },
-    ]))
-    start_query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True } }
-    start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
-    for entry in intermediary_data:
-        print('--------------------------------')
-        print(UUID_MAP[entry['_id']]['name'])
-        for total in entry['totals']:
-            times = sorted([a['time'] // (60*1000) - start_time for a in total['events']])
-            print(total['special'], total['total'], times)
-
-    query = { "event": "UsingSpecialItemEvent" }
-    if experimentLabel != None:
-        query['experimentLabel'] = experimentLabel
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort': { 'time': 1 } },

@@ -10,6 +10,7 @@ from generate_diversity_of_labor_by_event_pie_charts import generate_diversity_o
 from generate_diversity_of_labor_by_player_column_chart import generate_diversity_of_labor_by_player_column_chart
 from generate_entity_damage_interactions_column_chart import generate_entity_damage_interactions_column_chart
 from generate_location_spread_by_player_time_series import generate_location_spread_by_player_time_series
+from generate_location_spread_time_series import generate_location_spread_time_series
 from generate_percent_duplicate_location_column_chart import generate_percent_duplicate_location_column_chart
 from generate_sharing_column_chart import generate_sharing_column_chart
 from generate_special_items_over_time_unweighted_time_series import generate_special_items_over_time_unweighted_time_series
@@ -37,6 +38,7 @@ def generate_data(client, experiment_label):
             'diversity_of_labor_by_player_column_chart': generate_diversity_of_labor_by_player_column_chart(client, experiment_label),
             'entity_damage_interactions_column_chart': generate_entity_damage_interactions_column_chart(client, experiment_label),
             'location_spread_by_player_time_series': generate_location_spread_by_player_time_series(client, experiment_label),
+            'location_spread_time_series': generate_location_spread_time_series(client, experiment_label),
             'percent_duplicate_location_column_chart': generate_percent_duplicate_location_column_chart(client, experiment_label),
             'sharing_column_chart': generate_sharing_column_chart(client, experiment_label),
             'special_items_over_time_unweighted_time_series': generate_special_items_over_time_unweighted_time_series(client, experiment_label),
@@ -68,6 +70,6 @@ if __name__ == '__main__':
     data = [{
         'experiment_label': team,
         'data': generate_data(client, team)
-    } for team in ['group1', 'Team2', 'Team3']];
+    } for team in ['group1', 'Team2', 'Team3', 'Team3take2', 'Team5']];
 
     writeToFile(data, args.out if args.out != None else '../static_files/data/teams.json')
