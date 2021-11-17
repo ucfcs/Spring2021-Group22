@@ -9,10 +9,7 @@ import ssl
 from pymongo.message import MAX_INT32, MIN_INT32
 from bson.json_util import dumps, loads
 
-load_dotenv()
-
 time_offset = True
-
 
 def main():
 

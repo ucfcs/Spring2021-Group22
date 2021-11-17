@@ -9,22 +9,8 @@ import matplotlib.pyplot as plt
 import json
 from uuid_to_playerdata import UUID_MAP
 
-load_dotenv();
-
-MONGO_URI = 'MONGO_URI';
-if (MONGO_URI not in os.environ.keys()):
-    print('Please add MONGO_URI to your environment variables before using this utility');
-    exit(0);
-
-mongo_connection_uri = os.environ.get(MONGO_URI);
-
 PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
            '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--out', help='where to write the data to');
-parser.add_argument('--experiment', help='the experiment label to limit the data to');
-args = parser.parse_args()
 
 def repeating():
     return 1
@@ -52,12 +38,8 @@ def interpolate_missing_values(buckets):
     interpolated_values[len(buckets)-1] = buckets[len(buckets)-1] if buckets[len(buckets)-1] != None else 0
     return interpolated_values
 
-# Precompute the data structure needed for the inventory size time series. This would be
-# the "tools" part of the process. This would be run once for each team we have run
-# through the map
-def precomputeJSON(experimentLabel):
-    client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
 
+def generate_special_items_over_time_weighted_time_series(client, experimentLabel):
     query = { "event": "UsingSpecialItemEvent" }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
@@ -82,9 +64,7 @@ def precomputeJSON(experimentLabel):
         }
         },
     ]))
-    start_query = {}
-    if experimentLabel != None:
-        start_query['experimentLabel'] = experimentLabel 
+    start_query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True } }
     start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
     for entry in intermediary_data:
         print('--------------------------------')
@@ -163,12 +143,3 @@ def precomputeJSON(experimentLabel):
         } for player in PLAYERS],
         'categories': [idx for idx, _ in enumerate(buckets)]
     }
-
-# Write the results to a precomputed file. This file will likely be in the static_files 
-# directory.
-def writeToFile(data, file):
-    with open(file, 'w+') as out:
-        json.dump(data, out)
-
-data = precomputeJSON(args.experiment)
-writeToFile(data, args.out if args.out != None else '../static_files/data/special_items_over_time.json')
