@@ -71,9 +71,7 @@ def precomputeJSON(experimentLabel):
     # exit(0)
 
     #TODO extract this
-    query = { "event": "UsingSpecialItemEvent" }
-    if experimentLabel != None:
-        query['experimentLabel'] = experimentLabel
+    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": "UsingSpecialItemEvent" }
     intermediary_data = list(client.epilog.data2.aggregate([
         {'$match': query},
         {'$project': {'_id': 0, 'special': 1, 'player': 1, 'time': 1 }},

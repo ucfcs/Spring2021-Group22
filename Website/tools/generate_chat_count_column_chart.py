@@ -32,9 +32,7 @@ args = parser.parse_args()
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    query = { "event": 'AsyncPlayerChatEvent' }
-    if experimentLabel != None:
-        query['experimentLabel'] = experimentLabel
+    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": 'AsyncPlayerChatEvent' }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$project' : { '_id' : 0, 'player': 1, 'msg': 1 } },

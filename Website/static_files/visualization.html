@@ -31,6 +31,7 @@
     <script src="js/show_total_distance_travelled_column_chart.js"></script>
     <script src="js/show_percent_duplicate_location_column_chart.js"></script>
     <script src="js/show_zone_timeline_chart.js"></script>
+    <script src="js/show_entity_damage_interaction_column_chart.js"></script>
     <script> 
         $(function(){
             renderChatContentColumnChart(document.querySelector('#chart1'));
@@ -59,6 +60,7 @@
             renderSpecialItemsOverTime(document.querySelector('#chart11'));
             renderSpecialItemsOverTimeUnweighted(document.querySelector('#chart12'));
             renderLocationSpreadTimeSeries(document.querySelector('#chart13'));
+            renderEntityDamageInteractionColumnChart(document.querySelector('#chart14'));
             renderLocationSpreadByPlayersTimeSeries(document.querySelector('#chart15'));
             renderTotalDistanceTravelledColumnChart(document.querySelector('#chart17'));
             renderPercentDuplicateLocationColumnChart(document.querySelector('#chart18'));
@@ -127,6 +129,7 @@
         <div id="chart11"></div><br>
         <div id="chart12"></div><br>
         <div id="chart13"></div><br>
+        <div id="chart14"></div><br>
         <div id="chart15"></div><br>
         <div id="chart17"></div><br>
         <div id="chart18"></div><br>

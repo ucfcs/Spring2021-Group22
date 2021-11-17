@@ -57,9 +57,7 @@ def interpolate_missing_values(buckets):
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    query = { "event": "UsingSpecialItemEvent" }
-    if experimentLabel != None:
-        query['experimentLabel'] = experimentLabel
+    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": "UsingSpecialItemEvent" }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort': { 'time': 1 } },

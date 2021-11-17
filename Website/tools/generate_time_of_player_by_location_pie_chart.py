@@ -41,9 +41,7 @@ def build_pie_chart(player, intermediary_data):
 # through the map
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    query = { "event": 'PlayerLocationEvent' }
-    if experimentLabel != None:
-        query['experimentLabel'] = experimentLabel
+    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": 'PlayerLocationEvent' }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$project' : { '_id' : 0, 'player': 1, 'zone': 1 } },

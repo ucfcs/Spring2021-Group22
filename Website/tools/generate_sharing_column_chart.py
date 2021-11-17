@@ -37,9 +37,7 @@ def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(
         mongo_connection_uri, serverSelectionTimeoutMS=5000)
     collection = client.epilog.data2
-    query = {"event": "PlayerPickupItemEvent"}
-    if experimentLabel != None:
-        query['experimentLabel'] = experimentLabel
+    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": "PlayerPickupItemEvent"}
     cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
     actions = ['given', 'taken']
     intermediary_data = {}

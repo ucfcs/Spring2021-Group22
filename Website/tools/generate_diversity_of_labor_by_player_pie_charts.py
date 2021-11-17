@@ -43,10 +43,8 @@ def build_pie_chart(event, intermediary_data):
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(
         mongo_connection_uri, serverSelectionTimeoutMS=5000)
-    query = {"event": {'$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
+    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": {'$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
                                'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']}}
-    if experimentLabel != None:
-        query['experimentLabel'] = experimentLabel
     intermediary_data = list(client.epilog.data2.aggregate([
         {'$match': query},
         {'$project': {'_id': 0, 'event': '$event', 'player': 1, 'zone': 1}},
