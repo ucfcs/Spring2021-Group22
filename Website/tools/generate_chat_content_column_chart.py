@@ -24,4 +24,5 @@ def generate_chat_content_column_chart(client, experimentLabel):
             }
         ],
         'categories': [UUID_MAP[data['_id']]['name'] for data in intermediary_data],
+        'colors': [UUID_MAP[data['_id']]['color'] for data in intermediary_data],
     }

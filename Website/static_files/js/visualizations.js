@@ -37,6 +37,7 @@ function renderChatContentColumnChart(elements, data) {
       height: 350,
     },
     series: data.series,
+    colors: data.colors,
     xaxis: {
       categories: data.categories,
     },
@@ -45,6 +46,11 @@ function renderChatContentColumnChart(elements, data) {
         text: 'Content Length',
       },
     },
+    plotOptions: {
+      bar: {
+          distributed: true
+      }
+    }
   }
 
   const achart = new ApexCharts(element, options)
@@ -63,6 +69,7 @@ function renderChatCountColumnChart(elements, data) {
       height: 350,
     },
     series: data.series,
+    colors: data.colors,
     xaxis: {
       categories: data.categories,
     },
@@ -71,6 +78,11 @@ function renderChatCountColumnChart(elements, data) {
         text: 'Message Count',
       },
     },
+    plotOptions: {
+      bar: {
+          distributed: true
+      }
+    }
   }
 
   const achart = new ApexCharts(element, options)
@@ -96,7 +108,7 @@ function renderDistanceFromCenterByPlayerTimeSeries(elements, data) {
       curve: 'straight',
     },
     title: {
-      text: 'Average Distance of All Players From Center Over Time',
+      text: 'Average Distance From Center By Player Over Time',
       align: 'left',
     },
     grid: {
@@ -146,7 +158,7 @@ function renderDiversityOfLaborByPlayerColumnChart(elements, data) {
   const element = elements[0]
   const options = {
     title: {
-      text: 'Diversity of Labor by Players',
+      text: 'Percentage of Labor Events By Player',
     },
     chart: {
       type: 'bar',
@@ -178,7 +190,7 @@ function renderEntityDamageInteractionsColumnChart(elements, data) {
   const element = elements[0]
   const options = {
     title: {
-      text: 'Entity Damage',
+      text: 'Damage Dealt And Taken From Entities By Player',
     },
     chart: {
       type: 'bar',
@@ -222,7 +234,7 @@ function renderLocationSpreadByPlayerTimeSeries(elements, data) {
       curve: 'straight',
     },
     title: {
-      text: 'Average Distance of All Players Over Time',
+      text: 'Average Distance Between Players By Player Over Time',
       align: 'left',
     },
     grid: {
@@ -262,7 +274,7 @@ function renderLocationSpreadTimeSeries(elements, data) {
       curve: 'straight',
     },
     title: {
-      text: 'Average Distance of All Players Over Time',
+      text: 'Average Distance Between All Players Over Time',
       align: 'left',
     },
     grid: {
@@ -295,6 +307,7 @@ function renderPercentDuplicateLocationColumnChart(elements, data) {
       height: 350,
     },
     series: data.series,
+    colors: data.colors,
     xaxis: {
       categories: data.categories,
     },
@@ -308,6 +321,11 @@ function renderPercentDuplicateLocationColumnChart(elements, data) {
     dataLabels: {
       formatter: roundFormatter,
     },
+    plotOptions: {
+      bar: {
+          distributed: true
+      }
+    }
   }
 
   const achart = new ApexCharts(element, options)
@@ -358,7 +376,7 @@ function renderSpecialItemsOverTimeUnweightedTimeSeries(elements, data) {
       enabled: false,
     },
     title: {
-      text: 'Special Item Usage Over Time',
+      text: 'Unweighted Special Item Usage Over Time By Player',
       align: 'left',
     },
     grid: {
@@ -397,7 +415,7 @@ function renderSpecialItemsOverTimeWeightedTimeSeries(elements, data) {
       enabled: false,
     },
     title: {
-      text: 'Weighted Special Item Usage Over Time',
+      text: 'Weighted Special Item Usage By Player Over Time',
       align: 'left',
     },
     grid: {
@@ -423,7 +441,7 @@ function renderTimeOfPlayerByLocationColumnChart(elements, data) {
   const element = elements[0]
   const options = {
     title: {
-      text: 'Time Spent for Player by Location',
+      text: 'Time Spent For Player By Location',
     },
     chart: {
       type: 'bar',
@@ -435,7 +453,7 @@ function renderTimeOfPlayerByLocationColumnChart(elements, data) {
     },
     yaxis: {
       title: {
-        text: 'Time Spent',
+        text: 'Time Spent (s)',
       },
     },
   }
@@ -456,6 +474,7 @@ function renderTimeOfPlayerByLocationPieCharts(elements, data) {
       chart: {
         type: 'pie',
       },
+      colors: chart.colors,
       series: chart.series,
       labels: chart.labels,
       dataLabels: {
@@ -473,13 +492,14 @@ function renderTotalDistanceColumnChart(elements, data) {
   const element = elements[0]
   const options = {
     title: {
-      text: 'Total Distance Travelled by Player',
+      text: 'Total Distance Travelled By Player',
     },
     chart: {
       type: 'bar',
       height: 350,
     },
     series: data.series,
+    colors: data.colors,
     xaxis: {
       categories: data.categories,
     },
@@ -492,6 +512,11 @@ function renderTotalDistanceColumnChart(elements, data) {
     dataLabels: {
       formatter: roundFormatter,
     },
+    plotOptions: {
+      bar: {
+          distributed: true
+      }
+    }
   }
 
   const achart = new ApexCharts(element, options)
@@ -510,6 +535,7 @@ function renderTrophyCountColumnChart(elements, data) {
       height: 350,
     },
     series: data.series,
+    colors: data.colors,
     xaxis: {
       categories: data.categories,
     },
@@ -518,6 +544,11 @@ function renderTrophyCountColumnChart(elements, data) {
         text: 'Trophies',
       },
     },
+    plotOptions: {
+      bar: {
+          distributed: true
+      }
+    }
   }
 
   const achart = new ApexCharts(element, options)
@@ -529,7 +560,7 @@ function renderZoneTimelineChart(elements, data) {
   const element = elements[0]
   const options = {
     title: {
-      text: 'Zone Timeline',
+      text: 'Zone Timeline By Player',
     },
     chart: {
       type: 'rangeBar',

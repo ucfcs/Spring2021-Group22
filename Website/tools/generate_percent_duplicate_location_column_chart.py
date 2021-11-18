@@ -20,9 +20,6 @@ parser.add_argument('--out', help='where to write the data to');
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
 args = parser.parse_args()
 
-# Precompute the data structure needed for the trophy column chart. This would be
-# the "tools" part of the process. This would be run once for each team we have run
-# through the map
 def generate_percent_duplicate_location_column_chart(client, experimentLabel):
     query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": 'PlayerLocationEvent' }
     intermediary_data = list(client.epilog.data2.aggregate([
@@ -44,14 +41,15 @@ def generate_percent_duplicate_location_column_chart(client, experimentLabel):
 
     APPROXIMATE_EVENTS_IN_AN_HOUR = 60*60;
     for player in PLAYERS:
-        processed_data[player] = processed_data[player] / APPROXIMATE_EVENTS_IN_AN_HOUR
+        processed_data[player] = (processed_data[player] / APPROXIMATE_EVENTS_IN_AN_HOUR) * 100.0
 
     return {
         'series': [
             { 
-                'name': 'Total Distance Travelled', 
+                'name': 'Percentage Overlap', 
                 'data': [processed_data[player] for player in PLAYERS]
             }
         ],
         'categories': [UUID_MAP[player]['name'] for player in PLAYERS],
+        'colors': [UUID_MAP[player]['color'] for player in PLAYERS],
     }

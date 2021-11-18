@@ -39,4 +39,5 @@ def generate_total_distance_column_chart(client, experimentLabel):
             }
         ],
         'categories': [UUID_MAP[player]['name'] for player in PLAYERS],
+        'colors': [UUID_MAP[player]['color'] for player in PLAYERS],
     }

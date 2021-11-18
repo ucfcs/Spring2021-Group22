@@ -16,3 +16,13 @@ UUID_MAP = {
         'color': "#69D2E7",
     },
 }
+
+ZONE_MAP = {
+    'Cave': '#bf9c6d', 
+    'Center': '#06b2b8', 
+    'Dunes': '#f7e62d', 
+    'Farms': '#8bbf6d', 
+    'Forest': '#0bbf32', 
+    'Mansion': '#c429c4', 
+    'Maze': '#f72d2d',
+}

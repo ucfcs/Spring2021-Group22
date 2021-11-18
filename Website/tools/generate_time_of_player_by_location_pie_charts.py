@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import json
 from zoning_util import ALL_ZONES, getZone
-from uuid_to_playerdata import UUID_MAP
+from uuid_to_playerdata import UUID_MAP, ZONE_MAP
 
 PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
            '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
@@ -19,6 +19,7 @@ def build_pie_chart(player, intermediary_data):
     return {
         'title': 'Time Spent in Zones for ' + UUID_MAP[player]['name'],
         'series': [next((data['total'] for data in player_data if data['zone'] == zone), 0) for zone in ZONES],
+        'colors': [ZONE_MAP[zone] for zone in ZONES],
         'labels': ZONES,
     };
 

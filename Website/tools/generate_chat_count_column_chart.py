@@ -8,8 +8,6 @@ from datetime import datetime, timedelta
 import json
 from uuid_to_playerdata import UUID_MAP
 
-
-
 def generate_chat_count_column_chart(client, experimentLabel):
     query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": 'AsyncPlayerChatEvent' }
     intermediary_data = list(client.epilog.data2.aggregate([
@@ -28,4 +26,5 @@ def generate_chat_count_column_chart(client, experimentLabel):
             }
         ],
         'categories': [UUID_MAP[data['_id']]['name'] for data in intermediary_data],
+        'colors': [UUID_MAP[data['_id']]['color'] for data in intermediary_data],
     }
