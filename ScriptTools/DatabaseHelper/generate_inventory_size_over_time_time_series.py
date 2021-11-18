@@ -25,9 +25,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--experiment', help='the experiment label to limit the data to');
 args = parser.parse_args()
 
-# Precompute the data structure needed for the inventory size time series. This would be
-# the "tools" part of the process. This would be run once for each team we have run
-# through the map
+
 def precomputeJSON(experimentLabel):
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
     collection = client.epilog.data2;
