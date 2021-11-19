@@ -45,7 +45,8 @@ def generate_distance_from_center_by_player_time_series(client, experimentLabel)
     return {
         'series': [{
             'name': UUID_MAP[player]['name'],
-            'data': [(data['total'] / data['count'] if data['count'] > 0 else 0) for data in proccessed_data[player]]
+            'data': [(data['total'] / data['count'] if data['count'] > 0 else 0) for data in proccessed_data[player]],
+            'color': UUID_MAP[player]['color'],
         } for player in PLAYERS],
         'categories': [i for i in range(60)]
     }

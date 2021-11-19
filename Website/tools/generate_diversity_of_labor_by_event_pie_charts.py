@@ -18,6 +18,7 @@ def build_pie_chart(event, intermediary_data):
     return {
         'title': 'Player Contributions for ' + event,
         'series': [next((data['total'] for data in player_data if data['player'] == player), 0) for player in PLAYERS],
+        'colors': [UUID_MAP[player]['color'] for player in PLAYERS],
         'labels': [UUID_MAP[player]['name'] for player in PLAYERS],
     };
 

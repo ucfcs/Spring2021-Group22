@@ -7,9 +7,8 @@ import os
 from datetime import datetime, time, timedelta
 import matplotlib.pyplot as plt
 import json
+from start_time_util import get_start_time
 from uuid_to_playerdata import UUID_MAP
-
-
 
 PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
            '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
@@ -28,8 +27,7 @@ def generate_location_spread_by_player_time_series(client, experimentLabel):
         { '$project' : { '_id' : 0, 'player': 1, 'distances': 1, 'time': 1 } },
     ]))
 
-    start_query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True } }
-    start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
+    start_time = get_start_time(client, experimentLabel) // (60*1000)
     proccessed_data = { player: [{ 'total': 0, 'count': 0 }]*(60) for player in PLAYERS }
     for event in intermediary_data:
         event_time = event['time'] // (60*1000)
@@ -44,7 +42,8 @@ def generate_location_spread_by_player_time_series(client, experimentLabel):
     return {
         'series': [{
             'name': UUID_MAP[player]['name'],
-            'data': [(data['total'] / data['count'] if data['count'] > 0 else 0) for data in proccessed_data[player]]
+            'data': [(data['total'] / data['count'] if data['count'] > 0 else 0) for data in proccessed_data[player]],
+            'color': UUID_MAP[player]['color'],
         } for player in PLAYERS],
         'categories': [i for i in range(60)]
     }

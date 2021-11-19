@@ -106,7 +106,8 @@ def generate_special_items_over_time_weighted_time_series(client, experimentLabe
     return {
         'series': [{
             'name': UUID_MAP[player]['name'],
-            'data': processed_data[player]
+            'data': processed_data[player],
+            'color': UUID_MAP[player]['color'],
         } for player in PLAYERS],
         'categories': [idx for idx, _ in enumerate(buckets)]
     }

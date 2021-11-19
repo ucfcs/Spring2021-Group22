@@ -3,6 +3,7 @@ import argparse
 from dotenv import load_dotenv
 import os
 from uuid_to_playerdata import UUID_MAP
+from start_time_util import get_start_time 
 
 # Main script
 if __name__ == '__main__':
@@ -34,8 +35,7 @@ if __name__ == '__main__':
         }
         },
     ]))
-    start_query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True } }
-    start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
+    start_time = get_start_time(client, experimentLabel) // (60*1000)
     for entry in intermediary_data:
         print('--------------------------------')
         print(UUID_MAP[entry['_id']]['name'])

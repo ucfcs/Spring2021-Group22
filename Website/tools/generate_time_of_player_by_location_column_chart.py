@@ -37,7 +37,7 @@ def generate_time_of_player_by_location_column_chart(client, experimentLabel):
                         (zone_data['totals'] for zone_data in intermediary_data if zone_data['_id'] == player), []) 
                     if player_data['zone'] == zone), 0)
                 for zone in ZONES],
+                'color': UUID_MAP[player]['color'],
             } for player in PLAYERS],
-        'colors': [UUID_MAP[player]['color'] for player in PLAYERS],
         'categories': ZONES,
     }
