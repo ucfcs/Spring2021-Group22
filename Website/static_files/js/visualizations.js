@@ -143,9 +143,15 @@ function renderDiversityOfLaborByEventPieCharts(elements, data) {
       },
       series: chart.series,
       labels: chart.labels,
+      colors: chart.colors,
       dataLabels: {
-        enabled: false,
+        minAngleToShowLabel: 10,
       },
+      tooltip: {
+        y: {
+          formatter: roundFormatter
+        }
+      }
     }
 
     const achart = new ApexCharts(element, options)
@@ -478,8 +484,13 @@ function renderTimeOfPlayerByLocationPieCharts(elements, data) {
       series: chart.series,
       labels: chart.labels,
       dataLabels: {
-        enabled: false,
+        minAngleToShowLabel: 10,
       },
+      tooltip: {
+        y: {
+          formatter: roundFormatter
+        }
+      }
     }
 
     const achart = new ApexCharts(element, options)

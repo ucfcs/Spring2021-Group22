@@ -21,7 +21,10 @@ parser.add_argument('--experiment', help='the experiment label to limit the data
 args = parser.parse_args()
 
 def generate_percent_duplicate_location_column_chart(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": 'PlayerLocationEvent' }
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': 'PlayerLocationEvent',
+    }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort' : { 'time': 1 } },

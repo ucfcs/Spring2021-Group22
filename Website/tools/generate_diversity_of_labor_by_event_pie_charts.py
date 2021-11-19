@@ -26,8 +26,11 @@ def build_pie_chart(event, intermediary_data):
 # the "tools" part of the process. This would be run once for each team we have run
 # through the map
 def generate_diversity_of_labor_by_event_pie_charts(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": {'$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
-                               'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']}}
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': { '$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
+                               'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']}
+    }
     intermediary_data = list(client.epilog.data2.aggregate([
         {'$match': query},
         {'$project': {'_id': 0, 'event': '$event', 'player': 1, 'zone': 1}},

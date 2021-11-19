@@ -14,8 +14,10 @@ EVENTS = ['BarrelOpenedEvent', 'CollectTrophyEvent', 'DoFarmEvent',
           'DuneBreakEvent', 'OreBreakEvent', 'SolveMansionPuzzleEvent', 'VillagerTradeEvent']
 
 def generate_diversity_of_labor_by_player_column_chart(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": {'$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
-                               'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']}}
+    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+                'event': {'$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
+                               'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']}
+    }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel
     intermediary_data = list(client.epilog.data2.aggregate([

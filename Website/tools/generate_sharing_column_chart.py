@@ -15,7 +15,10 @@ PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b
 
 def generate_sharing_column_chart(client, experimentLabel):
     collection = client.epilog.data2
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": "PlayerPickupItemEvent"}
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': 'PlayerPickupItemEvent',
+    }
     cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
     actions = ['given', 'taken']
     intermediary_data = {}

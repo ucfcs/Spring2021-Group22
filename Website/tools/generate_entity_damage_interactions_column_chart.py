@@ -15,7 +15,7 @@ EVENTS = ['PlayerDamageByEntityEvent', 'EntityDamageByPlayerEvent' ];
 def generate_entity_damage_interactions_column_chart(client, experimentLabel):
     query = { 
         'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
-        "event": { '$in': EVENTS } 
+        'event': { '$in': EVENTS } 
     }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },

@@ -15,7 +15,10 @@ PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b
 ZONES = ['Cave', 'Center', 'Dunes', 'Farms', 'Forest', 'Mansion', 'Maze']
 
 def generate_zone_timeline_chart(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": 'PlayerLocationEvent' }
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': 'PlayerLocationEvent',
+    }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort' : { 'time': 1 } },

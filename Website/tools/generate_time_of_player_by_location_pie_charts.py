@@ -24,7 +24,10 @@ def build_pie_chart(player, intermediary_data):
     };
 
 def generate_time_of_player_by_location_pie_charts(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": 'PlayerLocationEvent' }
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': 'PlayerLocationEvent',
+    }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$project' : { '_id' : 0, 'player': 1, 'zone': 1 } },

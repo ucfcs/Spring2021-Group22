@@ -41,7 +41,10 @@ def interpolate_missing_values(buckets):
 
 
 def generate_special_items_over_time_unweighted_time_series(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": "UsingSpecialItemEvent" }
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': 'UsingSpecialItemEvent',
+    }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort': { 'time': 1 } },

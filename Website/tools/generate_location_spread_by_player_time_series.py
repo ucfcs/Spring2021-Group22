@@ -20,7 +20,10 @@ args = parser.parse_args()
 
 
 def generate_location_spread_by_player_time_series(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": "PlayerLocationEvent" }
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': 'PlayerLocationEvent' 
+    }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort': { 'time': 1 } },
