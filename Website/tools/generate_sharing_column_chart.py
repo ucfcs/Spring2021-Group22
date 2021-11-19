@@ -7,6 +7,7 @@ import os
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import json
+from start_time_util import get_times
 
 from uuid_to_playerdata import UUID_MAP
 
@@ -15,9 +16,11 @@ PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b
 
 def generate_sharing_column_chart(client, experimentLabel):
     collection = client.epilog.data2
+    (start_time, end_time) = get_times(client, experimentLabel)
     query = { 
         'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
         'event': 'PlayerPickupItemEvent',
+        'time': { '$gte': start_time, '$lte': end_time },
     }
     cursor = collection.find(query, sort=[('time', pymongo.ASCENDING)])
     actions = ['given', 'taken']

@@ -7,6 +7,7 @@ import os
 from datetime import datetime, timedelta
 import json
 from uuid_to_playerdata import UUID_MAP
+from start_time_util import get_times
 
 PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
            '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
@@ -14,9 +15,12 @@ EVENTS = ['BarrelOpenedEvent', 'CollectTrophyEvent', 'DoFarmEvent',
           'DuneBreakEvent', 'OreBreakEvent', 'SolveMansionPuzzleEvent', 'VillagerTradeEvent']
 
 def generate_diversity_of_labor_by_player_column_chart(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
-                'event': {'$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
-                               'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']}
+    (start_time, end_time) = get_times(client, experimentLabel)
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': {'$in': ['DoFarmEvent', 'OreBreakEvent', 'DuneBreakEvent',
+                               'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']},
+        'time': { '$gte': start_time, '$lte': end_time },
     }
     if experimentLabel != None:
         query['experimentLabel'] = experimentLabel

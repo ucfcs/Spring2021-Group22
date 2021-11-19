@@ -6,6 +6,7 @@ from datetime import datetime, time, timedelta
 import matplotlib.pyplot as plt
 import json
 from uuid_to_playerdata import UUID_MAP
+from start_time_util import get_times
 
 
 
@@ -18,9 +19,11 @@ parser.add_argument('--experiment', help='the experiment label to limit the data
 args = parser.parse_args()
 
 def generate_distance_from_center_by_player_time_series(client, experimentLabel):
+    (start_time, end_time) = get_times(client, experimentLabel)
     query = { 
         'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
-        "event": "PlayerLocationEvent" 
+        "event": "PlayerLocationEvent",
+        'time': { '$gte': start_time, '$lte': end_time },
     }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
@@ -29,7 +32,7 @@ def generate_distance_from_center_by_player_time_series(client, experimentLabel)
     ]))
 
     start_time = list(client.epilog.data2.find(query).sort('time', 1).limit(1))[0]['time'] // (60*1000)
-    proccessed_data = { player: [{ 'total': 0, 'count': 0 }]*(60) for player in PLAYERS }
+    proccessed_data = { player: [{ 'total': 0, 'count': 0 } for _ in range(60)] for player in PLAYERS }
     for event in intermediary_data:
         event_time = event['time'] // (60*1000)
 

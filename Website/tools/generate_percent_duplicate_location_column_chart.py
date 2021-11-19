@@ -9,6 +9,7 @@ import json
 from math import floor
 
 from uuid_to_playerdata import UUID_MAP
+from start_time_util import get_times
 
 
 
@@ -21,9 +22,11 @@ parser.add_argument('--experiment', help='the experiment label to limit the data
 args = parser.parse_args()
 
 def generate_percent_duplicate_location_column_chart(client, experimentLabel):
+    (start_time, end_time) = get_times(client, experimentLabel)
     query = { 
         'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
         'event': 'PlayerLocationEvent',
+        'time': { '$gte': start_time, '$lte': end_time },
     }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
