@@ -7,6 +7,7 @@ async function squigglemap(dataPath) {
 		<div class=\"row align-items-center\">\
 			<div class=\"col-sm-2\">\
 				<p id=\"value-range\"></p>\
+				<div id=\"slider-button\"><div>\
 			</div>\
 			<div class=\"col-sm\">\
 				<div id=\"slider-range\"></div>\
@@ -72,7 +73,7 @@ async function squigglemap(dataPath) {
 		.max(_maxTime)
 		.width(400)
 		.tickFormat(x => parseInt(x))
-		.ticks(5)
+		// .ticks(10)
 		.default([_minTime, _maxTime])
 		.fill('#2196f3')
 		.step(1)
@@ -102,6 +103,26 @@ async function squigglemap(dataPath) {
 			.value()
 			.join('-')
 	);
+	playbutton = d3.select('div#slider-button')
+	.append("button")
+	.text('Play')
+	.on('click', async () => {
+		playbutton.text('Playing')
+		await onPlay()
+		playbutton.text('Play')
+	})
+
+	// Create simple play animation
+	const timer = ms => new Promise(res => setTimeout(res, ms))
+	const onPlay = async () => {
+		let space = Math.floor((_maxTime - _minTime) / 200)
+		for (i = 0; i < 200; i++) {
+			sliderRange.value([space * i, space * (i + 5)])
+			generateData(space * i, space * (i + 5))
+			drawPlayers(data)
+			await timer(100)
+		}
+	}
 
 	let input = d3.select("div#input")
 
@@ -140,7 +161,7 @@ async function squigglemap(dataPath) {
 	// draw path for each player with unique color
 	function drawPlayers(data) {
 
-		console.log('draw players', data, Object.values(data))
+		// console.log('draw players', data, Object.values(data))
 
 		let path = heatmap
 			.selectAll("path")

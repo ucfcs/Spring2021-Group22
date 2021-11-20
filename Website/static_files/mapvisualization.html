@@ -9,80 +9,45 @@
     <title>Map Visualization</title>
     <link type="text/css" rel="stylesheet" href="/styles.css">
     <link href="http://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
-    <!-- <link href="/squigglemap.html" rel="import" /> -->
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
     <script src="/js/core.js"></script>
-    <script src="/js/UUIDtoPlayer.js"></script>
+
     <script src="/js/squigglemap.js"></script>
     <script src="/js/heatmap.js"></script>
-    <script src="https://d3js.org/d3.v7.js"></script>
-    <script src="https://unpkg.com/d3-simple-slider"></script>
 
-    <!-- <script>
-      $(function () {
-        // renderDropdown();
-        // squigglemap();
-        // heatmap();
-
-        fetchTeams().then(() => {
-          console.log(teams);
-          renderDropdown();
-          squigglemap();
-          heatmap();
-        });
-      });
-    </script> -->
+    <script src="js/d3.v7.min.js"></script>
+    <script src="js/d3-simple-slider.js"></script>
 
     <script>
-
-        function loadVis(squiggle, heat) {
-          console.log(squiggle, heat)
-          squigglemap(squiggle)
-          heatmap(heat)
-        }
-
-  async function fetchTeams() {
-    teams = await getData('_teams.json')
-  }
-    function renderDropdown() {
-      const element = $('#team-select')
-      // for (team of teams) {
-      //     element.append(
-      //         $(
-      //             '<button onclick="renderCharts(\'' +
-      //             team.experiment_label +
-      //             '\')">' +
-      //             teamData.experiment_label +
-      //             '</button>'
-      //         )
-      //     )
-      // }
-      for (const [team, data] of Object.entries(teams)) {
-        // element.append(
-        //   $(
-        //     '<button onclick="loadVis(\"' + data.squigglemap + '\", \"' + data.heatmap + '\")">' + team + '</button>'
-        //   )
-        // )
-        button = $("<button>" + team + "</button>");
-
-        button.click(function () {
-          // getFeed('http://open.live.bbc.co.uk/weather/feeds/en/PA2/3dayforecast.rss, showFeedResults');
-          console.log(1)
-          loadVis(data.squigglemap, data.heatmap)
-
-        });
-        element.append(button)
+      async function fetchTeams() {
+        teams = await getData('_teams.json')
       }
-    }
+      function renderDropdown() {
+        const element = $('#team-select')
 
-      $(function(){
+        for (const [team, data] of Object.entries(teams)) {
+          button = $("<button>" + team + "</button>");
+          button.click(function () {
+            loadVis(data.squigglemap, data.heatmap)
+          });
+          element.append(button)
+        }
+      }
+      function loadVis(squiggle, heat) {
+        squigglemap(squiggle)
+        heatmap(heat)
+      }
+
+      $(function () {
         fetchTeams().then(() => {
-              renderDropdown();
+          renderDropdown();
 
-              squigglemap(Object.entries(teams)[0][1].squigglemap)
-              heatmap(Object.entries(teams)[0][1].heatmap)
-            });
+          squigglemap(Object.entries(teams)[0][1].squigglemap)
+          heatmap(Object.entries(teams)[0][1].heatmap)
         });
+      });
     </script>
 
   </head>
@@ -131,6 +96,7 @@
           <div class="row align-items-center">
             <div class="col-sm-2">
               <p id="value-range"></p>
+              <div id="slider-button"></div>
             </div>
             <div class="col-sm">
               <div id="slider-range"></div>
