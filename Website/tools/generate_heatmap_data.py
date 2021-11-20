@@ -15,8 +15,6 @@ from collections import defaultdict
 
 load_dotenv()
 
-time_offset = True
-
 
 def def_value():
     return 0
@@ -28,22 +26,9 @@ def main():
 
     client = pymongo.MongoClient(
         os.getenv('MONGO_URI'), ssl_cert_reqs=ssl.CERT_NONE)
-    collection = client.test.data3
+    collection = client.epilog.test
 
     print('fetching metadata')
-
-    # for time in collection.find().sort('time', pymongo.ASCENDING).limit(1):
-    #     _time = math.floor(time['time'] / 1000)
-    #     if time_offset:
-    #         _time_offset = _time
-    #         min_time = 0
-    #     else:
-    #         min_time = _time
-    # for time in collection.find().sort('time', pymongo.DESCENDING).limit(1):
-    #     if time_offset:
-    #         max_time = math.floor(time['time'] / 1000) - _time_offset
-    #     else:
-    #         max_time = math.floor(time['time'] / 1000)
 
     doc_count = collection.estimated_document_count()
 
@@ -53,11 +38,9 @@ def main():
                      suffix='Complete', length=50)
 
     data = defaultdict(def_value)
-    # data['time'] = {'min': min_time, 'max': max_time}
-    # data['timeline'] = dict()
 
     index = 0
-    for doc in collection.find({'x': {'$exists': True}, 'y': {'$exists': True}, 'z': {'$exists': True}}).sort('time', pymongo.ASCENDING):
+    for doc in collection.find({'experimentLabel': "Team5", 'x': {'$exists': True}, 'y': {'$exists': True}, 'z': {'$exists': True}}).sort('time', pymongo.ASCENDING):
         printProgressBar(index, doc_count, prefix='Progress:',
                          suffix='Complete', length=50)
         index = index + 1
@@ -81,7 +64,7 @@ def main():
 # write to file and increment file name if it already exists
 
 
-def writeToFile(data, filename, extension='json'):
+def writeToFile(data, filename, extension='csv'):
     i = 0
     istr = ''
     while os.path.exists(f'{filename}{istr}.{extension}'):

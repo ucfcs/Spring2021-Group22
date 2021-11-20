@@ -16,19 +16,75 @@
     <script src="/js/squigglemap.js"></script>
     <script src="/js/heatmap.js"></script>
     <script src="https://d3js.org/d3.v7.js"></script>
-  
-    <!-- Range slider code -->
-    <script src="/js/d3slider.js"></script>
-  
-    <!-- Range slider style -->
-    <link href="/css/d3slider.css" rel="stylesheet">
-    <script>
-      $(function(){
-        squigglemap();
-        heatmap();
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+
+    <!-- <script>
+      $(function () {
+        // renderDropdown();
+        // squigglemap();
+        // heatmap();
+
+        fetchTeams().then(() => {
+          console.log(teams);
+          renderDropdown();
+          squigglemap();
+          heatmap();
+        });
       });
+    </script> -->
+
+    <script>
+
+        function loadVis(squiggle, heat) {
+          console.log(squiggle, heat)
+          squigglemap(squiggle)
+          heatmap(heat)
+        }
+
+  async function fetchTeams() {
+    teams = await getData('_teams.json')
+  }
+    function renderDropdown() {
+      const element = $('#team-select')
+      // for (team of teams) {
+      //     element.append(
+      //         $(
+      //             '<button onclick="renderCharts(\'' +
+      //             team.experiment_label +
+      //             '\')">' +
+      //             teamData.experiment_label +
+      //             '</button>'
+      //         )
+      //     )
+      // }
+      for (const [team, data] of Object.entries(teams)) {
+        // element.append(
+        //   $(
+        //     '<button onclick="loadVis(\"' + data.squigglemap + '\", \"' + data.heatmap + '\")">' + team + '</button>'
+        //   )
+        // )
+        button = $("<button>" + team + "</button>");
+
+        button.click(function () {
+          // getFeed('http://open.live.bbc.co.uk/weather/feeds/en/PA2/3dayforecast.rss, showFeedResults');
+          console.log(1)
+          loadVis(data.squigglemap, data.heatmap)
+
+        });
+        element.append(button)
+      }
+    }
+
+      $(function(){
+        fetchTeams().then(() => {
+              renderDropdown();
+
+              squigglemap(Object.entries(teams)[0][1].squigglemap)
+              heatmap(Object.entries(teams)[0][1].heatmap)
+            });
+        });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -63,23 +119,35 @@
     <h1 id="title-style" class="col text-center">Map Data</h1>
     <br>
     <div class="card center" style="width: 70%;">
+
       <!-- <img src="..." class="card-img-top" alt="..."> -->
       <div class="card-body">
         <h5 class="card-title">Team 3 Experimental Charts and Visualizations</h5>
+        <div id="team-select"></div>
+        <hr>
         <p>Squigglemap</p>
-        <p id="value"></p>
 
-        <div id="slider-container"></div>
-        <div id="range-label"></div>
-      
-        <div id="map"></div>
-      
-        <div id="input"></div>
+        <div id="squigglemap">
+          <div class="row align-items-center">
+            <div class="col-sm-2">
+              <p id="value-range"></p>
+            </div>
+            <div class="col-sm">
+              <div id="slider-range"></div>
+            </div>
+          </div>
+        
+          <div id="map"></div>
+        
+          <div id="input"></div>
+        </div>
 
         <hr>
         <p>Heatmap</p>
-        <div id="heatmap"></div>
-        <div id="heatmap_tooltip"></div>
+        <div id="heatmap">
+          <div id="heatmap_map"></div>
+          <div id="heatmap_tooltip"></div>
+        </div>
 
       </div>
       <br>

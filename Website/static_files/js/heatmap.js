@@ -1,4 +1,9 @@
-async function heatmap() {
+async function heatmap(dataPath) {
+	// Jquery empty node and reset before adding data
+	// d3 code just appends what it needs, could rework to reuse nodes
+	$("div#heatmap").empty()
+	$("div#heatmap").append("<div id=heatmap_map><div><div id=heatmap_tooltip><div>")
+
 	const SCALE = 2
 	let width = 417 * SCALE, height = 417 * SCALE; // 417 is image size
 	const CENTER = { x: width / 2, y: height / 2 };
@@ -83,7 +88,7 @@ async function heatmap() {
 
 	//Read the data
 	// d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/heatmap_data.csv").then(function (data) {
-	d3.csv('/data/heatmap.csv').then(function (data) {
+	d3.csv('/data/' + dataPath).then(function (data) {
 
 		let max = Math.max(...data.map(d => parseInt(d.count)))
 

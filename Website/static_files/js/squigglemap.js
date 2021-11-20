@@ -1,10 +1,27 @@
-async function squigglemap() {
+async function squigglemap(dataPath) {
+	// Jquery empty node and reset before adding data
+	// d3 code just appends what it needs, could rework to reuse nodes
+	$("div#squigglemap").empty()
+	$("div#squigglemap").append("\
+	<div id=\"squigglemap\">\
+		<div class=\"row align-items-center\">\
+			<div class=\"col-sm-2\">\
+				<p id=\"value-range\"></p>\
+			</div>\
+			<div class=\"col-sm\">\
+				<div id=\"slider-range\"></div>\
+			</div>\
+		</div>\
+		<div id=\"map\"></div>\
+		<div id=\"input\"></div>\
+	</div>")
+
 	// Initial Values
 	const SCALE = 2
 	let width = 417 * SCALE, height = 417 * SCALE; // 417 is image size
 	const CENTER = { x: width / 2, y: height / 2 };
 
-	const inputdata = await getData('squigglemap.json')
+	const inputdata = await getData(dataPath)
 
 	const _minTime = inputdata.time.min;
 	const _maxTime = inputdata.time.max;
@@ -26,7 +43,7 @@ async function squigglemap() {
 		for (const player in data) {
 			data[player].pos.length = 0;
 		}
-		for (const key of Object.keys(inputdata.timeline).sort((a,b) => parseFloat(a) - parseFloat(b))) {
+		for (const key of Object.keys(inputdata.timeline).sort((a, b) => parseFloat(a) - parseFloat(b))) {
 			let res = inputdata.timeline[key].filter(f => f.event === "PlayerLocationEvent")
 			if (res.length > 0) {
 				res.forEach(r => {
@@ -48,20 +65,43 @@ async function squigglemap() {
 		dataMax = upperTime;
 	}
 
+	// Show/update slider
+	var sliderRange = d3
+		.sliderBottom()
+		.min(_minTime)
+		.max(_maxTime)
+		.width(400)
+		.tickFormat(x => parseInt(x))
+		.ticks(5)
+		.default([_minTime, _maxTime])
+		.fill('#2196f3')
+		.step(1)
+		.on('onchange', val => {
+			// d3.select('p#value-range').text(val.map(d3.format('.2%')).join('-'));
+			d3.select('p#value-range').text(val.join('-'));
+			// console.log(val)
+		})
+		.on('end', val => {
+			console.log(val)
+			generateData(val[0], val[1])
+			drawPlayers(data)
+		})
 
-	var slider = createD3RangeSlider(inputdata.time.min, inputdata.time.max, "#slider-container", true);
+	var gRange = d3
+		.select('#slider-range')
+		.append('svg')
+		.attr('width', 500)
+		.attr('height', 100)
+		.append('g')
+		.attr('transform', 'translate(30,30)');
 
-	// Only redraw lines after selection is made, not on every change
-	slider.onChangeEnd(function (newRange) {
+	gRange.call(sliderRange);
 
-		generateData(newRange.begin, newRange.end)
-
-
-		drawPlayers(data)
-
-
-		d3.select("#range-label").html(newRange.begin + " &mdash; " + newRange.end);
-	});
+	d3.select('p#value-range').text(
+		sliderRange
+			.value()
+			.join('-')
+	);
 
 	let input = d3.select("div#input")
 
