@@ -21,6 +21,7 @@ from generate_time_of_player_by_location_pie_charts import generate_time_of_play
 from generate_total_distance_column_chart import generate_total_distance_column_chart
 from generate_trophy_count_column_chart import generate_trophy_count_column_chart
 from generate_zone_timeline_chart import generate_zone_timeline_chart
+from generate_trophy_timeline_step_chart import generate_trophy_timeline_step_chart
 
 # Write the results to a precomputed file. This file will likely be in the static_files 
 # directory.
@@ -49,6 +50,7 @@ def generate_data(client, experiment_label):
             'total_distance_column_chart': generate_total_distance_column_chart(client, experiment_label),
             'trophy_count_column_chart': generate_trophy_count_column_chart(client, experiment_label),
             'zone_timeline_chart': generate_zone_timeline_chart(client, experiment_label),
+            'trophy_timeline_step_chart': generate_trophy_timeline_step_chart(client, experiment_label),
         };
     
 # Main script
@@ -70,6 +72,6 @@ if __name__ == '__main__':
     data = [{
         'experiment_label': team,
         'data': generate_data(client, team)
-    } for team in ['group1', 'Team2', 'Team3', 'Team3take2', 'Team5']];
+    } for team in ['group1', 'Team2', 'Team3', 'Team3take2', 'Team5', 'team6']];
 
     writeToFile(data, args.out if args.out != None else '../static_files/data/teams.json')

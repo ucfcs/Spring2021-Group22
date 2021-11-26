@@ -22,44 +22,35 @@ def generate_diversity_of_labor_by_player_column_chart(client, experimentLabel):
                                'VillagerTradeEvent', 'CollectTrophyEvent', 'BarrelOpenedEvent', 'SolveMansionPuzzleEvent']},
         'time': { '$gte': start_time, '$lte': end_time },
     }
-    if experimentLabel != None:
-        query['experimentLabel'] = experimentLabel
     intermediary_data = list(client.epilog.data2.aggregate([
         {'$match': query},
         {'$project': {'_id': 0, 'event': '$event', 'player': 1, 'zone': 1}},
         {'$group': {'_id': {'event': '$event', 'player': '$player'}, 'total': {'$sum': 1}}},
         {'$group': {
-            '_id':  "$_id.player",
-            'totals': {'$push': {'event': '$_id.event', 'total': '$total'}}
+            '_id':  "$_id.event",
+            'totals': {'$push': {'player': '$_id.player', 'total': '$total'}}
         }
         },
     ]))
 
     # normalize event totals
-    event_totals = [0 for _ in EVENTS]
-    for player_data in intermediary_data:
-        for idx, event in enumerate(EVENTS):
-            event_totals[idx] += (
-                [event_data['total'] for event_data in player_data['totals']
-                    if event_data['event'] == event][0]
-                if (len([event_data['total'] for event_data in player_data['totals'] if event_data['event'] == event]) > 0)
-                else 0
-            )
-    for player_data in intermediary_data:
-        for idx, event in enumerate(EVENTS):
-            for event_data in player_data['totals']:
-                if event_data['event'] == event:
-                    event_data['total'] /= event_totals[idx]
-                    event_data['total'] *= 100.0
+    for event_data in intermediary_data:
+        total = 0
+        for player_data in event_data['totals']:
+            total += player_data['total']
+        for player_data in event_data['totals']:
+            player_data['total'] /= total
+            player_data['total'] *= 100.0
 
     return {
         'series': [{
-            'name': UUID_MAP[ player]['name'],
+            'name': event,
             'data': [
-                next((event_data['total'] for event_data in next(
-                    (player_data['totals'] for player_data in intermediary_data if player_data['_id'] == player), [])
-                    if event_data['event'] == event), 0)
-            for event in EVENTS],
-        } for player in PLAYERS],
-        'categories': EVENTS,
+                next((player_data['total'] for player_data in next(
+                    (event_data['totals'] for event_data in intermediary_data if event_data['_id'] == event), [])
+                    if player_data['player'] == player), 0)
+                for player in PLAYERS
+            ],
+        } for event in EVENTS],
+        'categories': [UUID_MAP[player]['name'] for player in PLAYERS],
     }

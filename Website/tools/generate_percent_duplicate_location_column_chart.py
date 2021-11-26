@@ -45,9 +45,8 @@ def generate_percent_duplicate_location_column_chart(client, experimentLabel):
         previous_locations[event['player']] = (x, y, z)
         travelled_set.add((x, y, z))
 
-    APPROXIMATE_EVENTS_IN_AN_HOUR = 60*60;
     for player in PLAYERS:
-        processed_data[player] = (processed_data[player] / APPROXIMATE_EVENTS_IN_AN_HOUR) * 100.0
+        processed_data[player] = (processed_data[player] / len(travelled_set)) * 100.0
 
     return {
         'series': [

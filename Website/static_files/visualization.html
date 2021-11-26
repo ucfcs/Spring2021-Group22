@@ -63,10 +63,26 @@
     <div class="card center" style="width: 70%;">
       <!-- <img src="..." class="card-img-top" alt="..."> -->
       <div class="card-body">
-        <h5 class="card-title">Beta Charts and Visualizations</h5>
+        <h5 class="card-title">Charts and Visualizations</h5>
         <div id="chat_content_column_chart"></div><br>
+        <p>
+          Displays the total number of characters of chat messages that were sent by 
+          each player.
+        </p>
         <div id="chat_count_column_chart"></div><br>
+        <p>
+          Displays the total number of chat messages that were sent by 
+          each player. In general, this chart should be relatively equal
+          to the chat content chart, but it would be interesting to see
+          otherwise.
+        </p>
         <div id="distance_from_center_by_player_time_series"></div><br>
+        <p>
+          For each player, displays the distance that the player was from the center
+          of the map over time. Because the scale is in minutes and steps were recorded
+          per second, the data points are for the averaged distance the player was from 
+          the center over each minute.
+        </p>
         <div id="diversity_of_labor_by_event_pie_charts" style="display: grid; grid-template-columns: 1fr 1fr">
           <div id="diversity_of_labor_by_event_pie_charts_1"></div>
           <div id="diversity_of_labor_by_event_pie_charts_2"></div>
@@ -76,25 +92,114 @@
           <div id="diversity_of_labor_by_event_pie_charts_6"></div>
           <div id="diversity_of_labor_by_event_pie_charts_7"></div>
         </div><br>
+        <p>
+          Each pie chart is for a significant "labor" event. The pie charts
+          are divided by player, showing each player's contribution to the total
+          number of the particular event recorded. This can be used to visually
+          identify what players were predominantly performing what action. In 
+          general, the events that correlate with zones - such as DuneBreakEvent -
+          should align with the bar chart displaying the amount of time each player
+          spent in each zone.
+        </p>
         <div id="diversity_of_labor_by_player_column_chart"></div><br>
+        <p>
+          Each bar is for a significant "labor" event. The bars are segregated by
+          player, showing each players percentage of a certain event total. This is 
+          another way to look at the pie charts above, but with an emphasis on each 
+          player's contribution to all 'labor' events, not just their contribution to
+          each 'labor' event.
+        </p>
         <div id="entity_damage_interactions_column_chart"></div><br>
+        <p>
+          Shows the damage recieved and dealt to mobs in the game. This is meant to track
+          players fighting hostile mobs in the maze, but will also include damage done
+          to passive mobs in the center.
+        </p>
         <div id="location_spread_by_player_time_series"></div><br>
+        <p>
+          For each player, displays the average distance that the player was from each other
+          player over time. Because the scale is in minutes and steps were recorded
+          per second, the data points are for the averaged distance the player was from 
+          each other player over each minute. 
+        </p>
         <div id="location_spread_time_series"></div><br>
+        <p>
+          Displays the average distance between all members over time. This was calculated
+          by considering the average distance recorded for each player of each other player
+          each minute. Each player's average minute-distance was added and divided by the size
+          of the team (4). The calculation was done this way, instead of averaging each players
+          distance from each other together, to take advantage of the way event collection was 
+          occuring.
+        </p>
         <div id="percent_duplicate_location_column_chart"></div><br>
+        <p>
+          Displays the number of locations players travelled that were already
+          taken by themselves or any member of their team. Standing in place would
+          only accumulate a single "new location". The total number of "duplicate" 
+          locations were divided by the total number of locations recorded for the
+          whole team.
+        </p>
         <div id="sharing_column_chart"></div><br>
+        <p>
+          A representation of the sharing of items. For each player, there are 2 bars: one
+          for the number of items a player gave to another player, and one for the number
+          of items a player recieved from another player. We hypothesized that large bars
+          would signify collaborative efforts.
+        </p>
         <div id="special_items_over_time_unweighted_time_series"></div><br>
+        <p>
+          A representation of the usage of powerups over time. For each second
+          where a player was "using" a powerup, an event was recorded and is shown
+          here. If a player attacked a mob, an event was logged. If a player used
+          an "escape rope" to teleport to the center of the map, an event was logged.
+          If a player was wearing a helmet in any given second, an event was logged.
+          The reason powerups were tracked like this was to try to remain consistent
+          across one-time powerups (escape rope), repeated-time powerups (sword, bow), 
+          and continuous powerups (potions, glow path).
+        </p>
         <div id="special_items_over_time_weighted_time_series"></div><br>
-        <div id="time_in_location_by_player_column_chart"></div><br>
+         <p>
+          A representation of the usage of powerups over time. However, in contrast
+          to the previous chart, this chart attempted to normalize powerups by their
+          frequency (one-time, repeated-time, continuous). It is difficult to tell
+          how effective this normalization was. If the project developers had more time,
+          perhaps this chart could have been tweaked better.
+        </p>
         <div id="time_of_player_by_location_column_chart"></div><br>
+        <p>
+          Displays the total number of seconds that were spent by each player in each zone. This
+          is useful in determining if players were completely specializing in zones or sharing
+          responsibilities.
+        </p>
         <div id="time_of_player_by_location_pie_charts" style="display: grid; grid-template-columns: 1fr 1fr">
           <div id="time_of_player_by_location_pie_charts_1"></div>
           <div id="time_of_player_by_location_pie_charts_2"></div>
           <div id="time_of_player_by_location_pie_charts_3"></div>
           <div id="time_of_player_by_location_pie_charts_4"></div>
         </div><br>
+        <p>
+          Shows how each player distributed their time by zone. This should also be useful in determining
+          if players were specializing in zones or not.
+        </p>
         <div id="total_distance_column_chart"></div><br>
+        <p>
+          Shows the total distance travelled by player.
+        </p>
         <div id="trophy_count_column_chart"></div><br>
+        <p>
+          Shows the total trophies that were collected by each player. To any viewer who participated
+          in the experiment, no, this is not a reflection of how well you did compared to your teammates.
+          Completing the map was intentionally a team effort ;).
+        </p>
         <div id="zone_timeline_chart"></div><br>
+        <p>
+          Shows what zone each player was in at any given second in the map. Something interesting to pull
+          from this chart is how often and when each player spent time in the Maze.
+        </p>
+        <div id="trophy_timeline_step_chart"></div><br>
+        <p>
+          Shows the cummulative number of trophies earned each minute of the map.
+        </p>
       </div>
       <br>
       <!-- <ul class="list-group list-group-flush">

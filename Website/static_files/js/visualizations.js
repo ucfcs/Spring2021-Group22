@@ -591,6 +591,26 @@ function renderZoneTimelineChart(elements, data) {
   currentCharts.push(achart)
 }
 
+function renderTrophyTimelineStepChart(elements, data) {
+  const element = elements[0]
+  const options = {
+    title: {
+      text: 'Cumulative Trophies Collected by Minute',
+    },
+    chart: {
+      type: 'line',
+    },
+    stroke: {
+      curve: 'stepline',
+    },
+    series: data.series,
+  }
+
+  const achart = new ApexCharts(element, options)
+  achart.render()
+  currentCharts.push(achart)
+}
+
 function renderCharts(experimentLabel) {
   for (let chart of currentCharts) {
     chart.destroy()
@@ -680,5 +700,9 @@ function renderCharts(experimentLabel) {
   renderZoneTimelineChart(
     [document.getElementById('zone_timeline_chart')],
     chartSource.zone_timeline_chart
+  )
+  renderTrophyTimelineStepChart(
+    [document.getElementById('trophy_timeline_step_chart')],
+    chartSource.trophy_timeline_step_chart
   )
 }
