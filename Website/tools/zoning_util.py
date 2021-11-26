@@ -1,6 +1,6 @@
-# Utility file for capturing what zone a location is in
+# Utility file for capturing what zone a location is in. A bug that was noticed
+# after tests were run was the waiting room was logged as "Maze"
 
-#TODO make sure these boundaries capture everything and everything correctly
 ZONE_DUNES = { "name": "Dunes", "start": [22, -76], "end": [76,-11] }
 ZONE_FARMS = { "name": "Farms", "start": [-76, -76], "end": [-2, -12] }
 ZONE_CAVE = { "name": "Cave", "start": [-76, 6], "end": [-5, 76] }

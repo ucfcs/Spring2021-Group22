@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import json
 from uuid_to_playerdata import UUID_MAP
+from start_time_util import get_times
 
 PLAYERS = ['14d285df-e64e-41f2-bc4b-979e846c3cec', '6dc38184-c3e7-49ab-a99b-799b01274d01',
            '7d80f280-eaa6-404c-8830-643ccb357b62', 'ffaa5663-850e-4009-80c4-c8bbe34cd285']
@@ -23,7 +24,7 @@ def expected_minutes(x):
 
 def interpolate_missing_values(buckets):
     run = { 'location': len(buckets)-1, 'value': 0 }
-    forwardLookup = [{ 'location': len(buckets)-1, 'value': 0 }]*(len(buckets))
+    forwardLookup = [{ 'location': len(buckets)-1, 'value': 0 } for _ in range(len(buckets))]
     for i in range(len(buckets)):
         j = len(buckets)-1 - i
         if buckets[j] != None:
@@ -40,7 +41,12 @@ def interpolate_missing_values(buckets):
 
 
 def generate_special_items_over_time_unweighted_time_series(client, experimentLabel):
-    query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, "event": "UsingSpecialItemEvent" }
+    (start_time, end_time) = get_times(client, experimentLabel)
+    query = { 
+        'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True }, 
+        'event': 'UsingSpecialItemEvent',
+        'time': { '$gte': start_time, '$lte': end_time },
+    }
     intermediary_data = list(client.epilog.data2.aggregate([
         { '$match' : query },
         { '$sort': { 'time': 1 } },
@@ -48,8 +54,7 @@ def generate_special_items_over_time_unweighted_time_series(client, experimentLa
         { '$group': { '_id' : '$player', 'events': { '$push': { 'special': '$special', 'time': { '$floor': { '$divide': ['$time', 1000] } } } } } },
     ]))
 
-    start_query = { 'experimentLabel': experimentLabel if experimentLabel != None else { '$exists': True } }
-    start_time = list(client.epilog.data2.find(start_query).sort('time', 1).limit(1))[0]['time']
+    (start_time, end_time) = get_times(client, experimentLabel)
     processed_data = {}
     for player_data in intermediary_data:
         buckets = []
@@ -64,7 +69,8 @@ def generate_special_items_over_time_unweighted_time_series(client, experimentLa
     return {
         'series': [{
             'name': UUID_MAP[player]['name'],
-            'data': processed_data[player]
+            'data': processed_data[player],
+            'color': UUID_MAP[player]['color'],
         } for player in PLAYERS],
         'categories': [idx for idx, _ in enumerate(buckets)]
     }
