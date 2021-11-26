@@ -47,10 +47,18 @@
       <img src="/img/maze.png" class="card-img-top center" alt="Maze" style="width: 80%;">
       <div class="card-body">
         <h4 class="card-title">Game Timeline Overview</h4>
-        <p class="card-text">Excluding the warmup, the game will last anywhere from 1 to 1 1⁄2 hours. The beginning of the game is expected to be slow, with players figuring out initial roles and deciding on a plan of action. A player will probably start planting seeds, another will explore the home area, and another will venture out to get a feel for the maze. Although the players will be briefed on everything during the warmup, the game is still expected to be foreign until they start getting their hands dirty.
+        <p class="card-text">Excluding the warmup, the game will last 1 hour. The beginning of the game is expected to be slow, with players figuring out initial roles and deciding on a plan of action. A player will probably start planting seeds, another will explore the home area, and another will venture out to get a feel for the maze. Although the players will be briefed on everything during the warmup, the game is still expected to be foreign until they start getting their hands dirty.
             <br><br>After a brief exploration, players will settle into a routine style of gameplay. Whatever players are allocated to be maze explorers will explore the maze, and whatever players are allocated to be resource collectors will collect resources from the home area. Once nightfall hits, players will either group up and sleep or group up in the home area to avoid dangerous night mobs.
             <br><br>About an hour into gameplay, the players should have reached a point where some or all of them can survive nights in the maze. At this point, it may be advantageous to leave the center area and only return to stock up on food.
             <br><br>There will not be any point where the game is “finished”. Once the duration we decide on has passed, the game will be over. The score of the team will be based on the number of treasures they collected.
+        </p>
+        <br>
+        <h4 class="card-title">General Data Collection</h4>
+        <p class="card-text">
+          Some events are collected right when an action takes place. Events like this include 
+          breaking blocks and attacking entities. Other events are polled by the second, including
+          player locations and potion effects. Because of this, viewers should be aware that the charts
+          and visualizations on this website are <i>approximations</i> and are not exact.
         </p>
         <br>
         <h4 class="card-title">HeapCraft</h4>
@@ -58,6 +66,80 @@
         <br>
         <h4 class="card-title">Epilog</h4>
         <p class="card-text">This is the main tool under HeapCraft, it is the primary way that data is collected. It intercepts, classifies, and logs all the player behavior events that happen on any server using it as a plugin. Epilog is the main part of the HeapCraft project and the basis for most of the work that we are going to be doing in our project.</p>
+        <br>
+        <h4 class="card-title">Mute Commentator</h4>
+        <p class="card-text">
+          Mute Commentator is the nickname we gave to our fork of Epilog. 
+          This fork included a removal of an intermediate server, a bug fix, custom events,
+          and a few experiment tools.
+        </p>
+        <p class="card-text">
+          In the original plugin, there was an intermediary server between the server and the database. 
+          Because we were planning to migrate the plugin towards a non-sql structure and were logging
+          data points straight to a local database, we decided to remove the middleman.
+        </p>
+        <p class="card-text">
+          The original author decided to push data annotation to a separate thread. This was done with 
+          the intent of making the plugin as least-intensive to the
+          tick speed as possible. However, the Bukkit api is not thread-safe (https://bukkit.fandom.com/wiki/Scheduler_Programming).
+          It seems that at some point the author recognized this, since the LogEvent originally included a seemingly
+          random copy of a block's material. The likely explanation for this property is that its value became 
+          "undefined behavior" when it was accessed from a non-main thread. To mitigate this problem, our
+          team moved the data annotation process back to the primary thread. We noticed no performance impact
+          for our small experiment setups.
+        </p>
+        <p class="card-text">
+          Instead of adding endless general-purpose properties to the different Minecraft events, we decided
+          to add some custom events to reflect how our custom map ran. We also added properties to events
+          that made sense for our map - such as annotating many events with the zone the player was in when
+          they generated it.
+          <table class="table">
+            <thead class="thead-dark">
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>  
+            </thead>
+            <tbody>
+              <tr>
+                <td>CrouchGreetingEvent</td>
+                <td>Recognizes a silly nonverbal action that players take to greet one another. When a player crouches 3 consecutive times and is looking at another player, this event is logged. The mechanism for determining this sequence was approximated and could be improved.</td>
+              </tr>
+                <tr>
+              <td>DuneBreakEvent</td>
+              <td>Recognizes when a player breaks a block of sand from the sand area of the map.</td>
+                </tr>
+              <tr>
+                <td>BarrelOpenedEvent</td>
+                <td>Recognizes when a player views the contents of a hidden barrel.</td>
+              </tr>
+              <tr>
+                <td>SolveMansionPuzzleEvent</td>
+                <td>Recognizes when a player solves a puzzle from the puzzle house. Puzzles include finding hidden barrels, finding a hidden lever, cooperating on pressure plates, and solving the pin code in the attic.</td>
+              </tr>
+              <tr>
+                <td>OreBreakEvent</td>
+                <td>Recognizes when a player mines a block of ore from the cave area of the map.</td>
+              </tr>
+              <tr>
+                <td>CollectTrophyEvent</td>
+                <td>Recognizes when a player collects a trophy from the maze.</td>
+              </tr>
+              <tr>
+                <td>VillagerTradeEvent</td>
+                <td>Recognizes when a player exchanges materials for a special item from a villager.</td>
+              </tr>
+              <tr>
+                <td>DoFarmEvent</td>
+                <td>Recognizes when a player plants or harvests a crop from the farm area of the map.</td>
+              </tr>
+              <tr>
+                <td>UsingSpecialItemEvent</td>
+                <td>Recognizes when a player is actively using a special item. Because some items are single-use and others continuous-use, the way this event was logged was once a second while an item was active. Attacking a mob with a sword would log an event for each hit, wearing armor would log an event for each second, and using the escape rope would log a single event for when it was used.</td>
+              </tr>
+            </tbody>
+          </table>
+        </p>
       </div>
       <!-- <ul class="list-group list-group-flush">
         <li class="list-group-item">An item</li>
