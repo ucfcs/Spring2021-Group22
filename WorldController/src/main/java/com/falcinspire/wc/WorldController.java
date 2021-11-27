@@ -11,6 +11,5 @@ public class WorldController extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		getCommand("maze").setExecutor(new MazeCommand(this));
-		getServer().getPluginManager().registerEvents(new SwearListener(), this);
 	}
 }
