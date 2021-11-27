@@ -11,7 +11,8 @@
     <link href="http://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <script src="/js/core.js"></script>
 
     <script src="/js/heatmap.js"></script>
@@ -19,13 +20,21 @@
     <script src="js/d3.v7.min.js"></script>
     <script src="js/d3-simple-slider.js"></script>
 
+    <script src="js/visualizations_overall.js"></script>
+    
     <script>
-
-
       $(function () {
         heatmap('heatmap/overall.csv')
       });
     </script>
+
+    <script> 
+        $(function(){
+            fetchData().then(() => {
+              renderCharts();
+            });
+        });
+    </script> 
 
   </head>
   <body>
@@ -73,6 +82,19 @@
         <h3>Heatmap</h3>
         <p>Shows entire map and how many events happened at each location. The more events that happen will turn block darker. Hovering mouse over a block shows how many events and the coordinate of the block</p>
         <div id="heatmap"></div>
+        <div id="location_spread_overall_time_series"></div><br>
+        <p>
+          Displays the average distance between all members for all teams over time. This was calculated
+          per-team by considering the average distance recorded for each player of each other player
+          each minute. Each player's average minute-distance was added and divided by the size
+          of the team (4). The calculation was done this way, instead of averaging each players
+          distance from each other together, to take advantage of the way event collection was 
+          occuring.
+        </p>
+        <div id="trophy_timeline_overall_step_chart"></div><br>
+        <p>
+          Shows the cummulative number of trophies earned each minute of the map for each team.
+        </p>
 
       </div>
       <br>

@@ -70,8 +70,8 @@ if __name__ == '__main__':
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
     
     data = [{
-        'experiment_label': team,
+        'experiment_label': 'Team ' + repr(idx+1),
         'data': generate_data(client, team)
-    } for team in ['group1', 'Team2', 'Team3', 'Team3take2', 'Team5', 'team6']];
+    } for idx, team in enumerate(['group1', 'Team2', 'Team3', 'Team3take2', 'Team5', 'team6'])];
 
     writeToFile(data, args.out if args.out != None else '../static_files/data/teams.json')
