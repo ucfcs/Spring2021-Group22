@@ -24,7 +24,7 @@ def main():
 
     print('fetching metadata')
 
-    mongo_filter = { 'experimentLabel': "Team5", 'event': 'PlayerLocationEvent' }
+    mongo_filter = { 'experimentLabel': "team6", 'event': 'PlayerLocationEvent' }
     # mongo_filter = {'event': 'PlayerLocationEvent'}
 
     for time in collection.find(mongo_filter).sort('time', pymongo.ASCENDING).limit(1):

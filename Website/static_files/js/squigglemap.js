@@ -5,11 +5,11 @@ async function squigglemap(dataPath) {
 	$("div#squigglemap").append("\
 	<div id=\"squigglemap\">\
 		<div class=\"row align-items-center\">\
-			<div class=\"col-sm-2\">\
+			<div>\
 				<p id=\"value-range\"></p>\
 				<div id=\"slider-button\"><div>\
 			</div>\
-			<div class=\"col-sm\">\
+			<div>\
 				<div id=\"slider-range\"></div>\
 			</div>\
 		</div>\
@@ -126,10 +126,10 @@ async function squigglemap(dataPath) {
 
 	let input = d3.select("div#input")
 
-	input.append("h3")
+	input.append("h5")
 		.text("Toggle Visibility of player")
-	input.append("p")
-		.text("rises to top on reshowing")
+	// input.append("p")
+	// 	.text("rises to top on reshowing")
 
 	// Select map div and set attributes
 	let map = d3.select("div#map")
@@ -214,6 +214,7 @@ async function squigglemap(dataPath) {
 			.attr("for", player.player)
 			.text(player.player)
 			.style("color", player.color)
+			.style("background-color", player.color == 'yellow' ? 'gray' : '')
 	}
 
 	function initZoom() {

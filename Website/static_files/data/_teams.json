@@ -18,5 +18,9 @@
 	"Team5": {
 		"squigglemap": "squigglemap/Team5.json",
 		"heatmap": "heatmap/Team5.csv"
+	},
+	"Team6": {
+		"squigglemap": "squigglemap/team6.json",
+		"heatmap": "heatmap/team6.csv"
 	}
 }
