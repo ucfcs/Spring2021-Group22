@@ -54,10 +54,10 @@ async function heatmap(dataPath) {
 
 
 
-	// Select map div and set attributes
+	// // Select map div and set attributes
 	let map = d3.select("div#heatmap")
-		.style("width", width + "px")
-		.style("height", height + "px")
+	// 	.style("width", width + "px")
+	// 	.style("height", height + "px")
 
 	// create base svg
 	let _svg = map
@@ -107,7 +107,7 @@ async function heatmap(dataPath) {
 		}
 		const mousemove = function (event, d) {
 			tooltip
-				.html(`The exact value of<br>this cell is: ${d.count} at ${d.x}, ${d.y}`)
+				.html(`${d.count} events happened at block x:${d.x} y:${d.y}`)
 		}
 		const mouseleave = function (event, d) {
 			tooltip
@@ -126,7 +126,7 @@ async function heatmap(dataPath) {
 			.attr("y", function (d) { return coord(0, d.y)[1] - 0.5 })
 			.attr("width", `${SCALE}px`)
 			.attr("height", `${SCALE}px`)
-			.style("fill", function (d) { return rgb2hex(hsv2rgb(scale(d.count, 0, max, 0.2, 0.8), 0.8, 0.8)) })
+			.style("fill", function (d) { return rgb2hex(hsv2rgb(scale(d.count, 0, max, 0.2, 0.6), 0.8, 0.8)) })
 			.style("opacity", 0.8)
 			.on("mouseover", mouseover)
 			.on("mousemove", mousemove)

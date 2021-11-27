@@ -72,6 +72,9 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/visualization.html">Chart Visualizations</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/overalldata.html">Overall Data</a>
+            </li>
           </ul>
           <!-- <form class="d-flex">
             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -87,33 +90,16 @@
 
       <!-- <img src="..." class="card-img-top" alt="..."> -->
       <div class="card-body">
-        <h5 class="card-title">Team 3 Experimental Charts and Visualizations</h5>
+        <h5 class="card-title">Map Visualizations</h5>
         <div id="team-select"></div>
         <hr>
-        <p>Squigglemap</p>
-
-        <div id="squigglemap">
-          <div class="row align-items-center">
-            <div class="col-sm-2">
-              <p id="value-range"></p>
-              <div id="slider-button"></div>
-            </div>
-            <div class="col-sm">
-              <div id="slider-range"></div>
-            </div>
-          </div>
-        
-          <div id="map"></div>
-        
-          <div id="input"></div>
-        </div>
-
+        <h3>Squigglemap</h3>
+        <p>Shows player movements over entire run. Slider can be dragged to show a slice of time. Play button will animate time to show entire expirement in one minute</p>
+        <div id="squigglemap"></div>
         <hr>
-        <p>Heatmap</p>
-        <div id="heatmap">
-          <div id="heatmap_map"></div>
-          <div id="heatmap_tooltip"></div>
-        </div>
+        <h3>Heatmap</h3>
+        <p>Shows entire map and how many events happened at each location. The more events that happen will turn block darker. Hovering mouse over a block shows how many events and the coordinate of the block</p>
+        <div id="heatmap"></div>
 
       </div>
       <br>

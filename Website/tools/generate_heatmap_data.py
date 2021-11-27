@@ -40,7 +40,7 @@ def main():
     data = defaultdict(def_value)
 
     index = 0
-    for doc in collection.find({'experimentLabel': "Team5", 'x': {'$exists': True}, 'y': {'$exists': True}, 'z': {'$exists': True}}).sort('time', pymongo.ASCENDING):
+    for doc in collection.find({ 'experimentLabel': "team6",'x': {'$exists': True}, 'y': {'$exists': True}, 'z': {'$exists': True}}).sort('time', pymongo.ASCENDING):
         printProgressBar(index, doc_count, prefix='Progress:',
                          suffix='Complete', length=50)
         index = index + 1
