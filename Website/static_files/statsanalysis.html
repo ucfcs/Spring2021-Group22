@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Statistics Analysis</title>
+    <link type="text/css" rel="stylesheet" href="/styles.css">
+    <link href="http://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <!-- <a class="navbar-brand" id="title-style" href="#">Measuring Collaboration in Minecraft&nbsp;&nbsp;&nbsp;&nbsp;</a> -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/collection.html">Data Collection</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/mapvisualization.html">Map Visualizations</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/visualization.html">Chart Visualizations</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/overalldata.html">Overall Data</a>
+            </li>
+          </ul>
+          <!-- <form class="d-flex">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form> -->
+        </div>
+      </div>
+    </nav>
+    <br><br>
+    <h1 id="title-style" class="col text-center">Statistics Analysis</h1>
+    <br>
+    <div class="card center" style="width: 70%;">
+      <img src="/img/maze.png" class="card-img-top center" alt="Maze" style="width: 80%;">
+      <div class="card-body">
+        <h4 class="card-title">Process of Analysis</h4>
+        <p class="card-text">
+            To begin with the analysis, we uploaded a json file with the data of all events recorded across all the groups we ran into a Google Colab file. We converted the json file into a Pandas DataFrame in order to more easily perform exploratory data analysis. We then dropped events that were not useful towards the collaboration between players, such as events recording player velocity or using beds (which we removed in later runs to avoid confusion). We also removed events caused by non particpants, which MuteCommentator mistakingly picked up.
+            <br><br>
+            Once the events were separated, the player IDs and team labels were label encoded so that we could use those for the in the correlation matrix to help determine which events seemed to be most related with a team or player's success in finding trophies. We also recorded the different entiteis involved with Player damage events in order to differentiate between damage interactions between players and monsters and animals. The columns from the original DataFrame would not work with a correlation matrix as they were, so we created a new DataFrame that would works better with the information gained from the different events.
+            <br><br>
+            With this new DataFrame, we were able to develop a correlation matrix that shows how correlated different events were with each other. Dark boxes represent little correlation, while the brighter boxes represent high positive or negative correlation, depending on the color. The rows that were of most interest to our research were the bottom 2 rows, which represent trophies collected per player and per group. 
+            <br><br>
+            From the matrix we created, it seems that groups that obtained the most trophies tended to complete mansion puzzles, avoid attacking each other, mine ores, trade with villagers, and attack monsters. Players that collected more trophies tended to fight monsters, complete mansion puzzles, and send more messages, although these levels of correlation were much lower than the group levels of correlation.
+        </p>
+        <br>
+        <img src="/img/corrmatx.png">
+        <p><a href="https://colab.research.google.com/drive/1BXcYGYRt20L3u8wBgjASx-9hIoakK07c?usp=sharing">Colab Notebook</a></p>
+
+
+      </div>
+      <!-- <ul class="list-group list-group-flush">
+        <li class="list-group-item">An item</li>
+        <li class="list-group-item">A second item</li>
+        <li class="list-group-item">A third item</li>
+      </ul>
+      <div class="card-body">
+        <a href="#" class="card-link">Card link</a>
+        <a href="#" class="card-link">Another link</a>
+      </div> -->
+    </div>
+    <br><br>
+    <nav class="navbar bottom navbar-light bg-light">
+        <div class="container-fluid">
+            <img src="/img/ucflogo.png" alt="UCF" style="width: 7rem;">&nbsp;&nbsp;&nbsp;<br>
+            <div><b>Researchers</b> : Eshika Sahay, Ryan Glaspey, Joshua Kraftchick, Andres Velazquez</div>
+          <div><b>Contact</b> : Dr. Gita Sukthankar (<a href="mailto:gitars@eecs.ucf.edu">gitars@eecs.ucf.edu</a>)</div>
+        </div>
+      </nav>
+  </body>
+</html>
