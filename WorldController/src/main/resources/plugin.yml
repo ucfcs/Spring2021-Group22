@@ -1,9 +1,0 @@
-name: WorldController
-main: com.falcinspire.wc.WorldController
-version: 0.0.1-dev
-author: GoldTeam
-
-commands:
-  maze:
-    description: Generate a maze from a .png file
-    usage: /maze <name.png>
