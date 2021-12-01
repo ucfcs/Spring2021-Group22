@@ -31,6 +31,7 @@
           button = $("<button>" + team + "</button>");
           button.click(function () {
             loadVis(data.squigglemap, data.heatmap)
+            $('#selected-team').html(team)
           });
           element.append(button)
         }
@@ -93,6 +94,7 @@
         <h5 class="card-title col text-center"><b>Map Visualizations</b></h5>
         <div class="col text-center">
           <div id="team-select"></div>
+          <div><p id="selected-team">Team 1</p></div>
         </div>
         <hr>
         <h3>Squigglemap</h3>
