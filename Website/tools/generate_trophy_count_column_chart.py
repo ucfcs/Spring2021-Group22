@@ -35,6 +35,6 @@ def generate_trophy_count_column_chart(client, experimentLabel):
                 'data': [next((data['total'] for data in intermediary_data if data['_id'] == player), 0) for player in PLAYERS]
             }
         ],
-        'categories': [UUID_MAP[data['_id']]['name'] for data in intermediary_data],
-        'colors': [UUID_MAP[data['_id']]['color'] for data in intermediary_data],
+        'categories': [UUID_MAP[player]['name'] for player in PLAYERS],
+        'colors': [UUID_MAP[player]['color'] for player in PLAYERS],
     }

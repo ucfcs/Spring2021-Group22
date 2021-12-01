@@ -22,7 +22,7 @@ if __name__ == '__main__':
         print('Please add MONGO_URI to your environment variables before using this utility');
         exit(0);
 
-    RECORD_PERIOD_IN_SECONDS = 10
+    RECORD_PERIOD_IN_SECONDS = 60
 
     mongo_connection_uri = os.environ.get(MONGO_URI);
     client = pymongo.MongoClient(mongo_connection_uri, serverSelectionTimeoutMS=5000)
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         { '$project': { 'experimentLabel': 1, 'time': { '$floor': { '$divide': ['$time', RECORD_PERIOD_IN_SECONDS*1000] } } } },
         { '$sort' : { 'time': 1 } },
         { '$group': { '_id': '$time', 'total': { '$sum': 1 }, 'labels': { '$push': '$experimentLabel' } }}
-    ]))
+    ], allowDiskUse=True))
     min_time = min((int(data['_id']) for data in results))
     max_time = max((int(data['_id']) for data in results))
     last_real_data_time = min_time
