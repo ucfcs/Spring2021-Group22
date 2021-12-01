@@ -1,3 +1,6 @@
+# Gets a list of all teams then calls generate_heatmap_data for each team
+# also does it for all teams in one csv
+
 import pymongo
 from dotenv import load_dotenv
 import os

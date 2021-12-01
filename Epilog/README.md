@@ -11,3 +11,7 @@ Modified from [source](https://github.com/stepmuel/epilog) by UCF Senior Design 
 Major Changes
 
 Removed updater
+
+Log to mongodb
+
+added custom events to corespond to custom map

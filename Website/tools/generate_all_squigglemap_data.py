@@ -1,3 +1,5 @@
+# Gets a list of all teams then calls generate_squigglemap_data for each team
+
 import pymongo
 from dotenv import load_dotenv
 import os

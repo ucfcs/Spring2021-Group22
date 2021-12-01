@@ -1,3 +1,7 @@
+# Generates a csv file of all of the data associated with a single team for the heat map
+# Call by running `python generate_heapmap_data.py team`
+# Where team is the experimentLabel associated with the team
+
 import pymongo
 from dotenv import load_dotenv
 import os
