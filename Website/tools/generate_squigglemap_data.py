@@ -1,34 +1,31 @@
 import pymongo
 from dotenv import load_dotenv
-import argparse
 import os
-import json
 import math
 import ssl
+import sys
 
-from pymongo.message import MAX_INT32, MIN_INT32
-from bson.json_util import dumps, loads
+from utils import printProgressBar, writeToFile
 
 time_offset = True
 
 load_dotenv()
 
-
-def main():
+def main(argv):
+    team = argv[0]
 
     print('Connecting to Mongo')
 
     client = pymongo.MongoClient(
         os.getenv('MONGO_URI'), ssl_cert_reqs=ssl.CERT_NONE)
-    collection = client.epilog.test
+    collection = client.epilog.data
 
     print('fetching metadata')
 
-    mongo_filter = { 'experimentLabel': "team6", 'event': 'PlayerLocationEvent' }
+    mongo_filter = { 'experimentLabel': team, 'event': 'PlayerLocationEvent' }
     # mongo_filter = {'event': 'PlayerLocationEvent'}
 
     for time in collection.find(mongo_filter).sort('time', pymongo.ASCENDING).limit(1):
-        print(time)
         _time = math.floor(time['time'] / 1000)
         if time_offset:
             _time_offset = _time
@@ -36,15 +33,10 @@ def main():
         else:
             min_time = _time
     for time in collection.find(mongo_filter).sort('time', pymongo.DESCENDING).limit(1):
-        print(time)
-
         if time_offset:
             max_time = math.floor(time['time'] / 1000) - _time_offset
         else:
             max_time = math.floor(time['time'] / 1000)
-
-    print(min_time)
-    print(max_time)
 
     doc_count = collection.estimated_document_count()
 
@@ -81,47 +73,9 @@ def main():
     print('')
 
     print('Writing data to file')
-    writeToFile(data, 'squigglemap', 'json')
+    writeToFile(data, team, 'json')
 
     return 0
 
-# write to file and increment file name if it already exists
-
-
-def writeToFile(data, filename, extension='json'):
-    i = 0
-    istr = ''
-    while os.path.exists(f'{filename}{istr}.{extension}'):
-        i += 1
-        istr = str(i)
-
-    with open(f'{filename}{istr}.{extension}', 'w') as outfile:
-        json.dump(data, outfile)
-
-
-# Print iterations progress
-def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd='\r'):
-    '''
-    Call in a loop to create terminal progress bar
-    @params:
-        iteration   - Required  : current iteration (Int)
-        total       - Required  : total iterations (Int)
-        prefix      - Optional  : prefix string (Str)
-        suffix      - Optional  : suffix string (Str)
-        decimals    - Optional  : positive number of decimals in percent complete (Int)
-        length      - Optional  : character length of bar (Int)
-        fill        - Optional  : bar fill character (Str)
-        printEnd    - Optional  : end character (e.g. '\r', '\r\n') (Str)
-    '''
-    percent = ('{0:.' + str(decimals) + 'f}').format(100 *
-                                                     (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
-    # Print New Line on Complete
-    if iteration == total:
-        print()
-
-
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
