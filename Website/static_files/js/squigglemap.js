@@ -115,8 +115,8 @@ async function squigglemap(dataPath) {
 	// Create simple play animation
 	const timer = ms => new Promise(res => setTimeout(res, ms))
 	const onPlay = async () => {
-		let space = Math.floor((_maxTime - _minTime) / 200)
-		for (i = 0; i < 200; i++) {
+		let space = Math.floor((_maxTime - _minTime) / 255)
+		for (i = 0; i < 250; i++) {
 			sliderRange.value([space * i, space * (i + 5)])
 			generateData(space * i, space * (i + 5))
 			drawPlayers(data)
