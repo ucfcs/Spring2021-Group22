@@ -591,6 +591,26 @@ function renderZoneTimelineChart(elements, data) {
   currentCharts.push(achart)
 }
 
+function renderDeathTimelineStepChart(elements, data) {
+  const element = elements[0]
+  const options = {
+    title: {
+      text: 'Cumulative Deaths by Minute',
+    },
+    chart: {
+      type: 'line',
+    },
+    stroke: {
+      curve: 'stepline',
+    },
+    series: data.series,
+  }
+
+  const achart = new ApexCharts(element, options)
+  achart.render()
+  currentCharts.push(achart)
+}
+
 function renderTrophyTimelineStepChart(elements, data) {
   const element = elements[0]
   const options = {
@@ -700,6 +720,10 @@ function renderCharts(experimentLabel) {
   renderZoneTimelineChart(
     [document.getElementById('zone_timeline_chart')],
     chartSource.zone_timeline_chart
+  )
+  renderDeathTimelineStepChart(
+    [document.getElementById('death_timeline_step_chart')],
+    chartSource.death_timeline_step_chart
   )
   renderTrophyTimelineStepChart(
     [document.getElementById('trophy_timeline_step_chart')],

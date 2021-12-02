@@ -3,6 +3,7 @@ import argparse
 from dotenv import load_dotenv
 import os
 import json
+from generate_death_timeline_step_chart import generate_death_timeline_step_chart
 from generate_chat_content_column_chart import generate_chat_content_column_chart
 from generate_chat_count_column_chart import generate_chat_count_column_chart
 from generate_distance_from_center_by_player_time_series import generate_distance_from_center_by_player_time_series
@@ -50,6 +51,7 @@ def generate_data(client, experiment_label):
             'total_distance_column_chart': generate_total_distance_column_chart(client, experiment_label),
             'trophy_count_column_chart': generate_trophy_count_column_chart(client, experiment_label),
             'zone_timeline_chart': generate_zone_timeline_chart(client, experiment_label),
+            'death_timeline_step_chart': generate_death_timeline_step_chart(client, experiment_label),
             'trophy_timeline_step_chart': generate_trophy_timeline_step_chart(client, experiment_label),
         };
     
