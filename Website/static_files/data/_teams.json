@@ -1,25 +1,25 @@
 {
-	"Team1": {
+	"Team 1": {
 		"squigglemap": "squigglemap/group1.json",
 		"heatmap": "heatmap/group1.csv"
 	},
-	"Team2": {
+	"Team 2": {
 		"squigglemap": "squigglemap/Team2.json",
 		"heatmap": "heatmap/Team2.csv"
 	},
-	"Team3": {
+	"Team 3": {
 		"squigglemap": "squigglemap/Team3.json",
 		"heatmap": "heatmap/Team3.csv"
 	},
-	"Team4": {
+	"Team 4": {
 		"squigglemap": "squigglemap/Team3take2.json",
 		"heatmap": "heatmap/Team3take2.csv"
 	},
-	"Team5": {
+	"Team 5": {
 		"squigglemap": "squigglemap/Team5.json",
 		"heatmap": "heatmap/Team5.csv"
 	},
-	"Team6": {
+	"Team 6": {
 		"squigglemap": "squigglemap/team6.json",
 		"heatmap": "heatmap/team6.csv"
 	}
