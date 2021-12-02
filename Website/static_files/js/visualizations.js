@@ -632,6 +632,7 @@ function renderTrophyTimelineStepChart(elements, data) {
 }
 
 function renderCharts(experimentLabel) {
+  $('#selected-team').html(experimentLabel)
   for (let chart of currentCharts) {
     chart.destroy()
   }

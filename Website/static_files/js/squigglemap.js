@@ -147,7 +147,7 @@ async function squigglemap(dataPath) {
 	let image = svg.append("image")
 		.attr("width", width + "px")
 		.attr("height", height + "px")
-		.attr("xlink:href", "/img/highresmap.png")
+		.attr("xlink:href", "/img/map.png")
 
 	let heatmap = svg.append("g").attr("id", 'heatmap')
 

@@ -70,7 +70,7 @@ async function heatmap(dataPath) {
 	let image = svg.append("image")
 		.attr("width", width + "px")
 		.attr("height", height + "px")
-		.attr("xlink:href", "/img/highresmap.png")
+		.attr("xlink:href", "/img/map.png")
 
 	// Create square that is able to be placed under selected cell as outline
 	// weird issues trying to use css outline on elements that are only a few pixels in size
