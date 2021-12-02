@@ -603,6 +603,11 @@ function renderDeathTimelineStepChart(elements, data) {
     stroke: {
       curve: 'stepline',
     },
+    tooltip: {
+      y: {
+        formatter: roundFormatter
+      }
+    },
     series: data.series,
   }
 
