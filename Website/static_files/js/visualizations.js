@@ -90,46 +90,6 @@ function renderChatCountColumnChart(elements, data) {
   currentCharts.push(achart)
 }
 
-function renderDistanceFromCenterByPlayerTimeSeries(elements, data) {
-  const element = elements[0]
-  const options = {
-    series: data.series,
-    chart: {
-      height: 350,
-      type: 'line',
-      zoom: {
-        enabled: false,
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    stroke: {
-      curve: 'straight',
-    },
-    title: {
-      text: 'Average Distance From Center By Player Over Time',
-      align: 'left',
-    },
-    grid: {
-      row: {
-        colors: ['#f3f3f3', 'transparent'],
-        opacity: 0.5,
-      },
-    },
-    xaxis: {
-      categories: data.categories,
-    },
-    yaxis: {
-      decimalsInFloat: 2,
-    },
-  }
-
-  const achart = new ApexCharts(element, options)
-  achart.render()
-  currentCharts.push(achart)
-}
-
 function renderDiversityOfLaborByEventPieCharts(elements, data) {
   for (let i = 0; i < data.charts.length; i++) {
     const element = elements[i]
@@ -222,6 +182,46 @@ function renderEntityDamageInteractionsColumnChart(elements, data) {
   currentCharts.push(achart)
 }
 
+function renderLocationSpreadTimeSeries(elements, data) {
+  const element = elements[0]
+  const options = {
+    series: data.series,
+    chart: {
+      height: 350,
+      type: 'line',
+      zoom: {
+        enabled: false,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: 'straight',
+    },
+    title: {
+      text: 'Average Distance Between All Players Over Time',
+      align: 'left',
+    },
+    grid: {
+      row: {
+        colors: ['#f3f3f3', 'transparent'],
+        opacity: 0.5,
+      },
+    },
+    xaxis: {
+      categories: data.categories,
+    },
+    yaxis: {
+      decimalsInFloat: 2,
+    },
+  }
+
+  const achart = new ApexCharts(element, options)
+  achart.render()
+  currentCharts.push(achart)
+}
+
 function renderLocationSpreadByPlayerTimeSeries(elements, data) {
   const element = elements[0]
   const options = {
@@ -262,7 +262,7 @@ function renderLocationSpreadByPlayerTimeSeries(elements, data) {
   currentCharts.push(achart)
 }
 
-function renderLocationSpreadTimeSeries(elements, data) {
+function renderDistanceFromCenterByPlayerTimeSeries(elements, data) {
   const element = elements[0]
   const options = {
     series: data.series,
@@ -280,7 +280,7 @@ function renderLocationSpreadTimeSeries(elements, data) {
       curve: 'straight',
     },
     title: {
-      text: 'Average Distance Between All Players Over Time',
+      text: 'Average Distance From Center By Player Over Time',
       align: 'left',
     },
     grid: {
@@ -654,10 +654,6 @@ function renderCharts(experimentLabel) {
     [document.getElementById('chat_count_column_chart')],
     chartSource.chat_count_column_chart
   )
-  renderDistanceFromCenterByPlayerTimeSeries(
-    [document.getElementById('distance_from_center_by_player_time_series')],
-    chartSource.distance_from_center_by_player_time_series
-  )
   renderDiversityOfLaborByEventPieCharts(
     [
       document.getElementById('diversity_of_labor_by_event_pie_charts_1'),
@@ -678,13 +674,17 @@ function renderCharts(experimentLabel) {
     [document.getElementById('entity_damage_interactions_column_chart')],
     chartSource.entity_damage_interactions_column_chart
   )
+  renderLocationSpreadTimeSeries(
+    [document.getElementById('location_spread_time_series')],
+    chartSource.location_spread_time_series
+  )
   renderLocationSpreadByPlayerTimeSeries(
     [document.getElementById('location_spread_by_player_time_series')],
     chartSource.location_spread_by_player_time_series
   )
-  renderLocationSpreadTimeSeries(
-    [document.getElementById('location_spread_time_series')],
-    chartSource.location_spread_time_series
+  renderDistanceFromCenterByPlayerTimeSeries(
+    [document.getElementById('distance_from_center_by_player_time_series')],
+    chartSource.distance_from_center_by_player_time_series
   )
   renderPercentDuplicateLocationColumnChart(
     [document.getElementById('percent_duplicate_location_column_chart')],
